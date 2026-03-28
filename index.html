@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuickForm — 让大模型生成的交互网页也能回收数据</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="images/fonts.css" rel="stylesheet">
 <style>
 /* === RESET & VARIABLES === */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -642,7 +640,7 @@ img { max-width: 100%; display: block; }
 <!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge">AI原生教育工具 · 开源免费</div>
+    <div class="hero-badge">AI原生教育工具 · 开源免费 · 四步极简上手</div>
     <h1 class="hero-title">QuickForm</h1>
     <p class="hero-subtitle">让大模型生成的交互网页<br>也能回收数据</p>
     <p class="hero-slogan">努力打通AI赋能教育的"最后一公里"</p>
@@ -652,20 +650,20 @@ img { max-width: 100%; display: block; }
     </div>
     <div class="hero-stats">
       <div class="stat-item">
-        <div class="stat-num">1000+</div>
+        <div class="stat-num" data-key="schools">0</div>
+        <div class="stat-label">学校单位</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-key="users">0</div>
         <div class="stat-label">注册教师</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">4 步</div>
-        <div class="stat-label">极简上手</div>
+        <div class="stat-num" data-key="tasks">0</div>
+        <div class="stat-label">数据任务</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">2 天</div>
-        <div class="stat-label">AI开发完成</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">100%</div>
-        <div class="stat-label">免费开源</div>
+        <div class="stat-num" data-key="submissions">0</div>
+        <div class="stat-label">回收数据</div>
       </div>
     </div>
   </div>
@@ -952,7 +950,7 @@ img { max-width: 100%; display: block; }
         <div class="timeline-item">
           <div class="date">2025 年 11 月 1 日</div>
           <h4>QuickForm 诞生</h4>
-          <p>一个周六，谢作如打开 Trae（字节跳动编程工具），输入了一段需求描述。两天时间，QuickForm 原型诞生。名字也是 AI 取的。</p>
+          <p>一个周六的晚上，谢作如打开 Trae（字节跳动编程工具），输入了一段需求描述。两天时间，QuickForm 原型诞生。名字也是 AI 取的。</p>
         </div>
         <div class="timeline-item">
           <div class="date">2025 年 11 月</div>
@@ -1042,8 +1040,8 @@ img { max-width: 100%; display: block; }
       </div>
       <div class="footer-col">
         <h4>联系我们</h4>
-        <a href="/cdn-cgi/l/email-protection#c6a4a3a1afa8a8a3b4a0acb186f7f0f5e8a5a9ab">方建文：<span class="__cf_email__" data-cfemail="2a484f4d4344444f584c405d6a1b1c1904494547">[email&#160;protected]</span></a>
-        <a href="/cdn-cgi/l/email-protection#754d464641444d453504045b161a18">谢作如：<span class="__cf_email__" data-cfemail="f6cec5c5c2c7cec6b68787d895999b">[email&#160;protected]</span></a>
+        <a href="mailto:beginnerfjw@163.com">方建文：beginnerfjw@163.com</a>
+        <a href="mailto:8334180@qq.com">谢作如：8334180@qq.com</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -1101,18 +1099,57 @@ const animateNum = (el, target, suffix = '') => {
   requestAnimationFrame(step);
 };
 
-const statsObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const nums = entry.target.querySelectorAll('.stat-num');
-      nums[0] && animateNum(nums[0], 1000, '+');
-      statsObserver.unobserve(entry.target);
+// 存储当前统计数据
+let currentStats = {};
+
+// 从API获取统计数据
+const fetchStats = async () => {
+  try {
+    const response = await fetch('https://quickform.cn/api/stats/overview');
+    if (!response.ok) throw new Error('Network response was not ok');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch stats:', error);
+    return null;
+  }
+};
+
+// 更新显示的数字（仅当数据变化时）
+const updateStatsDisplay = (newData) => {
+  const nums = document.querySelectorAll('.stat-num');
+  nums.forEach((num) => {
+    const key = num.getAttribute('data-key');
+    if (key && newData[key] !== undefined) {
+      const newValue = newData[key];
+      const oldValue = currentStats[key] || 0;
+      // 仅当数据变化时才更新
+      if (newValue !== oldValue) {
+        animateNum(num, newValue, '');
+      }
     }
   });
-}, { threshold: 0.5 });
+  currentStats = { ...newData };
+};
 
-const heroStats = document.querySelector('.hero-stats');
-if (heroStats) statsObserver.observe(heroStats);
+// 初始加载和定时更新
+const initStats = async () => {
+  const data = await fetchStats();
+  if (data) {
+    updateStatsDisplay(data);
+  }
+};
+
+// 页面加载时立即获取数据
+initStats();
+
+// 每5秒更新一次
+setInterval(async () => {
+  const data = await fetchStats();
+  if (data) {
+    updateStatsDisplay(data);
+  }
+}, 5000);
 
 // Island float animation
 document.querySelectorAll('.island').forEach((el, i) => {

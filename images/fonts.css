@@ -1,0 +1,119 @@
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(notosanssc-300.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(notosanssc-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(notosanssc-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(notosanssc-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(notosanssc-700.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(notoserifsc-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(notoserifsc-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(notoserifsc-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(notoserifsc-700.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(notoserifsc-900.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(outfit-300.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(outfit-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(outfit-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(outfit-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(outfit-700.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(outfit-800.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(outfit-900.ttf) format('truetype');
+}
