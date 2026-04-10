@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuickForm — 让大模型生成的交互网页也能回收数据</title>
 <link href="images/fonts.css" rel="stylesheet">
+<script src="languages.js"></script>
 <style>
 /* === RESET & VARIABLES === */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,12 +72,43 @@ nav .logo {
   background-clip: text;
 }
 nav .logo span { font-weight: 400; opacity: 0.5; -webkit-text-fill-color: var(--ink-muted); margin-left: 8px; font-size: 0.8rem; }
-nav .nav-links { display: flex; gap: 28px; align-items: center; }
+nav .nav-links {
+  display: flex; gap: 28px; align-items: center;
+}
 nav .nav-links a {
   font-size: 0.85rem; font-weight: 500; color: var(--ink-light);
   transition: color 0.2s; position: relative;
 }
 nav .nav-links a:hover { color: var(--accent-teal); }
+nav .lang-switcher {
+  display: flex; gap: 8px; align-items: center;
+  margin-left: 20px;
+}
+nav .lang-switcher button {
+  background: none; border: 1px solid var(--card-border);
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--ink-light); cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  font-family: var(--font-body);
+  position: relative;
+  overflow: hidden;
+}
+nav .lang-switcher button:hover {
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+  transform: translateY(-1px);
+}
+nav .lang-switcher button.active {
+  background: var(--accent-teal);
+  color: white;
+  border-color: var(--accent-teal);
+  box-shadow: 0 2px 8px rgba(13,148,136,0.3);
+}
+nav .lang-switcher button.active:hover {
+  background: var(--accent-teal-light);
+  border-color: var(--accent-teal-light);
+}
 nav .nav-cta {
   background: var(--ink); color: var(--cream); font-size: 0.8rem;
   padding: 8px 20px; border-radius: 100px; font-weight: 600;
@@ -86,7 +118,16 @@ nav .nav-cta {
 nav .nav-cta:hover { background: var(--accent-teal); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(13,148,136,0.3); }
 
 @media (max-width: 768px) {
-  nav .nav-links { display: none; }
+  nav .nav-links {
+    display: none;
+  }
+  nav .lang-switcher {
+    margin-left: 0;
+  }
+  nav .lang-switcher button {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
 }
 
 /* === HERO === */
@@ -633,6 +674,11 @@ img { max-width: 100%; display: block; }
     <a href="#cases">应用案例</a>
     <a href="#versions">版本</a>
     <a href="#story">故事</a>
+    <div class="lang-switcher">
+      <button data-lang="zh" class="active">中文</button>
+      <button data-lang="en">English</button>
+      <button data-lang="zh_tw">繁體</button>
+    </div>
     <a href="https://quickform.cn" target="_blank"><button class="nav-cta">访问平台 →</button></a>
   </div>
 </nav>
@@ -640,30 +686,30 @@ img { max-width: 100%; display: block; }
 <!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge">AI原生教育工具 · 开源免费 · 四步极简上手</div>
+    <div class="hero-badge" data-key="hero.badge">AI原生教育工具 · 开源免费 · 四步极简上手</div>
     <h1 class="hero-title">QuickForm</h1>
-    <p class="hero-subtitle">让大模型生成的交互网页<br>也能回收数据</p>
-    <p class="hero-slogan">努力打通AI赋能教育的"最后一公里"</p>
+    <p class="hero-subtitle" data-key="hero.subtitle">让大模型生成的交互网页<br>也能回收数据</p>
+    <p class="hero-slogan" data-key="hero.slogan">努力打通AI赋能教育的"最后一公里"</p>
     <div class="hero-actions">
-      <a href="https://quickform.cn" target="_blank"><button class="btn-primary">开始使用 QuickForm →</button></a>
-      <a href="https://quickform.readthedocs.io/" target="_blank"><button class="btn-secondary">📖 查看文档</button></a>
+      <a href="https://quickform.cn" target="_blank"><button class="btn-primary" data-key="hero.actions.primary">开始使用 QuickForm →</button></a>
+      <a href="https://quickform.readthedocs.io/" target="_blank"><button class="btn-secondary" data-key="hero.actions.secondary">📖 查看文档</button></a>
     </div>
     <div class="hero-stats">
       <div class="stat-item">
         <div class="stat-num" data-key="schools">0</div>
-        <div class="stat-label">学校单位</div>
+        <div class="stat-label" data-key="hero.stats.schools">学校单位</div>
       </div>
       <div class="stat-item">
         <div class="stat-num" data-key="users">0</div>
-        <div class="stat-label">注册教师</div>
+        <div class="stat-label" data-key="hero.stats.users">注册教师</div>
       </div>
       <div class="stat-item">
         <div class="stat-num" data-key="tasks">0</div>
-        <div class="stat-label">数据任务</div>
+        <div class="stat-label" data-key="hero.stats.tasks">数据任务</div>
       </div>
       <div class="stat-item">
         <div class="stat-num" data-key="submissions">0</div>
-        <div class="stat-label">回收数据</div>
+        <div class="stat-label" data-key="hero.stats.submissions">回收数据</div>
       </div>
     </div>
   </div>
@@ -672,62 +718,62 @@ img { max-width: 100%; display: block; }
 <!-- PROBLEM -->
 <section id="problem">
   <div class="container">
-    <div class="section-label reveal">问题</div>
-    <h2 class="section-heading reveal">交互网页虽然精彩<br>但数据却是一座座"孤岛"</h2>
-    <p class="section-desc reveal">教师借助 DeepSeek、GPT 等大模型可以快速生成课堂点名工具、单词连连看、物理实验模拟等精美交互网页。然而，学生的每一次点击、每一个选择，这些有价值的数据都停留在本地，无法自动汇聚到教师手中。</p>
+    <div class="section-label reveal" data-key="problem.label">问题</div>
+    <h2 class="section-heading reveal" data-key="problem.heading">交互网页虽然精彩<br>但数据却是一座座"孤岛"</h2>
+    <p class="section-desc reveal" data-key="problem.desc">教师借助 DeepSeek、GPT 等大模型可以快速生成课堂点名工具、单词连连看、物理实验模拟等精美交互网页。然而，学生的每一次点击、每一个选择，这些有价值的数据都停留在本地，无法自动汇聚到教师手中。</p>
     <div class="problem-grid">
       <div class="problem-visual reveal">
         <div class="data-islands">
           <div class="island">
             <div class="island-icon">🎯</div>
-            <div class="island-name">课堂点名</div>
-            <div class="island-data">32条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[0].name">课堂点名</div>
+            <div class="island-data" data-key="problem.islands[0].data">32条数据</div>
+            <div class="island-status" data-key="problem.islands[0].status">⚠ 无法回收</div>
           </div>
           <div class="island">
             <div class="island-icon">🔤</div>
-            <div class="island-name">单词连连看</div>
-            <div class="island-data">128条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[1].name">单词连连看</div>
+            <div class="island-data" data-key="problem.islands[1].data">128条数据</div>
+            <div class="island-status" data-key="problem.islands[1].status">⚠ 无法回收</div>
           </div>
           <div class="island">
             <div class="island-icon">⚗️</div>
-            <div class="island-name">化学实验</div>
-            <div class="island-data">67条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[2].name">化学实验</div>
+            <div class="island-data" data-key="problem.islands[2].data">67条数据</div>
+            <div class="island-status" data-key="problem.islands[2].status">⚠ 无法回收</div>
           </div>
           <div class="island">
             <div class="island-icon">📊</div>
-            <div class="island-name">在线测验</div>
-            <div class="island-data">256条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[3].name">在线测验</div>
+            <div class="island-data" data-key="problem.islands[3].data">256条数据</div>
+            <div class="island-status" data-key="problem.islands[3].status">⚠ 无法回收</div>
           </div>
           <div class="island">
             <div class="island-icon">🔬</div>
-            <div class="island-name">物理模拟</div>
-            <div class="island-data">89条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[4].name">物理模拟</div>
+            <div class="island-data" data-key="problem.islands[4].data">89条数据</div>
+            <div class="island-status" data-key="problem.islands[4].status">⚠ 无法回收</div>
           </div>
           <div class="island">
             <div class="island-icon">📝</div>
-            <div class="island-name">互动问答</div>
-            <div class="island-data">45条数据</div>
-            <div class="island-status">⚠ 无法回收</div>
+            <div class="island-name" data-key="problem.islands[5].name">互动问答</div>
+            <div class="island-data" data-key="problem.islands[5].data">45条数据</div>
+            <div class="island-status" data-key="problem.islands[5].status">⚠ 无法回收</div>
           </div>
         </div>
       </div>
       <div class="problem-cards">
         <div class="problem-card reveal">
-          <h4><span class="p-icon red">🏝️</span>数据孤岛</h4>
-          <p>每个AI生成的交互网页都是独立的"数据孤岛"，学生在前端的操作数据停留在本地浏览器，教师无法了解学生的真实使用情况。</p>
+          <h4><span class="p-icon red">🏝️</span><span data-key="problem.cards[0].title">数据孤岛</span></h4>
+          <p data-key="problem.cards[0].desc">每个AI生成的交互网页都是独立的"数据孤岛"，学生在前端的操作数据停留在本地浏览器，教师无法了解学生的真实使用情况。</p>
         </div>
         <div class="problem-card reveal reveal-delay-1">
-          <h4><span class="p-icon amber">🚧</span>技术门槛过高</h4>
-          <p>要实现数据回收，通常需要教师具备后端开发能力，自行搭建服务器和数据库。这对大多数一线教师而言门槛过高。</p>
+          <h4><span class="p-icon amber">🚧</span><span data-key="problem.cards[1].title">技术门槛过高</span></h4>
+          <p data-key="problem.cards[1].desc">要实现数据回收，通常需要教师具备后端开发能力，自行搭建服务器和数据库。这对大多数一线教师而言门槛过高。</p>
         </div>
         <div class="problem-card reveal reveal-delay-2">
-          <h4><span class="p-icon gray">📉</span>无法教学分析</h4>
-          <p>即使"单词连连看"再好玩，教师也没有办法知道哪些人在玩这个程序、哪些单词的错误率比较高，难以开展有效的教学优化。</p>
+          <h4><span class="p-icon gray">📉</span><span data-key="problem.cards[2].title">无法教学分析</span></h4>
+          <p data-key="problem.cards[2].desc">即使"单词连连看"再好玩，教师也没有办法知道哪些人在玩这个程序、哪些单词的错误率比较高，难以开展有效的教学优化。</p>
         </div>
       </div>
     </div>
@@ -737,34 +783,34 @@ img { max-width: 100%; display: block; }
 <!-- SOLUTION -->
 <section id="solution">
   <div class="container">
-    <div class="section-label reveal">解决方案</div>
-    <h2 class="section-heading reveal">四步极简体验</h2>
-    <p class="section-desc reveal">QuickForm 本身不生成网页，但提供了数据接口，能够把任何网页的数据汇总起来。只需四步，即可完成从数据收集到智能分析的全流程。</p>
+    <div class="section-label reveal" data-key="solution.label">解决方案</div>
+    <h2 class="section-heading reveal" data-key="solution.heading">四步极简体验</h2>
+    <p class="section-desc reveal" data-key="solution.desc">QuickForm 本身不生成网页，但提供了数据接口，能够把任何网页的数据汇总起来。只需四步，即可完成从数据收集到智能分析的全流程。</p>
     <div class="steps-grid">
       <div class="step-card reveal">
         <div class="step-num">01</div>
         <div class="step-icon">📮</div>
-        <h3>生成表单地址</h3>
-        <p>注册 QuickForm 账号，创建一个"数据任务"，系统自动生成专属的 API 接口地址——您的"数字收件箱"。</p>
+        <h3 data-key="solution.steps[0].title">生成表单地址</h3>
+        <p data-key="solution.steps[0].desc">注册 QuickForm 账号，创建一个"数据任务"，系统自动生成专属的 API 接口地址——您的"数字收件箱"。</p>
       </div>
       <div class="step-card reveal reveal-delay-1">
         <div class="step-num">02</div>
         <div class="step-icon">🤖</div>
-        <h3>生成交互网页</h3>
-        <p>用您熟悉的大模型生成网页，只需在提示词中加入一句话：</p>
-        <div class="prompt-hint">"请将数据以表单形式提交至<br>https://quickform.cn/api/..."</div>
+        <h3 data-key="solution.steps[1].title">生成交互网页</h3>
+        <p data-key="solution.steps[1].desc">用您熟悉的大模型生成网页，只需在提示词中加入一句话：</p>
+        <div class="prompt-hint" data-key="solution.steps[1].prompt">"请将数据以表单形式提交至<br>https://quickform.cn/api/..."</div>
       </div>
       <div class="step-card reveal reveal-delay-2">
         <div class="step-num">03</div>
         <div class="step-icon">📋</div>
-        <h3>收集与查看数据</h3>
-        <p>学生提交数据后，在 QuickForm 实时查看所有提交记录，支持逐条查看或批量导出为 Excel 表格。</p>
+        <h3 data-key="solution.steps[2].title">收集与查看数据</h3>
+        <p data-key="solution.steps[2].desc">学生提交数据后，在 QuickForm 实时查看所有提交记录，支持逐条查看或批量导出为 Excel 表格。</p>
       </div>
       <div class="step-card reveal reveal-delay-3">
         <div class="step-num">04</div>
         <div class="step-icon">📊</div>
-        <h3>生成智能报告</h3>
-        <p>一键生成 AI 智能分析报告，包含提交人数、平均分、错误分布、高频问题等可视化内容，快速把握教学重难点。</p>
+        <h3 data-key="solution.steps[3].title">生成智能报告</h3>
+        <p data-key="solution.steps[3].desc">一键生成 AI 智能分析报告，包含提交人数、平均分、错误分布、高频问题等可视化内容，快速把握教学重难点。</p>
       </div>
     </div>
   </div>
@@ -773,20 +819,20 @@ img { max-width: 100%; display: block; }
 <!-- PRINCIPLE -->
 <section id="principle">
   <div class="container">
-    <div class="section-label reveal">工作原理</div>
-    <h2 class="section-heading reveal">用 AI 解决 AI 的问题</h2>
+    <div class="section-label reveal" data-key="principle.label">工作原理</div>
+    <h2 class="section-heading reveal" data-key="principle.heading">用 AI 解决 AI 的问题</h2>
     <div class="principle-layout">
       <div class="principle-diagram reveal">
         <img src="images/principle.jpg" alt="QuickForm工作原理" style="width: 100%; height: auto; border-radius: var(--radius);">
       </div>
       <div class="principle-text reveal">
-        <h3>基于标准表单技术</h3>
-        <p>QuickForm 提供了写入（POST）和读出（GET）的数据接口。任何网页只需将表单的 <code>action</code> 属性指向 QuickForm 端点，数据就会自动分类保存。</p>
-        <p>因为表单技术非常成熟，所有大模型都能正确理解并生成对应代码——教师只需在提示词中加一句话。</p>
-        <blockquote class="principle-quote">
+        <h3 data-key="principle.text.title">基于标准表单技术</h3>
+        <p data-key="principle.text.p1">QuickForm 提供了写入（POST）和读出（GET）的数据接口。任何网页只需将表单的 <code>action</code> 属性指向 QuickForm 端点，数据就会自动分类保存。</p>
+        <p data-key="principle.text.p2">因为表单技术非常成熟，所有大模型都能正确理解并生成对应代码——教师只需在提示词中加一句话。</p>
+        <blockquote class="principle-quote" data-key="principle.text.quote">
           "数据不需要严格规范，因为大模型能分析'凌乱'的数据。用户不用了解数据类型和 SQL，只要能描述需求，AI 就能帮你完成后续分析。"
         </blockquote>
-        <p>这一设计理念继承了图灵"用机器打败机器"的思想——用 AI 编写工具、用 AI 采集数据、再用 AI 分析数据，每一个环节都与 AI 相关。</p>
+        <p data-key="principle.text.p3">这一设计理念继承了图灵"用机器打败机器"的思想——用 AI 编写工具、用 AI 采集数据、再用 AI 分析数据，每一个环节都与 AI 相关。</p>
       </div>
     </div>
   </div>
@@ -795,32 +841,32 @@ img { max-width: 100%; display: block; }
 <!-- CAPABILITIES -->
 <section id="capabilities">
   <div class="container">
-    <div class="section-label reveal">能力边界</div>
-    <h2 class="section-heading reveal">不止是表单回收</h2>
-    <p class="section-desc reveal">同一个 API 地址，既能写入也能读出，由此衍生出多种交互模式。</p>
+    <div class="section-label reveal" data-key="capabilities.label">能力边界</div>
+    <h2 class="section-heading reveal" data-key="capabilities.heading">不止是表单回收</h2>
+    <p class="section-desc reveal" data-key="capabilities.desc">同一个 API 地址，既能写入也能读出，由此衍生出多种交互模式。</p>
     <div class="cap-grid">
       <div class="cap-card reveal">
         <div class="cap-icon">📝</div>
-        <h3>经典应用</h3>
-        <p>将数据用 POST 方式提交到 QuickForm，覆盖问卷回收、在线考试、课堂签到等常见需求。</p>
+        <h3 data-key="capabilities.cards[0].title">经典应用</h3>
+        <p data-key="capabilities.cards[0].desc">将数据用 POST 方式提交到 QuickForm，覆盖问卷回收、在线考试、课堂签到等常见需求。</p>
         <div class="cap-tag">
-          <span>问卷调查</span><span>在线考试</span><span>课堂签到</span>
+          <span data-key="capabilities.cards[0].tags[0]">问卷调查</span><span data-key="capabilities.cards[0].tags[1]">在线考试</span><span data-key="capabilities.cards[0].tags[2]">课堂签到</span>
         </div>
       </div>
       <div class="cap-card reveal reveal-delay-1">
         <div class="cap-icon">📡</div>
-        <h3>交互分析</h3>
-        <p>用网页 A 提交数据，再做一个网页 B 实时读取并分析，构建数据看板、数据驾驶舱与大屏展示。</p>
+        <h3 data-key="capabilities.cards[1].title">交互分析</h3>
+        <p data-key="capabilities.cards[1].desc">用网页 A 提交数据，再做一个网页 B 实时读取并分析，构建数据看板、数据驾驶舱与大屏展示。</p>
         <div class="cap-tag">
-          <span>数据看板</span><span>驾驶舱</span><span>大屏展示</span>
+          <span data-key="capabilities.cards[1].tags[0]">数据看板</span><span data-key="capabilities.cards[1].tags[1]">驾驶舱</span><span data-key="capabilities.cards[1].tags[2]">大屏展示</span>
         </div>
       </div>
       <div class="cap-card reveal reveal-delay-2">
         <div class="cap-icon">💬</div>
-        <h3>即时互动</h3>
-        <p>在同一个网页上边提交数据、边读取数据，实现聊天室、留言板、弹幕墙等即时交互功能。</p>
+        <h3 data-key="capabilities.cards[2].title">即时互动</h3>
+        <p data-key="capabilities.cards[2].desc">在同一个网页上边提交数据、边读取数据，实现聊天室、留言板、弹幕墙等即时交互功能。</p>
         <div class="cap-tag">
-          <span>聊天室</span><span>留言板</span><span>弹幕墙</span>
+          <span data-key="capabilities.cards[2].tags[0]">聊天室</span><span data-key="capabilities.cards[2].tags[1]">留言板</span><span data-key="capabilities.cards[2].tags[2]">弹幕墙</span>
         </div>
       </div>
     </div>
@@ -830,43 +876,43 @@ img { max-width: 100%; display: block; }
 <!-- CASES -->
 <section id="cases">
   <div class="container">
-    <div class="section-label reveal">应用案例</div>
-    <h2 class="section-heading reveal">全国教师正在使用</h2>
-    <p class="section-desc reveal">来自全国各地的教师在课堂教学、创意教学和真实问题解决中广泛应用 QuickForm。</p>
+    <div class="section-label reveal" data-key="cases.label">应用案例</div>
+    <h2 class="section-heading reveal" data-key="cases.heading">全国教师正在使用</h2>
+    <p class="section-desc reveal" data-key="cases.desc">来自全国各地的教师在课堂教学、创意教学和真实问题解决中广泛应用 QuickForm。</p>
     <div class="cases-grid">
       <div class="case-card reveal">
         <div class="case-header"><div class="case-emoji">🏫</div></div>
         <div class="case-body">
-          <h3>常规课堂数据收集</h3>
-          <p>将交互网页嵌入日常教学，高效收集课堂练习、测验和反馈数据。</p>
+          <h3 data-key="cases.cards[0].title">常规课堂数据收集</h3>
+          <p data-key="cases.cards[0].desc">将交互网页嵌入日常教学，高效收集课堂练习、测验和反馈数据。</p>
           <ul>
-            <li>课堂即时练习与检测</li>
-            <li>学生签到与课堂参与度统计</li>
-            <li>为回收数据编写实时展示大屏</li>
+            <li data-key="cases.cards[0].items[0]">课堂即时练习与检测</li>
+            <li data-key="cases.cards[0].items[1]">学生签到与课堂参与度统计</li>
+            <li data-key="cases.cards[0].items[2]">为回收数据编写实时展示大屏</li>
           </ul>
         </div>
       </div>
       <div class="case-card reveal reveal-delay-1">
         <div class="case-header"><div class="case-emoji">🎮</div></div>
         <div class="case-body">
-          <h3>创意教学应用</h3>
-          <p>借助 AI 生成的游戏化、模拟化交互网页，激发学生兴趣并采集行为数据。</p>
+          <h3 data-key="cases.cards[1].title">创意教学应用</h3>
+          <p data-key="cases.cards[1].desc">借助 AI 生成的游戏化、模拟化交互网页，激发学生兴趣并采集行为数据。</p>
           <ul>
-            <li>游戏化教学互动</li>
-            <li>仿真实验数据采集</li>
-            <li>学习行为过程分析</li>
+            <li data-key="cases.cards[1].items[0]">游戏化教学互动</li>
+            <li data-key="cases.cards[1].items[1]">仿真实验数据采集</li>
+            <li data-key="cases.cards[1].items[2]">学习行为过程分析</li>
           </ul>
         </div>
       </div>
       <div class="case-card reveal reveal-delay-2">
         <div class="case-header"><div class="case-emoji">🌍</div></div>
         <div class="case-body">
-          <h3>真实问题解决</h3>
-          <p>支撑跨学科学习项目和教学管理场景，让数据驱动教学决策。</p>
+          <h3 data-key="cases.cards[2].title">真实问题解决</h3>
+          <p data-key="cases.cards[2].desc">支撑跨学科学习项目和教学管理场景，让数据驱动教学决策。</p>
           <ul>
-            <li>学生跨学科学习项目</li>
-            <li>教师教学管理优化</li>
-            <li>温州科技高中案例精选</li>
+            <li data-key="cases.cards[2].items[0]">学生跨学科学习项目</li>
+            <li data-key="cases.cards[2].items[1]">教师教学管理优化</li>
+            <li data-key="cases.cards[2].items[2]">温州科技高中案例精选</li>
           </ul>
         </div>
       </div>
@@ -877,34 +923,34 @@ img { max-width: 100%; display: block; }
 <!-- VERSIONS -->
 <section id="versions">
   <div class="container">
-    <div class="section-label reveal">版本介绍</div>
-    <h2 class="section-heading reveal">选择适合您的版本</h2>
-    <p class="section-desc reveal">QuickForm 分为两个版本，面向不同使用场景，均可免费使用。</p>
+    <div class="section-label reveal" data-key="versions.label">版本介绍</div>
+    <h2 class="section-heading reveal" data-key="versions.heading">选择适合您的版本</h2>
+    <p class="section-desc reveal" data-key="versions.desc">QuickForm 分为两个版本，面向不同使用场景，均可免费使用。</p>
     <div class="versions-grid">
       <div class="version-card reveal">
-        <div class="version-badge">开源</div>
-        <h3>教师版</h3>
-        <p>面向个人教师，在局域网内为班级学生提供数据收集服务。</p>
+        <div class="version-badge" data-key="versions.cards[0].badge">开源</div>
+        <h3 data-key="versions.cards[0].title">教师版</h3>
+        <p data-key="versions.cards[0].desc">面向个人教师，在局域网内为班级学生提供数据收集服务。</p>
         <ul class="version-features">
-          <li><span class="check">✓</span>完全开源，自由修改</li>
-          <li><span class="check">✓</span>单用户模式，简洁高效</li>
-          <li><span class="check">✓</span>运行在教师本地电脑上</li>
-          <li><span class="check">✓</span>内置 Python 环境</li>
-          <li><span class="check">✓</span>绿色软件，解压即用</li>
-          <li><span class="check">✓</span>局域网内数据收集</li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[0]">完全开源，自由修改</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[1]">单用户模式，简洁高效</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[2]">运行在教师本地电脑上</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[3]">内置 Python 环境</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[4]">绿色软件，解压即用</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[5]">局域网内数据收集</span></li>
         </ul>
       </div>
       <div class="version-card reveal reveal-delay-1">
-        <div class="version-badge">免费</div>
-        <h3>校园版</h3>
-        <p>面向学校和机构，部署在互联网上，支持多用户协作。</p>
+        <div class="version-badge" data-key="versions.cards[1].badge">免费</div>
+        <h3 data-key="versions.cards[1].title">校园版</h3>
+        <p data-key="versions.cards[1].desc">面向学校和机构，部署在互联网上，支持多用户协作。</p>
         <ul class="version-features">
-          <li><span class="check">✓</span>签署合作协议后免费使用</li>
-          <li><span class="check">✓</span>部署在互联网上</li>
-          <li><span class="check">✓</span>支持多用户、多角色</li>
-          <li><span class="check">✓</span>更完善的安全机制</li>
-          <li><span class="check">✓</span>官方维护与技术支持</li>
-          <li><span class="check">✓</span>持续更新与功能迭代</li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[0]">签署合作协议后免费使用</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[1]">部署在互联网上</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[2]">支持多用户、多角色</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[3]">更完善的安全机制</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[4]">官方维护与技术支持</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[5]">持续更新与功能迭代</span></li>
         </ul>
       </div>
     </div>
@@ -914,46 +960,46 @@ img { max-width: 100%; display: block; }
 <!-- STORY -->
 <section id="story">
   <div class="container">
-    <div class="section-label reveal">QuickForm 的故事</div>
-    <h2 class="section-heading reveal">一个周六，一段对话<br>一个 AI 原生项目的诞生</h2>
+    <div class="section-label reveal" data-key="story.label">QuickForm 的故事</div>
+    <h2 class="section-heading reveal" data-key="story.heading">一个周六，一段对话<br>一个 AI 原生项目的诞生</h2>
     <div class="story-layout">
       <div class="story-timeline reveal">
         <div class="timeline-item">
-          <div class="date">2024 年底</div>
-          <h4>问题浮现</h4>
-          <p>DeepSeek 发布后，教师们纷纷用大模型写"课堂点名""单词连连看"等交互网页。谢作如敏锐地发现：这些网页只是静态的，数据无法流通。</p>
+          <div class="date" data-key="story.timeline[0].date">2024 年底</div>
+          <h4 data-key="story.timeline[0].title">问题浮现</h4>
+          <p data-key="story.timeline[0].desc">DeepSeek 发布后，教师们纷纷用大模型写"课堂点名""单词连连看"等交互网页。谢作如敏锐地发现：这些网页只是静态的，数据无法流通。</p>
         </div>
         <div class="timeline-item">
-          <div class="date">2025 年初</div>
-          <h4>思考与探索</h4>
-          <p>谢作如在《中国信息技术教育》发表《借助大模型设计交互式课件》，开始寻找解决方案，期望教育企业能开发数据流通工具。</p>
+          <div class="date" data-key="story.timeline[1].date">2025 年初</div>
+          <h4 data-key="story.timeline[1].title">思考与探索</h4>
+          <p data-key="story.timeline[1].desc">谢作如在《中国信息技术教育》发表《借助大模型设计交互式课件》，开始寻找解决方案，期望教育企业能开发数据流通工具。</p>
         </div>
         <div class="timeline-item">
-          <div class="date">2025 年 11 月 1 日</div>
-          <h4>QuickForm 诞生</h4>
-          <p>一个周六的晚上，谢作如打开 Trae（字节跳动编程工具），输入了一段需求描述。两天时间，QuickForm 原型诞生。名字也是 AI 取的。</p>
+          <div class="date" data-key="story.timeline[2].date">2025 年 11 月 1 日</div>
+          <h4 data-key="story.timeline[2].title">QuickForm 诞生</h4>
+          <p data-key="story.timeline[2].desc">一个周六的晚上，谢作如打开 Trae（字节跳动编程工具），输入了一段需求描述。两天时间，QuickForm 原型诞生。名字也是 AI 取的。</p>
         </div>
         <div class="timeline-item">
-          <div class="date">2025 年 11 月</div>
-          <h4>团队组建与公测</h4>
-          <p>方建文（温州大学）和林淼焱迅速加入。林淼焱第二天就把 QuickForm 部署上线。一周后正式公测。</p>
+          <div class="date" data-key="story.timeline[3].date">2025 年 11 月</div>
+          <h4 data-key="story.timeline[3].title">团队组建与公测</h4>
+          <p data-key="story.timeline[3].desc">方建文（温州大学）和林淼焱迅速加入。林淼焱第二天就把 QuickForm 部署上线。一周后正式公测。</p>
         </div>
         <div class="timeline-item">
-          <div class="date">一个月内</div>
-          <h4>广泛传播</h4>
-          <p>仅靠一篇公众号文章，注册用户接近 1000 名，用户来自全国各地的一线教师。</p>
+          <div class="date" data-key="story.timeline[4].date">一个月内</div>
+          <h4 data-key="story.timeline[4].title">广泛传播</h4>
+          <p data-key="story.timeline[4].desc">仅靠一篇公众号文章，注册用户接近 1000 名，用户来自全国各地的一线教师。</p>
         </div>
       </div>
       <div class="story-highlight reveal">
-        <h3>AI 原生项目</h3>
-        <p>有人问，开发 QuickForm 花了多少时间？原型编写只花了两天。在维护过程中，团队从未"手搓"过代码。</p>
-        <p>用 AI 解决 AI 编程带来的新问题，用 AI 采集到的数据再借助 AI 进行分析——每一个环节都与 AI 有关。</p>
-        <p>这不再是传统的"AI+"，而是真正的"AI 原生应用"。</p>
+        <h3 data-key="story.highlight.title">AI 原生项目</h3>
+        <p data-key="story.highlight.p1">有人问，开发 QuickForm 花了多少时间？原型编写只花了两天。在维护过程中，团队从未"手搓"过代码。</p>
+        <p data-key="story.highlight.p2">用 AI 解决 AI 编程带来的新问题，用 AI 采集到的数据再借助 AI 进行分析——每一个环节都与 AI 有关。</p>
+        <p data-key="story.highlight.p3">这不再是传统的"AI+"，而是真正的"AI 原生应用"。</p>
         <div class="ai-native-tags">
-          <span>🤖 AI 编写工具</span>
-          <span>📡 AI 采集数据</span>
-          <span>📊 AI 分析数据</span>
-          <span>✨ AI 取的名字</span>
+          <span data-key="story.highlight.tags[0]">🤖 AI 编写工具</span>
+          <span data-key="story.highlight.tags[1]">📡 AI 采集数据</span>
+          <span data-key="story.highlight.tags[2]">📊 AI 分析数据</span>
+          <span data-key="story.highlight.tags[3]">✨ AI 取的名字</span>
         </div>
       </div>
     </div>
@@ -963,37 +1009,37 @@ img { max-width: 100%; display: block; }
 <!-- TEAM -->
 <section id="team">
   <div class="container">
-    <div class="section-label reveal">团队</div>
-    <h2 class="section-heading reveal">由一线教师发起</h2>
-    <p class="section-desc reveal">QuickForm 团队由一线教师发起，源自团队间的默契、信任和价值观的一致。</p>
+    <div class="section-label reveal" data-key="team.label">团队</div>
+    <h2 class="section-heading reveal" data-key="team.heading">由一线教师发起</h2>
+    <p class="section-desc reveal" data-key="team.desc">QuickForm 团队由一线教师发起，源自团队间的默契、信任和价值观的一致。</p>
     <div class="team-grid">
       <div class="team-card reveal">
         <div class="team-avatar">谢</div>
-        <h3>谢作如</h3>
-        <div class="role">温州科技高级中学 · AI科创中心主任</div>
-        <div class="bio">资深程序员与一线教育工作者，QuickForm 的发起人。早年从事网站开发，后转向创客教育与 AI 教育研究。</div>
+        <h3 data-key="team.members[0].name">谢作如</h3>
+        <div class="role" data-key="team.members[0].role">温州科技高级中学 · AI科创中心主任</div>
+        <div class="bio" data-key="team.members[0].bio">资深程序员与一线教育工作者，QuickForm 的发起人。早年从事网站开发，后转向创客教育与 AI 教育研究。</div>
       </div>
       <div class="team-card reveal reveal-delay-1">
         <div class="team-avatar">方</div>
-        <h3>方建文</h3>
-        <div class="role">温州大学 · 博士</div>
-        <div class="bio">来自温州大学教育技术系，为 QuickForm 提供学术支持与研究方向指导，推动项目的理论化与系统化。</div>
+        <h3 data-key="team.members[1].name">方建文</h3>
+        <div class="role" data-key="team.members[1].role">温州大学 · 博士</div>
+        <div class="bio" data-key="team.members[1].bio">来自温州大学教育技术系，为 QuickForm 提供学术支持与研究方向指导，推动项目的理论化与系统化。</div>
       </div>
       <div class="team-card reveal reveal-delay-2">
         <div class="team-avatar">林</div>
-        <h3>林淼焱</h3>
-        <div class="role">温州科技高级中学</div>
-        <div class="bio">核心技术开发成员，第一时间将 QuickForm 部署到互联网上进行测试，推动项目从原型走向产品。</div>
+        <h3 data-key="team.members[2].name">林淼焱</h3>
+        <div class="role" data-key="team.members[2].role">温州科技高级中学</div>
+        <div class="bio" data-key="team.members[2].bio">核心技术开发成员，第一时间将 QuickForm 部署到互联网上进行测试，推动项目从原型走向产品。</div>
       </div>
     </div>
     <div class="support-section reveal">
-      <h4>支持团队与机构</h4>
+      <h4 data-key="team.support.title">支持团队与机构</h4>
       <div class="support-logos">
-        <span>XEduPro 团队</span>
-        <span>DFRobot</span>
-        <span>清华大学出版社</span>
-        <span>全国中小学AI与科技教育大会</span>
-        <span>全国中小学STEAM教育大会</span>
+        <span data-key="team.support.logos[0]">XEduPro 团队</span>
+        <span data-key="team.support.logos[1]">DFRobot</span>
+        <span data-key="team.support.logos[2]">清华大学出版社</span>
+        <span data-key="team.support.logos[3]">全国中小学AI与科技教育大会</span>
+        <span data-key="team.support.logos[4]">全国中小学STEAM教育大会</span>
       </div>
     </div>
   </div>
@@ -1004,35 +1050,150 @@ img { max-width: 100%; display: block; }
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <div class="logo">QuickForm</div>
-        <p>让大模型生成的交互网页也能回收数据。努力打通AI赋能教育的"最后一公里"。</p>
+        <div class="logo" data-key="footer.brand.logo">QuickForm</div>
+        <p data-key="footer.brand.desc">让大模型生成的交互网页也能回收数据。努力打通AI赋能教育的"最后一公里"。</p>
       </div>
       <div class="footer-col">
-        <h4>链接</h4>
-        <a href="https://quickform.cn" target="_blank">官方平台</a>
-        <a href="https://quickform.readthedocs.io/" target="_blank">学习文档</a>
-        <a href="https://mp.weixin.qq.com/s/ouhSP_UHLfDbQMO2Ch_bkQ" target="_blank">公众号文章</a>
+        <h4 data-key="footer.links.title">链接</h4>
+        <a href="https://quickform.cn" target="_blank" data-key="footer.links.items[0].text">官方平台</a>
+        <a href="https://quickform.readthedocs.io/" target="_blank" data-key="footer.links.items[1].text">学习文档</a>
+        <a href="https://mp.weixin.qq.com/s/ouhSP_UHLfDbQMO2Ch_bkQ" target="_blank" data-key="footer.links.items[2].text">公众号文章</a>
       </div>
       <div class="footer-col">
-        <h4>资源</h4>
-        <a href="https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" target="_blank">四步入门</a>
-        <a href="https://quickform.readthedocs.io/zh-cn/latest/case.html" target="_blank">应用案例</a>
-        <a href="https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" target="_blank">本地部署</a>
+        <h4 data-key="footer.resources.title">资源</h4>
+        <a href="https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" target="_blank" data-key="footer.resources.items[0].text">四步入门</a>
+        <a href="https://quickform.readthedocs.io/zh-cn/latest/case.html" target="_blank" data-key="footer.resources.items[1].text">应用案例</a>
+        <a href="https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" target="_blank" data-key="footer.resources.items[2].text">本地部署</a>
       </div>
       <div class="footer-col">
-        <h4>联系我们</h4>
-        <a href="mailto:beginnerfjw@163.com">方建文：beginnerfjw@163.com</a>
-        <a href="mailto:8334180@qq.com">谢作如：8334180@qq.com</a>
+        <h4 data-key="footer.contact.title">联系我们</h4>
+        <a href="mailto:beginnerfjw@163.com" data-key="footer.contact.items[0].text">方建文：beginnerfjw@163.com</a>
+        <a href="mailto:8334180@qq.com" data-key="footer.contact.items[1].text">谢作如：8334180@qq.com</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025-2026 QuickForm 团队 · 开源免费 · 教师版遵循开源协议</span>
-      <span>由一线教师用 AI 创造</span>
+      <span data-key="footer.bottom.left">© 2025-2026 QuickForm 团队 · 开源免费 · 教师版遵循开源协议</span>
+      <span data-key="footer.bottom.right">由一线教师用 AI 创造</span>
     </div>
   </div>
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// 语言切换功能
+let currentLang = 'zh';
+
+// 获取翻译文本
+const getTranslation = (key, lang = currentLang) => {
+  const keys = key.split('.');
+  let result = languages[lang];
+  for (const k of keys) {
+    const arrayMatch = k.match(/^(\w+)\[(\d+)\]$/);
+    const indexMatch = k.match(/^\[(\d+)\]$/);
+    if (arrayMatch) {
+      const arrayName = arrayMatch[1];
+      const index = parseInt(arrayMatch[2], 10);
+      if (result && result[arrayName] && result[arrayName][index] !== undefined) {
+        result = result[arrayName][index];
+      } else {
+        return null;
+      }
+    } else if (indexMatch) {
+      const index = parseInt(indexMatch[1], 10);
+      if (result && result[index] !== undefined) {
+        result = result[index];
+      } else {
+        return null;
+      }
+    } else if (result && result[k] !== undefined) {
+      result = result[k];
+    } else {
+      return null;
+    }
+  }
+  return result;
+};
+
+// 应用翻译
+const applyTranslation = (lang) => {
+  currentLang = lang;
+  
+  // 更新HTML语言属性
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'zh_tw' ? 'zh-TW' : 'en';
+  
+  // 翻译所有带data-key的元素
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.getAttribute('data-key');
+    const translation = getTranslation(key, lang);
+    if (translation !== null) {
+      el.innerHTML = translation;
+    }
+  });
+  
+  // 翻译导航链接
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const navLinkData = languages[lang].nav.links;
+  navLinks.forEach((link, index) => {
+    if (navLinkData[index]) {
+      link.textContent = navLinkData[index].text;
+    }
+  });
+  
+  // 翻译导航按钮
+  const navCta = document.querySelector('.nav-cta');
+  if (navCta) {
+    navCta.textContent = languages[lang].nav.cta;
+  }
+  
+  // 翻译Logo副标题
+  const logoSub = document.querySelector('.logo span');
+  if (logoSub) {
+    logoSub.textContent = languages[lang].nav.logoSub;
+  }
+  
+  // 更新语言切换按钮状态
+  document.querySelectorAll('.lang-switcher button').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // 保存语言偏好
+  localStorage.setItem('quickform_lang', lang);
+};
+
+// 检测系统语言
+const detectSystemLanguage = () => {
+  const savedLang = localStorage.getItem('quickform_lang');
+  if (savedLang) {
+    return savedLang;
+  }
+  
+  const systemLang = navigator.language || navigator.userLanguage;
+  if (systemLang.startsWith('zh')) {
+    return systemLang.includes('TW') || systemLang.includes('HK') || systemLang.includes('MO') ? 'zh_tw' : 'zh';
+  } else if (systemLang.startsWith('en')) {
+    return 'en';
+  }
+  return 'zh';
+};
+
+// 初始化语言
+const initLanguage = () => {
+  const detectedLang = detectSystemLanguage();
+  applyTranslation(detectedLang);
+};
+
+// 语言切换事件
+const initLanguageSwitcher = () => {
+  document.querySelectorAll('.lang-switcher button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      applyTranslation(lang);
+    });
+  });
+};
+
 // Scroll reveal
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -1121,10 +1282,14 @@ const initStats = async () => {
   }
 };
 
-// 页面加载时立即获取数据
-initStats();
+// 页面加载时初始化
+window.addEventListener('DOMContentLoaded', () => {
+  initLanguage();
+  initLanguageSwitcher();
+  initStats();
+});
 
-// 每5秒更新一次
+// 每5秒更新一次统计数据
 setInterval(async () => {
   const data = await fetchStats();
   if (data) {
