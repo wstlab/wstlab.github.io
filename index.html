@@ -465,7 +465,7 @@ nav .nav-cta:hover { background: var(--accent-teal); transform: translateY(-1px)
   background: linear-gradient(180deg, var(--cream), var(--cream-warm));
 }
 .versions-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
   margin-top: 56px;
 }
 .version-card {
@@ -482,6 +482,7 @@ nav .nav-cta:hover { background: var(--accent-teal); transform: translateY(-1px)
 }
 .version-card:nth-child(1) .version-badge { background: rgba(5,150,105,0.1); color: var(--accent-emerald); }
 .version-card:nth-child(2) .version-badge { background: rgba(37,99,235,0.1); color: var(--accent-blue); }
+.version-card:nth-child(3) .version-badge { background: rgba(217,119,6,0.1); color: var(--accent-amber); }
 .version-card h3 {
   font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700;
   margin-bottom: 12px;
@@ -925,32 +926,45 @@ img { max-width: 100%; display: block; }
   <div class="container">
     <div class="section-label reveal" data-key="versions.label">版本介绍</div>
     <h2 class="section-heading reveal" data-key="versions.heading">选择适合您的版本</h2>
-    <p class="section-desc reveal" data-key="versions.desc">QuickForm 分为两个版本，面向不同使用场景，均可免费使用。</p>
+    <p class="section-desc reveal" data-key="versions.desc">QuickForm 分为三个版本，基本功能一致，均可无限制收集表单数据。</p>
     <div class="versions-grid">
       <div class="version-card reveal">
-        <div class="version-badge" data-key="versions.cards[0].badge">开源</div>
-        <h3 data-key="versions.cards[0].title">教师版</h3>
-        <p data-key="versions.cards[0].desc">面向个人教师，在局域网内为班级学生提供数据收集服务。</p>
+        <div class="version-badge" data-key="versions.cards[0].badge">在线</div>
+        <h3 data-key="versions.cards[0].title">在线版</h3>
+        <p data-key="versions.cards[0].desc">QuickForm 校园版的演示网站，适合学习调试，不宜作为真正教学。</p>
         <ul class="version-features">
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[0]">完全开源，自由修改</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[1]">单用户模式，简洁高效</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[2]">运行在教师本地电脑上</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[3]">内置 Python 环境</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[4]">绿色软件，解压即用</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[0].features[5]">局域网内数据收集</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[0]">即开即用，无需安装</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[1]">支持大模型直接访问</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[2]">适合学习调试使用</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[3]">内置社区交流功能</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[4]">并发流量有限制</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[0].features[5]">访问地址：quickform.cn</span></li>
+        </ul>
+      </div>
+      <div class="version-card reveal">
+        <div class="version-badge" data-key="versions.cards[1].badge">开源</div>
+        <h3 data-key="versions.cards[1].title">教师版</h3>
+        <p data-key="versions.cards[1].desc">面向个人教师，运行在本地电脑上，适合日常课堂教学使用。</p>
+        <ul class="version-features">
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[0]">完全开源，自由修改</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[1]">单用户模式，简洁高效</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[2]">内置 Python 环境</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[3]">绿色软件，解压即用</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[4]">局域网内数据收集</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[1].features[5]">可外网穿透供课外使用</span></li>
         </ul>
       </div>
       <div class="version-card reveal reveal-delay-1">
-        <div class="version-badge" data-key="versions.cards[1].badge">免费</div>
-        <h3 data-key="versions.cards[1].title">校园版</h3>
-        <p data-key="versions.cards[1].desc">面向学校和机构，部署在互联网上，支持多用户协作。</p>
+        <div class="version-badge" data-key="versions.cards[2].badge">免费</div>
+        <h3 data-key="versions.cards[2].title">校园版</h3>
+        <p data-key="versions.cards[2].desc">面向学校和机构，部署在服务器上，支持全校教师协作。</p>
         <ul class="version-features">
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[0]">签署合作协议后免费使用</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[1]">部署在互联网上</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[2]">支持多用户、多角色</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[3]">更完善的安全机制</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[4]">官方维护与技术支持</span></li>
-          <li><span class="check">✓</span><span data-key="versions.cards[1].features[5]">持续更新与功能迭代</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[0]">签署合作协议后免费</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[1]">部署在互联网或内网</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[2]">支持多用户、多角色</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[3]">更完善的安全机制</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[4]">官方维护与技术支持</span></li>
+          <li><span class="check">✓</span><span data-key="versions.cards[2].features[5]">持续更新与功能迭代</span></li>
         </ul>
       </div>
     </div>

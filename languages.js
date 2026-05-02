@@ -92,10 +92,11 @@ const languages = {
     versions: {
       label: "版本介绍",
       heading: "选择适合您的版本",
-      desc: "QuickForm 分为两个版本，面向不同使用场景，均可免费使用。",
+      desc: "QuickForm 分为三个版本，基本功能一致，均可无限制收集表单数据。",
       cards: [
-        { badge: "开源", title: "教师版", desc: "面向个人教师，在局域网内为班级学生提供数据收集服务。", features: ["完全开源，自由修改", "单用户模式，简洁高效", "运行在教师本地电脑上", "内置 Python 环境", "绿色软件，解压即用", "局域网内数据收集"] },
-        { badge: "免费", title: "校园版", desc: "面向学校和机构，部署在互联网上，支持多用户协作。", features: ["签署合作协议后免费使用", "部署在互联网上", "支持多用户、多角色", "更完善的安全机制", "官方维护与技术支持", "持续更新与功能迭代"] }
+        { badge: "在线", title: "在线版", desc: "QuickForm 校园版的演示网站，适合学习调试，不宜作为真正教学。", features: ["即开即用，无需安装", "支持大模型直接访问", "适合学习调试使用", "内置社区交流功能", "并发流量有限制", "访问地址：quickform.cn"] },
+        { badge: "开源", title: "教师版", desc: "面向个人教师，运行在本地电脑上，适合日常课堂教学使用。", features: ["完全开源，自由修改", "单用户模式，简洁高效", "内置 Python 环境", "绿色软件，解压即用", "局域网内数据收集", "可外网穿透供课外使用"] },
+        { badge: "免费", title: "校园版", desc: "面向学校和机构，部署在服务器上，支持全校教师协作。", features: ["签署合作协议后免费", "部署在互联网或内网", "支持多用户、多角色", "更完善的安全机制", "官方维护与技术支持", "持续更新与功能迭代"] }
       ]
     },
     story: {
@@ -257,10 +258,11 @@ const languages = {
     versions: {
       label: "Versions",
       heading: "Choose the version that suits you",
-      desc: "QuickForm has two versions for different usage scenarios, both available for free.",
+      desc: "QuickForm has three versions with consistent core features, all capable of unlimited form data collection.",
       cards: [
-        { badge: "Open Source", title: "Teacher Edition", desc: "For individual teachers, providing data collection services for class students within the local network.", features: ["Fully open source, freely modifiable", "Single-user mode, simple and efficient", "Runs on teacher's local computer", "Built-in Python environment", "Portable software, ready to use", "Local network data collection"] },
-        { badge: "Free", title: "Campus Edition", desc: "For schools and institutions, deployed on the internet, supporting multi-user collaboration.", features: ["Free after signing cooperation agreement", "Deployed on the internet", "Supports multiple users and roles", "More comprehensive security mechanisms", "Official maintenance and technical support", "Continuous updates and feature iterations"] }
+        { badge: "Online", title: "Online Version", desc: "Demo site for QuickForm Campus Edition, suitable for learning and debugging, not recommended for actual teaching.", features: ["Ready to use, no installation needed", "Supports direct AI model access", "Suitable for learning and debugging", "Built-in community features", "Limited concurrent traffic", "Access: quickform.cn"] },
+        { badge: "Open Source", title: "Teacher Edition", desc: "For individual teachers, runs on local computer, suitable for daily classroom teaching.", features: ["Fully open source, freely modifiable", "Single-user mode, simple and efficient", "Built-in Python environment", "Portable software, ready to use", "Local network data collection", "Can use proxy for outside-school access"] },
+        { badge: "Free", title: "Campus Edition", desc: "For schools and institutions, deployed on server, supporting collaboration among all school teachers.", features: ["Free after signing cooperation agreement", "Deploy on internet or intranet", "Supports multiple users and roles", "More comprehensive security mechanisms", "Official maintenance and technical support", "Continuous updates and feature iterations"] }
       ]
     },
     story: {
@@ -422,10 +424,11 @@ const languages = {
     versions: {
       label: "版本介紹",
       heading: "選擇適合您的版本",
-      desc: "QuickForm 分為兩個版本，面向不同使用場景，均可免費使用。",
+      desc: "QuickForm 分為三個版本，基本功能一致，均可無限制收集表單數據。",
       cards: [
-        { badge: "開源", title: "教師版", desc: "面向個人教師，在局域網內為班級學生提供數據收集服務。", features: ["完全開源，自由修改", "單用戶模式，簡潔高效", "運行在教師本地電腦上", "內置 Python 環境", "綠色軟體，解壓即用", "局域網內數據收集"] },
-        { badge: "免費", title: "校園版", desc: "面向學校和機構，部署在網際網路上，支援多使用者協作。", features: ["簽署合作協議後免費使用", "部署在網際網路上", "支援多使用者、多角色", "更完善的安全機制", "官方維護與技術支援", "持續更新與功能迭代"] }
+        { badge: "在線", title: "在線版", desc: "QuickForm 校園版的演示網站，適合學習調試，不宜作為真正教學。", features: ["即開即用，無需安裝", "支援大模型直接訪問", "適合學習調試使用", "內置社區交流功能", "並發流量有限制", "訪問地址：quickform.cn"] },
+        { badge: "開源", title: "教師版", desc: "面向個人教師，運行在本地電腦上，適合日常課堂教學使用。", features: ["完全開源，自由修改", "單用戶模式，簡潔高效", "內置 Python 環境", "綠色軟體，解壓即用", "局域網內數據收集", "可外網穿透供課外使用"] },
+        { badge: "免費", title: "校園版", desc: "面向學校和機構，部署在伺服器上，支援全校教師協作。", features: ["簽署合作協議後免費", "部署在互聯網或內網", "支援多使用者、多角色", "更完善的安全機制", "官方維護與技術支援", "持續更新與功能迭代"] }
       ]
     },
     story: {
