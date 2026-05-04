@@ -4,12 +4,13 @@ const languages = {
       logo: "QuickForm",
       logoSub: "AI原生数据平台",
       links: [
-        { text: "痛点", href: "#problem" },
-        { text: "使用指南", href: "#solution" },
-        { text: "工作原理", href: "#principle" },
-        { text: "应用案例", href: "#cases" },
+        { text: "前言", href: "#problem" },
+        { text: "指南", href: "#solution" },
+        { text: "原理", href: "#principle" },
+        { text: "案例", href: "#cases" },
         { text: "版本", href: "#versions" },
-        { text: "故事", href: "#story" }
+        { text: "故事", href: "#story" },
+        { text: "动态", href: "#news" }
       ],
       cta: "访问平台 →"
     },
@@ -117,6 +118,11 @@ const languages = {
         tags: ["🤖 AI 编写工具", "📡 AI 采集数据", "📊 AI 分析数据", "✨ AI 取的名字"]
       }
     },
+    news: {
+      label: "动态",
+      heading: "最新资讯",
+      desc: "QuickForm 的最新进展与动态"
+    },
     team: {
       label: "团队",
       heading: "由一线教师发起",
@@ -170,12 +176,13 @@ const languages = {
       logo: "QuickForm",
       logoSub: "AI-Native Data Platform",
       links: [
-        { text: "Problems", href: "#problem" },
+        { text: "Intro", href: "#problem" },
         { text: "Guide", href: "#solution" },
-        { text: "How It Works", href: "#principle" },
-        { text: "Use Cases", href: "#cases" },
-        { text: "Versions", href: "#versions" },
-        { text: "Story", href: "#story" }
+        { text: "How", href: "#principle" },
+        { text: "Cases", href: "#cases" },
+        { text: "Ver.", href: "#versions" },
+        { text: "Story", href: "#story" },
+        { text: "News", href: "#news" }
       ],
       cta: "Visit Platform →"
     },
@@ -283,6 +290,11 @@ const languages = {
         tags: ["🤖 AI-written tools", "📡 AI-collected data", "📊 AI-analyzed data", "✨ AI-chosen name"]
       }
     },
+    news: {
+      label: "News",
+      heading: "Latest Updates",
+      desc: "Latest developments and news about QuickForm"
+    },
     team: {
       label: "Team",
       heading: "Initiated by frontline teachers",
@@ -336,12 +348,13 @@ const languages = {
       logo: "QuickForm",
       logoSub: "AI原生數據平台",
       links: [
-        { text: "痛點", href: "#problem" },
-        { text: "使用指南", href: "#solution" },
-        { text: "工作原理", href: "#principle" },
-        { text: "應用案例", href: "#cases" },
+        { text: "前言", href: "#problem" },
+        { text: "指南", href: "#solution" },
+        { text: "原理", href: "#principle" },
+        { text: "案例", href: "#cases" },
         { text: "版本", href: "#versions" },
-        { text: "故事", href: "#story" }
+        { text: "故事", href: "#story" },
+        { text: "動態", href: "#news" }
       ],
       cta: "訪問平台 →"
     },
@@ -448,6 +461,11 @@ const languages = {
         p3: "這不再是傳統的\"AI+\"，而是真正的\"AI 原生應用\"。",
         tags: ["🤖 AI 編寫工具", "📡 AI 采集數據", "📊 AI 分析數據", "✨ AI 取的名字"]
       }
+    },
+    news: {
+      label: "動態",
+      heading: "最新資訊",
+      desc: "QuickForm 的最新進展與動態"
     },
     team: {
       label: "團隊",

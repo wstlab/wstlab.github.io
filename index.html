@@ -81,41 +81,27 @@ nav .nav-links a {
 }
 nav .nav-links a:hover { color: var(--accent-teal); }
 nav .lang-switcher {
-  display: flex; gap: 8px; align-items: center;
+  display: flex; gap: 6px; align-items: center;
   margin-left: 20px;
 }
 nav .lang-switcher button {
-  background: none; border: 1px solid var(--card-border);
-  padding: 4px 12px; border-radius: 100px;
-  font-size: 0.75rem; font-weight: 500;
-  color: var(--ink-light); cursor: pointer;
+  background: var(--ink); color: var(--cream); font-size: 0.8rem;
+  padding: 8px 16px; border-radius: 100px; font-weight: 600;
   transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-  font-family: var(--font-body);
-  position: relative;
-  overflow: hidden;
+  border: none; cursor: pointer; font-family: var(--font-body);
 }
 nav .lang-switcher button:hover {
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
-  transform: translateY(-1px);
+  background: var(--accent-teal); transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(13,148,136,0.3);
 }
 nav .lang-switcher button.active {
   background: var(--accent-teal);
   color: white;
-  border-color: var(--accent-teal);
   box-shadow: 0 2px 8px rgba(13,148,136,0.3);
 }
 nav .lang-switcher button.active:hover {
   background: var(--accent-teal-light);
-  border-color: var(--accent-teal-light);
 }
-nav .nav-cta {
-  background: var(--ink); color: var(--cream); font-size: 0.8rem;
-  padding: 8px 20px; border-radius: 100px; font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-  border: none; cursor: pointer; font-family: var(--font-body);
-}
-nav .nav-cta:hover { background: var(--accent-teal); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(13,148,136,0.3); }
 
 @media (max-width: 768px) {
   nav .nav-links {
@@ -126,7 +112,7 @@ nav .nav-cta:hover { background: var(--accent-teal); transform: translateY(-1px)
   }
   nav .lang-switcher button {
     font-size: 0.7rem;
-    padding: 3px 10px;
+    padding: 6px 12px;
   }
 }
 
@@ -657,6 +643,101 @@ footer::before {
   .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
 }
 
+/* === NEWS === */
+#news { padding: 100px 0; background: linear-gradient(180deg, var(--cream-warm), var(--cream)); }
+.news-ticker-container {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.news-ticker-wrapper {
+  overflow: hidden;
+  position: relative;
+  height: 40px;
+}
+.news-ticker {
+  display: flex;
+  flex-direction: column;
+  animation: newsScroll 20s linear infinite;
+}
+.news-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.news-ticker-item .news-date {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.news-ticker-item .news-title {
+  font-weight: 600;
+  color: var(--accent-blue);
+  white-space: nowrap;
+}
+.news-ticker-item .news-content {
+  color: var(--ink-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.news-ticker-item::before {
+  content: "●";
+  color: var(--accent-teal);
+  font-size: 0.5rem;
+  flex-shrink: 0;
+}
+@keyframes newsScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.news-ticker-container:hover .news-ticker {
+  animation-play-state: paused;
+}
+.news-list {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+.news-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.news-card-date {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+.news-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.news-card-content {
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  line-height: 1.6;
+}
+
 /* === UTILITIES === */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 60px); }
 a { color: inherit; text-decoration: none; }
@@ -669,18 +750,18 @@ img { max-width: 100%; display: block; }
 <nav id="nav">
   <div class="logo">QuickForm<span>AI原生数据平台</span></div>
   <div class="nav-links">
-    <a href="#problem">痛点</a>
-    <a href="#solution">使用指南</a>
-    <a href="#principle">工作原理</a>
-    <a href="#cases">应用案例</a>
+    <a href="#problem">前言</a>
+    <a href="#solution">指南</a>
+    <a href="#principle">原理</a>
+    <a href="#cases">案例</a>
     <a href="#versions">版本</a>
     <a href="#story">故事</a>
+    <a href="#news">动态</a>
     <div class="lang-switcher">
       <button data-lang="zh" class="active">中文</button>
       <button data-lang="en">English</button>
       <button data-lang="zh_tw">繁體</button>
     </div>
-    <a href="https://quickform.cn" target="_blank"><button class="nav-cta">访问平台 →</button></a>
   </div>
 </nav>
 
@@ -1020,6 +1101,25 @@ img { max-width: 100%; display: block; }
   </div>
 </section>
 
+<!-- NEWS -->
+<section id="news">
+  <div class="container">
+    <div class="section-label reveal" data-key="news.label">动态</div>
+    <h2 class="section-heading reveal" data-key="news.heading">最新资讯</h2>
+    <p class="section-desc reveal" data-key="news.desc">QuickForm 的最新进展与动态</p>
+    <div class="news-ticker-container reveal">
+      <div class="news-ticker-wrapper">
+        <div class="news-ticker" id="newsTicker">
+          <!-- 新闻内容将通过 JavaScript 动态加载 -->
+        </div>
+      </div>
+    </div>
+    <div class="news-list reveal" id="newsList">
+      <!-- 新闻列表将通过 JavaScript 动态加载 -->
+    </div>
+  </div>
+</section>
+
 <!-- TEAM -->
 <section id="team">
   <div class="container">
@@ -1152,12 +1252,6 @@ const applyTranslation = (lang) => {
     }
   });
   
-  // 翻译导航按钮
-  const navCta = document.querySelector('.nav-cta');
-  if (navCta) {
-    navCta.textContent = languages[lang].nav.cta;
-  }
-  
   // 翻译Logo副标题
   const logoSub = document.querySelector('.logo span');
   if (logoSub) {
@@ -1190,6 +1284,46 @@ const detectSystemLanguage = () => {
     return 'en';
   }
   return 'zh';
+};
+
+// 加载并显示新闻
+const loadNews = async () => {
+  try {
+    const response = await fetch('/news.json');
+    const news = await response.json();
+    
+    const ticker = document.getElementById('newsTicker');
+    const newsList = document.getElementById('newsList');
+    
+    if (!ticker || !newsList) return;
+    
+    // 创建滚动新闻内容（复制一份以实现无缝滚动）
+    const createTickerItems = (items) => {
+      return items.map(item => `
+        <div class="news-ticker-item">
+          <span class="news-date">${item.date}</span>
+          <span class="news-title">${item.title}</span>
+          <span class="news-content">${item.content}</span>
+        </div>
+      `).join('');
+    };
+    
+    const tickerHTML = createTickerItems(news);
+    ticker.innerHTML = tickerHTML + tickerHTML; // 复制一份实现无缝滚动
+    
+    // 创建新闻卡片列表（显示前6条）
+    const displayNews = news.slice(0, 6);
+    newsList.innerHTML = displayNews.map(item => `
+      <div class="news-card">
+        <div class="news-card-date">${item.date}</div>
+        <div class="news-card-title">${item.title}</div>
+        <div class="news-card-content">${item.content}</div>
+      </div>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Failed to load news:', error);
+  }
 };
 
 // 初始化语言
@@ -1301,6 +1435,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initLanguage();
   initLanguageSwitcher();
   initStats();
+  loadNews();
 });
 
 // 每5秒更新一次统计数据
