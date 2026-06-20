@@ -80,39 +80,101 @@ nav .nav-links a {
   transition: color 0.2s; position: relative;
 }
 nav .nav-links a:hover { color: var(--accent-teal); }
-nav .lang-switcher {
-  display: flex; gap: 6px; align-items: center;
+nav .nav-actions {
+  display: flex; gap: 12px; align-items: center;
   margin-left: 20px;
 }
-nav .lang-switcher button {
+nav .github-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--card-bg); color: var(--ink);
+  font-size: 0.8rem; font-weight: 600;
+  padding: 8px 16px; border-radius: 100px;
+  border: 1px solid var(--card-border);
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  font-family: var(--font-body);
+}
+nav .github-link:hover {
+  background: var(--ink); color: var(--cream);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26,26,46,0.15);
+}
+nav .github-link svg {
+  width: 16px; height: 16px; fill: currentColor;
+}
+nav .lang-switcher {
+  position: relative;
+}
+nav .lang-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
   background: var(--ink); color: var(--cream); font-size: 0.8rem;
-  padding: 8px 16px; border-radius: 100px; font-weight: 600;
+  padding: 8px 14px 8px 16px; border-radius: 100px; font-weight: 600;
   transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
   border: none; cursor: pointer; font-family: var(--font-body);
 }
-nav .lang-switcher button:hover {
-  background: var(--accent-teal); transform: translateY(-1px);
+nav .lang-toggle:hover {
+  background: var(--accent-teal);
   box-shadow: 0 4px 16px rgba(13,148,136,0.3);
 }
-nav .lang-switcher button.active {
-  background: var(--accent-teal);
-  color: white;
-  box-shadow: 0 2px 8px rgba(13,148,136,0.3);
+nav .lang-toggle .arrow {
+  width: 10px; height: 10px;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  fill: currentColor;
 }
-nav .lang-switcher button.active:hover {
-  background: var(--accent-teal-light);
+nav .lang-switcher.open .lang-toggle .arrow {
+  transform: rotate(180deg);
+}
+nav .lang-menu {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  min-width: 120px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  box-shadow: 0 12px 40px rgba(26,26,46,0.12);
+  opacity: 0; visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  z-index: 1001;
+}
+nav .lang-switcher.open .lang-menu {
+  opacity: 1; visibility: visible;
+  transform: translateY(0);
+}
+nav .lang-option {
+  display: block; width: 100%;
+  background: transparent; color: var(--ink-light);
+  font-size: 0.8rem; font-weight: 500;
+  padding: 8px 12px; border-radius: 8px;
+  border: none; cursor: pointer; text-align: left;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+nav .lang-option:hover {
+  background: rgba(13,148,136,0.08); color: var(--accent-teal);
+}
+nav .lang-option.active {
+  background: var(--accent-teal); color: #fff;
 }
 
 @media (max-width: 768px) {
   nav .nav-links {
     display: none;
   }
-  nav .lang-switcher {
+  nav .nav-actions {
     margin-left: 0;
   }
-  nav .lang-switcher button {
-    font-size: 0.7rem;
-    padding: 6px 12px;
+  nav .github-link span {
+    display: none;
+  }
+  nav .github-link {
+    padding: 8px;
+  }
+  nav .lang-toggle {
+    font-size: 0.75rem;
+    padding: 6px 12px 6px 14px;
   }
 }
 
@@ -757,10 +819,26 @@ img { max-width: 100%; display: block; }
     <a href="#versions">版本</a>
     <a href="#story">故事</a>
     <a href="#news">动态</a>
-    <div class="lang-switcher">
-      <button data-lang="zh" class="active">中文</button>
-      <button data-lang="en">English</button>
-      <button data-lang="zh_tw">繁體</button>
+    <div class="nav-actions">
+      <a href="https://github.com/wstlab/quickform" target="_blank" class="github-link" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+        <span>GitHub</span>
+      </a>
+      <div class="lang-switcher">
+        <button class="lang-toggle" aria-haspopup="true" aria-expanded="false">
+          <span class="current-lang">中文</span>
+          <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M6 8L1 3h10z"></path>
+          </svg>
+        </button>
+        <div class="lang-menu" role="menu">
+          <button class="lang-option active" data-lang="zh" role="menuitem">中文</button>
+          <button class="lang-option" data-lang="en" role="menuitem">English</button>
+          <button class="lang-option" data-lang="zh_tw" role="menuitem">繁體</button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -1258,12 +1336,14 @@ const applyTranslation = (lang) => {
     logoSub.textContent = languages[lang].nav.logoSub;
   }
   
-  // 更新语言切换按钮状态
-  document.querySelectorAll('.lang-switcher button').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.lang === lang) {
-      btn.classList.add('active');
-    }
+  // 更新语言下拉当前显示与选中状态
+  const langNames = { zh: '中文', en: 'English', zh_tw: '繁體' };
+  const currentLangLabel = document.querySelector('.lang-toggle .current-lang');
+  if (currentLangLabel) {
+    currentLangLabel.textContent = langNames[lang] || lang;
+  }
+  document.querySelectorAll('.lang-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
   });
   
   // 保存语言偏好
@@ -1332,13 +1412,43 @@ const initLanguage = () => {
   applyTranslation(detectedLang);
 };
 
-// 语言切换事件
+// 语言下拉切换事件
 const initLanguageSwitcher = () => {
-  document.querySelectorAll('.lang-switcher button').forEach(btn => {
+  const switcher = document.querySelector('.lang-switcher');
+  const toggle = document.querySelector('.lang-toggle');
+  const menu = document.querySelector('.lang-menu');
+  if (!switcher || !toggle || !menu) return;
+
+  const setOpen = (open) => {
+    switcher.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setOpen(!switcher.classList.contains('open'));
+  });
+
+  menu.querySelectorAll('.lang-option').forEach(btn => {
     btn.addEventListener('click', () => {
       const lang = btn.dataset.lang;
       applyTranslation(lang);
+      setOpen(false);
     });
+  });
+
+  // 点击外部关闭下拉
+  document.addEventListener('click', (e) => {
+    if (!switcher.contains(e.target)) {
+      setOpen(false);
+    }
+  });
+
+  // ESC 关闭下拉
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && switcher.classList.contains('open')) {
+      setOpen(false);
+    }
   });
 };
 
