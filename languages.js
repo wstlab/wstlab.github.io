@@ -10,7 +10,7 @@ const languages = {
         { text: "案例", href: "#cases" },
         { text: "版本", href: "#versions" },
         { text: "故事", href: "#story" },
-        { text: "动态", href: "#news" }
+        { text: "动态", href: "news.html" }
       ],
       cta: "访问平台 →"
     },
@@ -146,13 +146,15 @@ const languages = {
         title: "链接",
         items: [
           { text: "官方平台", href: "https://quickform.cn" },
-          { text: "学习文档", href: "https://quickform.readthedocs.io/" },
-          { text: "公众号文章", href: "https://mp.weixin.qq.com/s/ouhSP_UHLfDbQMO2Ch_bkQ" }
+          { text: "虚谷计划", href: "https://www.vvplan.cn/" },
+          { text: "QF温科高", href: "https://wzkjgz.site/" },
+          { text: "QF中鸣平台", href: "https://qf.zmrobo.com/" }
         ]
       },
       resources: {
         title: "资源",
         items: [
+          { text: "学习文档", href: "https://quickform.readthedocs.io/" },
           { text: "四步入门", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
           { text: "应用案例", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
           { text: "本地部署", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
@@ -182,7 +184,7 @@ const languages = {
         { text: "Cases", href: "#cases" },
         { text: "Ver.", href: "#versions" },
         { text: "Story", href: "#story" },
-        { text: "News", href: "#news" }
+        { text: "News", href: "news.html" }
       ],
       cta: "Visit Platform →"
     },
@@ -318,13 +320,15 @@ const languages = {
         title: "Links",
         items: [
           { text: "Official Platform", href: "https://quickform.cn" },
-          { text: "Learning Documentation", href: "https://quickform.readthedocs.io/" },
-          { text: "Public Account Article", href: "https://mp.weixin.qq.com/s/ouhSP_UHLfDbQMO2Ch_bkQ" }
+          { text: "Xugu Plan", href: "https://www.vvplan.cn/" },
+          { text: "QF WZSTH", href: "https://wzkjgz.site/" },
+          { text: "QF ZMRobo", href: "https://qf.zmrobo.com/" }
         ]
       },
       resources: {
         title: "Resources",
         items: [
+          { text: "Documentation", href: "https://quickform.readthedocs.io/" },
           { text: "4-Step Guide", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
           { text: "Use Cases", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
           { text: "Local Deployment", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
@@ -354,7 +358,7 @@ const languages = {
         { text: "案例", href: "#cases" },
         { text: "版本", href: "#versions" },
         { text: "故事", href: "#story" },
-        { text: "動態", href: "#news" }
+        { text: "動態", href: "news.html" }
       ],
       cta: "訪問平台 →"
     },
@@ -490,13 +494,15 @@ const languages = {
         title: "連結",
         items: [
           { text: "官方平台", href: "https://quickform.cn" },
-          { text: "學習文檔", href: "https://quickform.readthedocs.io/" },
-          { text: "公眾號文章", href: "https://mp.weixin.qq.com/s/ouhSP_UHLfDbQMO2Ch_bkQ" }
+          { text: "虛谷計畫", href: "https://www.vvplan.cn/" },
+          { text: "QF溫科高", href: "https://wzkjgz.site/" },
+          { text: "QF中鳴平台", href: "https://qf.zmrobo.com/" }
         ]
       },
       resources: {
         title: "資源",
         items: [
+          { text: "學習文檔", href: "https://quickform.readthedocs.io/" },
           { text: "四步入門", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
           { text: "應用案例", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
           { text: "本地部署", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
