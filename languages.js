@@ -2,7 +2,7 @@ const languages = {
   zh: {
     nav: {
       logo: "QuickForm",
-      logoSub: "AI原生数据平台",
+      logoSub: "AI原生数据服务",
       links: [
         { text: "前言", href: "#problem" },
         { text: "指南", href: "#solution" },
@@ -134,7 +134,7 @@ const languages = {
       ],
       support: {
         title: "支持团队与机构",
-        logos: ["XEduPro 团队", "DFRobot", "清华大学出版社", "全国中小学AI与科技教育大会", "全国中小学STEAM教育大会"]
+        logos: ["虚谷计划", "XEduPro 团队", "清华大学出版社", "全国中小学AI与科技教育大会", "全国中小学STEAM教育大会"]
       }
     },
     footer: {
@@ -148,7 +148,8 @@ const languages = {
           { text: "官方平台", href: "https://quickform.cn" },
           { text: "虚谷计划", href: "https://www.vvplan.cn/" },
           { text: "QF温科高", href: "https://wzkjgz.site/" },
-          { text: "QF中鸣平台", href: "https://qf.zmrobo.com/" }
+          { text: "QF中鸣平台", href: "https://qf.zmrobo.com/" },
+          { text: "OpenHydra", href: "https://openhydra.net/" }
         ]
       },
       resources: {
@@ -308,7 +309,7 @@ const languages = {
       ],
       support: {
         title: "Support Teams and Organizations",
-        logos: ["XEduPro Team", "DFRobot", "Tsinghua University Press", "National Primary and Secondary School AI and Technology Education Conference", "National Primary and Secondary School STEAM Education Conference"]
+        logos: ["Xugu Plan", "XEduPro Team", "Tsinghua University Press", "National Primary and Secondary School AI and Technology Education Conference", "National Primary and Secondary School STEAM Education Conference"]
       }
     },
     footer: {
@@ -322,7 +323,8 @@ const languages = {
           { text: "Official Platform", href: "https://quickform.cn" },
           { text: "Xugu Plan", href: "https://www.vvplan.cn/" },
           { text: "QF WZSTH", href: "https://wzkjgz.site/" },
-          { text: "QF ZMRobo", href: "https://qf.zmrobo.com/" }
+          { text: "QF ZMRobo", href: "https://qf.zmrobo.com/" },
+          { text: "OpenHydra", href: "https://openhydra.net/" }
         ]
       },
       resources: {
@@ -482,7 +484,7 @@ const languages = {
       ],
       support: {
         title: "支援團隊與機構",
-        logos: ["XEduPro 團隊", "DFRobot", "清華大學出版社", "全國中小學AI與科技教育大會", "全國中小學STEAM教育大會"]
+        logos: ["虛谷計畫", "XEduPro 團隊", "清華大學出版社", "全國中小學AI與科技教育大會", "全國中小學STEAM教育大會"]
       }
     },
     footer: {
@@ -496,7 +498,8 @@ const languages = {
           { text: "官方平台", href: "https://quickform.cn" },
           { text: "虛谷計畫", href: "https://www.vvplan.cn/" },
           { text: "QF溫科高", href: "https://wzkjgz.site/" },
-          { text: "QF中鳴平台", href: "https://qf.zmrobo.com/" }
+          { text: "QF中鳴平台", href: "https://qf.zmrobo.com/" },
+          { text: "OpenHydra", href: "https://openhydra.net/" }
         ]
       },
       resources: {
