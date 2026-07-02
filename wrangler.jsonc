@@ -1,0 +1,8 @@
+{
+  "name": "quickform",
+  "workers_dev": true,
+  "compatibility_date": "2026-07-02",
+  "assets": {
+    "directory": "./"
+  }
+}
