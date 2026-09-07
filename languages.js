@@ -155,10 +155,10 @@ const languages = {
       resources: {
         title: "资源",
         items: [
-          { text: "学习文档", href: "https://quickform.readthedocs.io/" },
-          { text: "四步入门", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
-          { text: "应用案例", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
-          { text: "本地部署", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
+          { text: "学习文档", href: "https://docs.quickform.cc/" },
+          { text: "四步入门", href: "https://docs.quickform.cc/zh-cn/latest/guide/start.html" },
+          { text: "应用案例", href: "https://docs.quickform.cc/zh-cn/latest/case.html" },
+          { text: "本地部署", href: "https://docs.quickform.cc/zh-cn/latest/guide/deploy.html" }
         ]
       },
       contact: {
@@ -330,10 +330,10 @@ const languages = {
       resources: {
         title: "Resources",
         items: [
-          { text: "Documentation", href: "https://quickform.readthedocs.io/" },
-          { text: "4-Step Guide", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
-          { text: "Use Cases", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
-          { text: "Local Deployment", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
+          { text: "Documentation", href: "https://docs.quickform.cc/" },
+          { text: "4-Step Guide", href: "https://docs.quickform.cc/zh-cn/latest/guide/start.html" },
+          { text: "Use Cases", href: "https://docs.quickform.cc/zh-cn/latest/case.html" },
+          { text: "Local Deployment", href: "https://docs.quickform.cc/zh-cn/latest/guide/deploy.html" }
         ]
       },
       contact: {
@@ -505,10 +505,10 @@ const languages = {
       resources: {
         title: "資源",
         items: [
-          { text: "學習文檔", href: "https://quickform.readthedocs.io/" },
-          { text: "四步入門", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/start.html" },
-          { text: "應用案例", href: "https://quickform.readthedocs.io/zh-cn/latest/case.html" },
-          { text: "本地部署", href: "https://quickform.readthedocs.io/zh-cn/latest/guide/deploy.html" }
+          { text: "學習文檔", href: "https://docs.quickform.cc/" },
+          { text: "四步入門", href: "https://docs.quickform.cc/zh-cn/latest/guide/start.html" },
+          { text: "應用案例", href: "https://docs.quickform.cc/zh-cn/latest/case.html" },
+          { text: "本地部署", href: "https://docs.quickform.cc/zh-cn/latest/guide/deploy.html" }
         ]
       },
       contact: {
