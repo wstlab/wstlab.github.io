@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":51,"key":"case-51","title":"草船借箭 · 神机妙算闯关赛","category":"practice","description":"草船借箭战报：围绕得分、关卡、回答开展交互学习，在数据大屏中回看记录。","headline":"草船借箭战报","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"level","label":"关卡"},{"key":"answers","label":"回答"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开游戏"}],"tasks":{"records":"04GzpeMtNYN"},"mapping":{"q7eis9rwwh":"04GzpeMtNYN"},"accent":"#4468ab","capture":false,"lesson":"打开游戏"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>草船借箭 · 神机妙算闯关赛 | 五年级下册课文游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 避免拖动干扰，不影响文字选择 */
+        }
+
+        body {
+            background: linear-gradient(145deg, #1e5f3a 0%, #0b3b23 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', '华文楷书', 'Microsoft YaHei', '楷体', 'Poppins', cursive, sans-serif;
+            padding: 20px;
+        }
+
+        /* 游戏主容器 仿古竹简风格 */
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            background: #fef7e0 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23d4af7a" opacity="0.1"><path d="M12,2L2,7l10,5l10-5L12,2z M2,17l10,5l10-5M2,12l10,5l10-5"/></svg>') repeat;
+            background-size: 40px;
+            border-radius: 64px 48px 64px 48px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.4), inset 0 1px 4px rgba(255,255,200,0.8);
+            padding: 20px 25px 35px;
+            transition: all 0.2s;
+        }
+
+        /* 头部信息 */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            background: #2c1a12c9;
+            background: linear-gradient(135deg, #3e2a21, #2a1a12);
+            padding: 12px 24px;
+            border-radius: 60px;
+            margin-bottom: 25px;
+            color: #ffefc0;
+            text-shadow: 2px 2px 0 #5a3a2a;
+            box-shadow: 0 6px 0 #1e120b;
+        }
+        .game-title {
+            font-size: 1.7rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .game-title span {
+            font-size: 1.9rem;
+        }
+        .score-board {
+            background: #00000055;
+            backdrop-filter: blur(4px);
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        .level-badge {
+            background: #e5b83c;
+            color: #2d2b1f;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* 关卡主体 */
+        .level-card {
+            background: #fffaf0dd;
+            backdrop-filter: blur(3px);
+            border-radius: 48px;
+            padding: 20px 25px;
+            margin: 15px 0;
+            border: 1px solid #e9cf8e;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .level-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #b45f2b;
+            border-left: 12px solid #e0a82b;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0 #ffefb0;
+        }
+        .level-desc {
+            background: #d9c2944d;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #4e3e2c;
+            font-style: italic;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        .questions-area {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .question-item {
+            background: #fff3e0;
+            border-radius: 36px;
+            padding: 18px 20px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            transition: 0.1s;
+        }
+        .question-text {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #3b2a1f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .question-icon {
+            font-size: 1.4rem;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 12px 0 8px;
+        }
+        .option {
+            background: #ede0c8;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #cbbd94;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option:hover {
+            background: #f5e6ca;
+            transform: scale(0.97);
+        }
+        input[type="radio"] {
+            accent-color: #b96f30;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 6px 14px;
+            border-radius: 28px;
+            font-size: 0.9rem;
+            background: #f9e9cf;
+            display: inline-block;
+            color: #6b4c2c;
+        }
+        .feedback.correct {
+            background: #b9d8a3;
+            color: #2a6210;
+            border-left: 6px solid #3e9f1f;
+        }
+        .feedback.wrong {
+            background: #f3cfb6;
+            color: #b13e3e;
+            border-left: 6px solid #c7362b;
+        }
+        .next-btn, .restart-btn, .submit-btn {
+            background: #e0a82b;
+            border: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 60px;
+            color: #2c2416;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #8b5a2b;
+            margin-top: 15px;
+            margin-right: 15px;
+            font-family: inherit;
+        }
+        .next-btn:active, .restart-btn:active, .submit-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8b5a2b;
+        }
+        .next-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .restart-btn {
+            background: #5d7c4c;
+            box-shadow: 0 5px 0 #2f4d2d;
+            color: #fef1cf;
+        }
+        /* 胜利动画 */
+        .victory-overlay {
+            text-align: center;
+            padding: 15px;
+            animation: float 0.8s ease;
+        }
+        @keyframes float {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .victory-text {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+        }
+        .form-panel {
+            background: #e7dbbc;
+            border-radius: 48px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin: 12px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .form-group label {
+            width: 70px;
+            font-weight: bold;
+        }
+        .form-group input {
+            flex: 1;
+            padding: 10px 18px;
+            border-radius: 60px;
+            border: 1px solid #c8aa6e;
+            font-size: 1rem;
+            background: #fff9ed;
+        }
+        .feedback-msg {
+            margin-top: 12px;
+            font-weight: bold;
+            background: #302218;
+            color: #ffdd99;
+            padding: 8px;
+            border-radius: 30px;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #af9466;
+            margin-top: 20px;
+        }
+        @media (max-width: 680px) {
+            .game-container { padding: 15px; }
+            .question-text { font-size: 1rem; }
+            .option { padding: 5px 12px; font-size: 0.85rem; }
+            .level-name { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameApp">
+    <div class="game-header">
+        <div class="game-title">
+            <span>🏹</span> 草船借箭 · 神机妙算闯关赛
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="level-badge" id="levelLabel">第一关</div>
+            <div class="score-board">🏆 得分: <span id="scoreDisplay">0</span> / 400</div>
+        </div>
+    </div>
+
+    
+    <div id="dynamicContent"></div>
+    <footer>⚡ 依据统编版五年级下册《草船借箭》设计 | 神机妙算，智夺东风 ⚡</footer>
+</div>
+
+<script>
+    // ----------------------------- 基于课文的题库 ---------------------------------
+    const LEVELS = [
+        {   // 第一关: 识人心
+            name: "第一关 · 识人心",
+            desc: "✨ 诸葛亮深谙人性，洞察人心。你能像他一样读懂周瑜、鲁肃、曹操吗？",
+            questions: [
+                {
+                    text: "1. 诸葛亮请鲁肃帮忙，并嘱咐鲁肃不要告诉周瑜，这是因为诸葛亮知道鲁肃是怎样的人？",
+                    options: ["A. 忠诚老实，守信用", "B. 胆小怕事，不敢做主", "C. 和周瑜关系不好", "D. 没有主见，容易糊弄"],
+                    correct: 0
+                },
+                {
+                    text: "2. 曹操听到擂鼓呐喊，为什么只命令弓弩手射箭，不敢派兵迎战？",
+                    options: ["A. 曹操胆小懦弱", "B. 江面大雾弥漫，怕有埋伏", "C. 曹操想要节约兵力", "D. 曹操故意让诸葛亮得箭"],
+                    correct: 1
+                },
+                {
+                    text: "3. 诸葛亮深知周瑜心胸狭窄，所以面对周瑜的陷害，诸葛亮怎么做？",
+                    options: ["A. 与周瑜当面对质", "B. 不动声色，用智慧完成造箭任务", "C. 请求鲁肃帮忙告状", "D. 放弃造箭逃走"],
+                    correct: 1
+                }
+            ]
+        },
+        {   // 第二关: 知天象
+            name: "第二关 · 知天象",
+            desc: "🌫️ 观星望气，预测大雾。诸葛亮为何能算准三天后必有漫天大雾？",
+            questions: [
+                {
+                    text: "1. 诸葛亮为什么能准确预料三天后有大雾？",
+                    options: ["A. 他精通天文气象，善于观察", "B. 随便猜测碰运气", "C. 鲁肃秘密告知", "D. 周瑜派人告诉他"],
+                    correct: 0
+                },
+                {
+                    text: "2. 诸葛亮选择“第三天四更”去曹营附近，最主要的原因是什么？",
+                    options: ["A. 此时敌军都在睡觉", "B. 此时大雾最浓，利于借箭", "C. 潮汐水位最高", "D. 风向转为西北风"],
+                    correct: 1
+                },
+                {
+                    text: "3. 让曹军无法分辨虚实、不敢出击的关键天气条件是？",
+                    options: ["A. 大雨倾盆", "B. 狂风大作", "C. 大雾漫天", "D. 雷电交加"],
+                    correct: 2
+                }
+            ]
+        },
+        {   // 第三关: 晓地利
+            name: "第三关 · 晓地利",
+            desc: "⛵ 利用长江天险，巧借地理优势，运筹帷幄之中。",
+            questions: [
+                {
+                    text: "1. 诸葛亮下令将二十条船怎样布置，以最大化受箭面积并安全返回？",
+                    options: ["A. 船头朝东，船尾朝西，一字排开并用绳索连接，受箭后调转船头", "B. 分散行驶，各自为战", "C. 围成一圈保护大船", "D. 只派两条船诱敌"],
+                    correct: 0
+                },
+                {
+                    text: "2. 诸葛亮让军士在船头“擂鼓呐喊”，主要目的是？",
+                    options: ["A. 壮大声势，制造大军来袭的假象", "B. 庆祝即将胜利", "C. 训练士兵胆量", "D. 求救于周瑜"],
+                    correct: 0
+                },
+                {
+                    text: "3. 借箭结束后，诸葛亮下令“船头朝东，船尾朝西”调转方向，原因是什么？",
+                    options: ["A. 顺风顺水，迅速撤回南岸", "B. 再次前往曹营继续借箭", "C. 观察曹营水寨布防", "D. 展示军威"],
+                    correct: 0
+                }
+            ]
+        },
+        {   // 第四关: 终极挑战
+            name: "第四关 · 终极挑战",
+            desc: "🔥 集识人心、知天象、晓地利于一身！考验整体战略智慧！",
+            questions: [
+                {
+                    text: "1. 诸葛亮立下军令状“三天造十万支箭”，他的真正计划是什么？",
+                    options: ["A. 利用草船向曹操“借”箭", "B. 发动工匠连夜赶造", "C. 向孙权借箭", "D. 购买民间箭矢"],
+                    correct: 0
+                },
+                {
+                    text: "2. 周瑜长叹：“诸葛亮神机妙算，我真比不上他！”这里的“神机妙算”主要体现为？",
+                    options: ["A. 识人心、知天象、晓地利", "B. 会使用法术", "C. 精通奇门遁甲", "D. 运气极佳"],
+                    correct: 0
+                },
+                {
+                    text: "3. 草船借箭成功最关键的原因是诸葛亮善于？",
+                    options: ["A. 利用天时、地利、人和", "B. 拥有精良战船", "C. 收买了曹操士兵", "D. 周瑜暗中协助"],
+                    correct: 0
+                }
+            ]
+        }
+    ];
+
+    // 游戏全局状态
+    let currentLevel = 0;            // 0-index
+    let levelPassed = [false, false, false, false];  // 是否已经获得该关分数+通关
+    let totalScore = 0;              // 实际得分 = 已过关卡数 * 100
+    let gameCompleted = false;       // 是否已全部通关
+    let currentQuestionsStatus = [];  // 每道题是否正确 [true/false] 仅当前关卡动态
+
+    // DOM 元素
+    const dynamicContainer = document.getElementById('dynamicContent');
+    const scoreSpan = document.getElementById('scoreDisplay');
+    const levelLabelSpan = document.getElementById('levelLabel');
+
+    // 辅助函数: 更新UI总分显示
+    function updateScoreUI() {
+        scoreSpan.innerText = totalScore;
+    }
+
+    // 重新计算总分 (基于levelPassed)
+    function recalcTotalScore() {
+        let newScore = 0;
+        for(let i = 0; i < levelPassed.length; i++) {
+            if(levelPassed[i]) newScore += 100;
+        }
+        totalScore = newScore;
+        updateScoreUI();
+    }
+
+    // 保存当前关卡每道题的正确状态 (由用户选择触发)
+    function updateCurrentQuestionStatus(qIndex, isCorrect) {
+        if(currentQuestionsStatus[qIndex] === isCorrect) return;
+        currentQuestionsStatus[qIndex] = isCorrect;
+        // 每次状态改变，检查是否当前关卡所有题目全对
+        const allCorrect = currentQuestionsStatus.length > 0 && currentQuestionsStatus.every(status => status === true);
+        // 如果全对 且 该关卡尚未标记为passed，则通关加分
+        if(allCorrect && !levelPassed[currentLevel]) {
+            // 通过本关卡!
+            levelPassed[currentLevel] = true;
+            recalcTotalScore();
+            // 重新渲染当前关卡界面 (更新按钮显示)
+            renderCurrentLevel();
+            // 如果第四关通关，需进入完结界面，不显示下一关，直接跳完成
+            if(currentLevel === 3) {
+                gameCompleted = true;
+                renderCompleteVictory();
+            }
+        }
+        // 如果之前已通关但因为修改某题变成未全对，则要撤销通过状态并扣分
+        else if(!allCorrect && levelPassed[currentLevel]) {
+            levelPassed[currentLevel] = false;
+            recalcTotalScore();
+            renderCurrentLevel();   // 刷新界面，按钮消失，题目继续保持可修改
+        } else {
+            // 未全对，未通关状态只更新反馈内容，但不需要重绘全部（保留原有反馈文字）
+            // 只更新对应题目的反馈样式，但为了简便，可以调用局部刷新反馈信息，但是我们已经将渲染整体刷新会导致用户选项丢失？
+            // 注意：如果在全对后修改某题导致未全对，会重新渲染，会丢失选项选择状态？需要在渲染时绑定已经存储的正确状态及用户所选值？
+            // 最好保留每个题目的用户选择值，而不是重新渲染后重置所有选择。
+            // 所以优化: 不使用整体重新渲染，而只是更新分数和按钮显示 + 单独更新反馈条。但是为了开发稳健，采用精细控制：每次选择只更新反馈样式与通关按钮状态。
+            // 但为了保证状态一致性，重新实现局部更新函数: 更新当前关卡按钮显示和分数显示即可，不再整体渲染(保留用户选项)。复杂，采用重绘但保留用户选中值的方式。
+            // 重绘时从当前questionsStatus和用户之前选中的索引？为了简单，存储每个题目当前用户选中的选项值(索引)
+            if(!allCorrect && !levelPassed[currentLevel]) {
+                // 普通错误情况，只需刷新该题的反馈消息（可以在事件中动态修改），但因为上面的renderCurrentLevel会重新绘制所有导致选项丢失
+                // 为了避免丢失，在每次题目change时直接操作DOM更新反馈，而不整体渲染。
+                // 重构: 监听采用动态绑定，每个选项change时更新当前题目状态和反馈，同时控制通关按钮。这样可以避免重绘。
+                // 为避免复杂bug，采用更可靠方法：renderCurrentLevel只负责初始绘制，后续所有状态变化通过事件直接修改DOM & 内存变量。
+                // 实现手动控制: 在用户选择答案时修改currentQuestionsStatus、更新该题目反馈区域、并检查通关状态 -> 显示/隐藏下一关按钮。
+                // 这样做不会重置页面，体验更好。
+            }
+        }
+        // 由于上述复杂，我们将在实际渲染函数中采用事件监听更新单一题目的方式，保留当前选中的值。
+        // 为了代码清晰且可靠，我将在第一次渲染时构建DOM，存储每个题目的radio group和反馈div引用，然后通过监听变化更新状态。
+    }
+
+    // 全局变量存储当前渲染的DOM元素引用及题目正确状态数组更新函数
+    let currentQuestionRefs = [];    // 存储每个题目的反馈div, radio组name等
+
+    // 渲染当前关卡 (完全基于内存中的levelPassed, currentLevel, 但保留用户已选值? 每次切换关卡或者初始化都会重建)
+    function renderCurrentLevel() {
+        if(gameCompleted) {
+            renderCompleteVictory();
+            return;
+        }
+        const levelData = LEVELS[currentLevel];
+        const passed = levelPassed[currentLevel];
+        // 构建html骨架
+        let html = `
+            <div class="level-card">
+                <div class="level-name">🏮 ${levelData.name}</div>
+                <div class="level-desc">📜 ${levelData.desc}</div>
+                <div class="questions-area" id="questionsArea"></div>
+                <div class="button-group" id="levelButtons"></div>
+            </div>
+        `;
+        dynamicContainer.innerHTML = html;
+        const questionsArea = document.getElementById('questionsArea');
+        // 生成每个题目
+        currentQuestionsStatus = new Array(levelData.questions.length).fill(false);
+        // 存储每个题目的用户选择值 (用于保留)
+        let selectedValues = new Array(levelData.questions.length).fill(null);
+        
+        levelData.questions.forEach((q, idx) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-item';
+            qDiv.setAttribute('data-qidx', idx);
+            const optionsHtml = q.options.map((opt, optIdx) => `
+                <label class="option">
+                    <input type="radio" name="q_${idx}" value="${optIdx}">
+                    <span>${opt}</span>
+                </label>
+            `).join('');
+            qDiv.innerHTML = `
+                <div class="question-text"><span class="question-icon">❓</span> ${q.text}</div>
+                <div class="options" id="options_${idx}">
+                    ${optionsHtml}
+                </div>
+                <div class="feedback" id="fb_${idx}">⚡ 未作答</div>
+            `;
+            questionsArea.appendChild(qDiv);
+            // 绑定change事件
+            const radios = qDiv.querySelectorAll(`input[name="q_${idx}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const selectedVal = parseInt(e.target.value);
+                    const isCorrect = (selectedVal === q.correct);
+                    // 更新正确状态数组
+                    currentQuestionsStatus[idx] = isCorrect;
+                    // 更新反馈显示
+                    const fbDiv = document.getElementById(`fb_${idx}`);
+                    if(isCorrect) {
+                        fbDiv.innerHTML = '✅ 回答正确！ 神机妙算！';
+                        fbDiv.className = 'feedback correct';
+                    } else {
+                        const correctAns = q.options[q.correct];
+                        fbDiv.innerHTML = `❌ 答错了… 正确答案是：${correctAns}。再试试看！`;
+                        fbDiv.className = 'feedback wrong';
+                    }
+                    // 每次选择后，检查本关是否已经全对
+                    const allNowCorrect = currentQuestionsStatus.every(v => v === true);
+                    const levelAlreadyPassed = levelPassed[currentLevel];
+                    if(allNowCorrect && !levelAlreadyPassed) {
+                        // 通关加分
+                        levelPassed[currentLevel] = true;
+                        recalcTotalScore();
+                        // 刷新按钮区域: 显示下一关或完成界面
+                        updateLevelButtons();
+                        // 如果是第四关通关, 切换完成界面
+                        if(currentLevel === 3) {
+                            gameCompleted = true;
+                            renderCompleteVictory();
+                        }
+                    } 
+                    else if(!allNowCorrect && levelAlreadyPassed) {
+                        // 已通过但修改导致全错，撤销通过
+                        levelPassed[currentLevel] = false;
+                        recalcTotalScore();
+                        updateLevelButtons();
+                    }
+                });
+            });
+        });
+        
+        // 按钮区域生成
+        function updateLevelButtons() {
+            const btnGroup = document.getElementById('levelButtons');
+            if(!btnGroup) return;
+            const isCurrentPassed = levelPassed[currentLevel];
+            btnGroup.innerHTML = '';
+            // 重新开始按钮全局保留（方便随时重置）
+            const restartGlobal = document.createElement('button');
+            restartGlobal.innerText = '🔄 重新开始';
+            restartGlobal.className = 'restart-btn';
+            restartGlobal.onclick = () => resetGame();
+            btnGroup.appendChild(restartGlobal);
+            
+            if(isCurrentPassed) {
+                if(currentLevel < 3) {
+                    const nextBtn = document.createElement('button');
+                    nextBtn.innerText = '➡️ 下一关';
+                    nextBtn.className = 'next-btn';
+                    nextBtn.onclick = () => {
+                        if(currentLevel + 1 < 4) {
+                            currentLevel++;
+                            // 重置当前关卡题目状态数组 (fresh)
+                            currentQuestionsStatus = new Array(LEVELS[currentLevel].questions.length).fill(false);
+                            gameCompleted = false;
+                            renderCurrentLevel();
+                            updateLevelLabel();
+                        }
+                    };
+                    btnGroup.appendChild(nextBtn);
+                } else if (currentLevel === 3) {
+                    // 第四关已通过, 显示胜利界面由外部 renderCompleteVictory 处理, 但以防万一，若没调用完成界面的手动触发
+                    if(!gameCompleted) {
+                        gameCompleted = true;
+                        renderCompleteVictory();
+                    }
+                }
+            } else {
+                // 未通关, 提示全部正确才可继续
+                const hintSpan = document.createElement('span');
+                hintSpan.innerText = '✨ 答对所有题目，即可过关 ✨';
+                hintSpan.style.fontSize = '0.9rem';
+                hintSpan.style.background = '#f0deae';
+                hintSpan.style.padding = '6px 15px';
+                hintSpan.style.borderRadius = '30px';
+                btnGroup.appendChild(hintSpan);
+            }
+        }
+        updateLevelButtons();
+        updateLevelLabel();
+    }
+
+    function updateLevelLabel() {
+        if(currentLevel === 0) levelLabelSpan.innerText = '第一关 · 识人心';
+        else if(currentLevel === 1) levelLabelSpan.innerText = '第二关 · 知天象';
+        else if(currentLevel === 2) levelLabelSpan.innerText = '第三关 · 晓地利';
+        else if(currentLevel === 3) levelLabelSpan.innerText = '第四关 · 终极挑战';
+        if(gameCompleted) levelLabelSpan.innerText = '🎉 通关！ 🎉';
+    }
+
+    // 完全通关后显示的胜利界面 + 表单提交
+    function renderCompleteVictory() {
+        // 保证分数展示最终
+        recalcTotalScore();
+        const victoryHtml = `
+            <div class="victory-overlay">
+                <div class="victory-text">🏆 借箭成功！ 🏆</div>
+                <div style="font-size: 2rem;">🎋✨ 神机妙算，名震江东 ✨🎋</div>
+                <div style="margin: 15px 0; font-size:1.2rem;">🎉 恭喜你完成所有关卡，总分 ${totalScore} / 400 🎉</div>
+                <div style="margin: 10px 0;"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c9772e' width='48px' height='48px'%3E%3Cpath d='M12,2L15,8.5L22,9.5L17,14L18.5,21L12,17.5L5.5,21L7,14L2,9.5L9,8.5L12,2Z'/%3E%3C/svg%3E" style="width:50px;"> 智慧之星</div>
+                <div class="form-panel">
+                    <h3>📜 提交战报，载入史册 📜</h3>
+                    <div class="form-group"><label>姓名：</label><input type="text" id="studentName" placeholder="例如：诸葛亮小徒"></div>
+                    <div class="form-group"><label>班级：</label><input type="text" id="studentClass" placeholder="例如：五（3）班"></div>
+                    <button id="submitReportBtn" class="submit-btn">⚡ 提交战报 ⚡</button>
+                    <button id="restartFromVictoryBtn" class="restart-btn">🏮 重新开始 🏮</button>
+                    <div id="postFeedback" class="feedback-msg"></div>
+                </div>
+            </div>
+        `;
+        dynamicContainer.innerHTML = victoryHtml;
+        levelLabelSpan.innerText = '🎉 通关！ 🎉';
+        document.getElementById('submitReportBtn')?.addEventListener('click', submitBattleReport);
+        document.getElementById('restartFromVictoryBtn')?.addEventListener('click', resetGame);
+    }
+
+    // 提交战报 POST
+    async function submitBattleReport() {
+        const studentName = document.getElementById('studentName')?.value.trim() || '';
+        const studentClass = document.getElementById('studentClass')?.value.trim() || '';
+        if(!studentName || !studentClass) {
+            const feedbackDiv = document.getElementById('postFeedback');
+            if(feedbackDiv) feedbackDiv.innerText = '❓ 请完整填写姓名和班级后再提交战报！';
+            return;
+        }
+        const gameName = "草船借箭·神机妙算闯关赛";
+        const score = totalScore;
+        const fullScore = 400;
+        const timestamp = new Date().toISOString();
+        const completed = gameCompleted ? "全部通关" : "未完全通关";
+        const payload = {
+            gameName: gameName,
+            studentName: studentName,
+            studentClass: studentClass,
+            score: score,
+            fullScore: fullScore,
+            timestamp: timestamp,
+            completed: completed
+        };
+        try {
+            const response = await fetch('https://qf.kjxs.site/api/04GzpeMtNYN', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.text();
+            const feedbackDiv = document.getElementById('postFeedback');
+            if(feedbackDiv) feedbackDiv.innerHTML = `✅ 战报飞鸽传书成功！ ${result || '都督点赞'}`;
+        } catch(error) {
+            const feedbackDiv = document.getElementById('postFeedback');
+            if(feedbackDiv) feedbackDiv.innerHTML = `⚠️ 网络延迟，但你的智慧已被铭记！(提交出错可稍后再试)`;
+            console.error(error);
+        }
+    }
+
+    // 重置所有游戏进度
+    function resetGame() {
+        currentLevel = 0;
+        levelPassed = [false, false, false, false];
+        totalScore = 0;
+        gameCompleted = false;
+        currentQuestionsStatus = [];
+        updateScoreUI();
+        // 重新渲染第一关
+        renderCurrentLevel();
+        levelLabelSpan.innerText = '第一关 · 识人心';
+    }
+
+    // 初始化游戏
+    function initGame() {
+        resetGame(); // 直接调用重置初始化
+    }
+    initGame();
+</script>
+</body>
+</html>

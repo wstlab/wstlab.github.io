@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":29,"key":"case-29","title":"吸管塔台 · 过程性数据工坊","category":"simulation","description":"塔台迭代工坊：围绕高度、吸管数量、承重开展交互学习，在数据大屏中回看记录。","headline":"塔台迭代工坊","view":"scatter","fields":[{"key":"height","label":"高度"},{"key":"strawCount","label":"吸管数量"},{"key":"load","label":"承重"},{"key":"iteration","label":"迭代轮次"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开工坊"}],"tasks":{"records":"y3UzyPxGXFU"},"mapping":{"b4obb5utjj":"y3UzyPxGXFU"},"accent":"#3c697b","capture":false,"lesson":"打开工坊"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>吸管塔台工程日志 | 过程性数据收集系统</title>
+    
+    <script src="/projects/shared/vendor/3f13e7495584e13d.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: #f1f5f9; }
+        .data-table-container::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .data-table-container::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 8px;
+        }
+        .data-table-container::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+        }
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            ring: 2px solid #3b82f6;
+            border-color: transparent;
+        }
+        .btn-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        
+        <div class="mb-8 text-center md:text-left md:flex md:justify-between md:items-end gap-4">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mb-2">
+                    <i class="fas fa-flask text-xs"></i>
+                    <span>六年级 · 工程实践</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                    吸管塔台 · 过程性数据工坊
+                </h1>
+                <p class="text-slate-500 mt-2 max-w-2xl text-sm md:text-base">
+                    结构化记录设计迭代、结构与成本数据，构建完整证据链，支持AI分析与科学论证。
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-2 justify-center md:justify-end">
+                <div class="bg-white/60 backdrop-blur-sm rounded-full px-4 py-1.5 shadow-sm text-sm font-medium text-slate-600">
+                    <i class="fas fa-database mr-1 text-blue-500"></i>
+                    <span id="recordCount">0</span> 条工程记录
+                </div>
+            </div>
+        </div>
+
+        
+        <div id="editModeBadge" class="hidden mb-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-amber-700 text-sm flex items-center justify-between">
+            <span><i class="fas fa-edit mr-2"></i> 正在编辑模式，修改后点击“更新记录”保存更改。</span>
+            <button id="cancelEditBtn" class="text-amber-800 hover:text-amber-900 font-medium text-xs bg-amber-100 px-3 py-1 rounded-full">取消编辑</button>
+        </div>
+
+        
+        <div class="space-y-6">
+            
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden card-hover">
+                <div class="bg-gradient-to-r from-slate-50 to-slate-100/50 px-6 py-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-id-card text-indigo-500 text-lg"></i>
+                        <h2 class="font-semibold text-slate-800 text-lg">📋 基础信息</h2>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">小组档案</span>
+                    </div>
+                </div>
+                <div class="p-5 md:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"><i class="fas fa-graduation-cap text-blue-400 w-4 mr-1"></i> 班级 <span class="text-red-400">*</span></label>
+                            <select id="className" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition">
+                                <option value="六(1)班">六(1)班</option>
+                                <option value="六(2)班">六(2)班</option>
+                                <option value="六(3)班">六(3)班</option>
+                                <option value="六(4)班">六(4)班</option>
+                                <option value="六(5)班">六(5)班</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"><i class="fas fa-users text-blue-400 w-4 mr-1"></i> 小组名称 <span class="text-red-400">*</span></label>
+                            <input type="text" id="groupName" placeholder="例：未来工程师组 / 第三小组" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"><i class="fas fa-user-friends text-blue-400 w-4 mr-1"></i> 成员姓名</label>
+                            <input type="text" id="memberNames" placeholder="例：张三、李四、王芳（多人用逗号隔开）" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden card-hover">
+                <div class="bg-gradient-to-r from-slate-50 to-blue-50/30 px-6 py-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-drafting-compass text-blue-600 text-lg"></i>
+                        <h2 class="font-semibold text-slate-800 text-lg">🏗️ 塔台工程记录表</h2>
+                        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">结构与性能数据</span>
+                    </div>
+                </div>
+                <div class="p-5 md:p-6">
+                    <form id="projectForm">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">🔄 迭代版本</label>
+                                <input type="text" id="iteration" placeholder="v1 / 初代" value="v1" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">📐 塔台高度 (cm)</label>
+                                <input type="number" id="height" step="0.1" placeholder="≥ 20 cm" class="w-full px-3 py-2.5 rounded-xl border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">⬛ 底座宽度 (cm)</label>
+                                <input type="number" id="baseWidth" step="0.1" placeholder="底部边长" class="w-full px-3 py-2.5 rounded-xl border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">🥤 吸管用量 (根)</label>
+                                <input type="number" id="strawCount" step="1" placeholder="整数" class="w-full px-3 py-2.5 rounded-xl border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">📏 胶带用量 (卷)</label>
+                                <input type="number" id="tapeRolls" step="0.1" placeholder="例如：1.5 卷" class="w-full px-3 py-2.5 rounded-xl border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">⚖️ 稳定性评分 (1-5)</label>
+                                <select id="stability" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white">
+                                    <option value="5">5 - 非常稳固</option>
+                                    <option value="4">4 - 较稳固</option>
+                                    <option value="3" selected>3 - 中等</option>
+                                    <option value="2">2 - 轻微晃动</option>
+                                    <option value="1">1 - 极不稳定</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">🏋️ 承重测试 (g)</label>
+                                <input type="number" id="weightCapacity" step="10" placeholder="单位克" class="w-full px-3 py-2.5 rounded-xl border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">💨 抗风测试</label>
+                                <select id="windResistance" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white">
+                                    <option value="优秀">优秀 - 强风无倒</option>
+                                    <option value="通过">通过 - 中轻度风</option>
+                                    <option value="未通过">未通过 - 易摇晃倒塌</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><i class="fas fa-coins text-amber-500"></i> 成本 (工程币)</label>
+                                <input type="number" id="cost" step="0.1" placeholder="例如：25.5 工程币" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><i class="far fa-lightbulb"></i> 设计思路 / 草图描述</label>
+                                <textarea id="designIdea" rows="2" placeholder="描述结构特点、连接方式、创新设计..." class="w-full px-4 py-2 rounded-xl border border-slate-200 bg-slate-50/50"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><i class="fas fa-arrows-spin"></i> 反思与改进</label>
+                                <textarea id="improvement" rows="2" placeholder="遇到的问题、优化方案、下一迭代计划..." class="w-full px-4 py-2 rounded-xl border border-slate-200 bg-slate-50/50"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3 pt-6 mt-2 border-t border-slate-100">
+                            <button type="submit" id="submitBtn" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition-all btn-transparent flex items-center justify-center gap-2">
+                                <i class="fas fa-save"></i> <span id="submitBtnText">保存记录</span>
+                            </button>
+                            <button type="button" id="resetFormBtn" class="px-5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-slate-600 transition">
+                                <i class="fas fa-undo-alt"></i> 清空
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden mt-8">
+            <div class="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-slate-100 bg-slate-50/40">
+                <div class="flex flex-wrap gap-2">
+                    <button id="exportJsonBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium hover:bg-emerald-100 transition">
+                        <i class="fas fa-download"></i> 导出 JSON (AI分析)
+                    </button>
+                    <button id="clearAllBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-100 transition">
+                        <i class="fas fa-trash-alt"></i> 清空所有数据
+                    </button>
+                    <button id="loadExampleBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 transition">
+                        <i class="fas fa-chalkboard-user"></i> 加载示例数据
+                    </button>
+                </div>
+                <div class="text-xs text-slate-400 flex items-center gap-1">
+                    <i class="fas fa-cloud-upload-alt"></i> 每次保存自动同步云端
+                </div>
+            </div>
+            
+            <div class="data-table-container overflow-x-auto p-0">
+                <table class="min-w-[1300px] w-full text-sm">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr class="text-left text-slate-600 font-semibold">
+                            <th class="px-4 py-3">班级</th>
+                            <th class="px-4 py-3">小组</th>
+                            <th class="px-4 py-3">成员姓名</th>
+                            <th class="px-4 py-3">迭代</th>
+                            <th class="px-4 py-3">高度(cm)</th>
+                            <th class="px-4 py-3">底座宽(cm)</th>
+                            <th class="px-4 py-3">吸管(根)</th>
+                            <th class="px-4 py-3">胶带(卷)</th>
+                            <th class="px-4 py-3">稳定性</th>
+                            <th class="px-4 py-3">承重(g)</th>
+                            <th class="px-4 py-3">抗风</th>
+                            <th class="px-4 py-3">成本(工程币)</th>
+                            <th class="px-4 py-3">设计思路(摘要)</th>
+                            <th class="px-4 py-3">反思改进(摘要)</th>
+                            <th class="px-4 py-3 text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr class="hover:bg-slate-50 transition">
+                            <td colspan="15" class="text-center py-8 text-slate-400">暂无工程数据，请填写上方表单添加记录 ✨</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50/60 px-4 py-2 text-xs text-slate-400 border-t flex justify-between">
+                <span><i class="far fa-clock"></i> 支持迭代追溯 · 双击表格行可快速编辑</span>
+                <span>📌 数据自动保存至浏览器及云端</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ---------- 数据模型 ----------
+        let engineeringRecords = [];
+        let currentEditId = null;
+
+        const STORAGE_KEY = 'straw_tower_evidence_v4';   // 升级版本适配成本字段
+        const API_ENDPOINT = 'https://qf.kjxs.site/api/y3UzyPxGXFU';
+
+        // 辅助函数：转义HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // 显示临时消息
+        function showMessage(msg, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-5 right-5 z-50 px-4 py-2 rounded-lg shadow-lg text-sm font-medium transition-all toast ${isError ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`;
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 保存至 localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(engineeringRecords));
+        }
+
+        // 发送单条记录到 API
+        async function sendRecordToAPI(record, action = 'create') {
+            try {
+                const payload = {
+                    record: record,
+                    action: action,
+                    timestamp: new Date().toISOString()
+                };
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    showMessage(`✅ 记录已同步至云端 (${action})`);
+                } else {
+                    const errorText = await response.text();
+                    console.warn('API响应错误:', errorText);
+                    showMessage(`⚠️ 云端同步失败 (${response.status})，但本地已保存`, true);
+                }
+            } catch (err) {
+                console.error('POST请求失败:', err);
+                showMessage('⚠️ 网络错误，云端同步未成功，本地数据已保留', true);
+            }
+        }
+
+        // 加载本地数据，兼容旧字段
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    engineeringRecords = JSON.parse(stored);
+                    engineeringRecords = engineeringRecords.map(record => {
+                        if (!record.className) record.className = "六(1)班";
+                        if (record.tapeLength !== undefined && record.tapeRolls === undefined) {
+                            record.tapeRolls = Math.round(record.tapeLength / 100 * 10) / 10;
+                        }
+                        if (record.tapeRolls === undefined) record.tapeRolls = 0;
+                        if (record.memberNames === undefined) record.memberNames = "";
+                        if (record.cost === undefined) record.cost = null;   // 新增成本字段
+                        return record;
+                    });
+                } catch(e) { engineeringRecords = []; }
+            } else {
+                engineeringRecords = [];
+            }
+            renderTable();
+            updateRecordCount();
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            if (!engineeringRecords.length) {
+                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-slate-400"><i class="fas fa-box-open mr-2"></i>暂无数据，快创建第一条塔台日志吧</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            engineeringRecords.forEach(record => {
+                const designBrief = record.designIdea ? (record.designIdea.length > 18 ? record.designIdea.substring(0, 18) + '…' : record.designIdea) : '—';
+                const improveBrief = record.improvement ? (record.improvement.length > 18 ? record.improvement.substring(0, 18) + '…' : record.improvement) : '—';
+                const membersBrief = record.memberNames ? (record.memberNames.length > 12 ? record.memberNames.substring(0, 12) + '…' : record.memberNames) : '—';
+                let stabilityIcon = '';
+                const stabilityVal = record.stability;
+                if (stabilityVal >= 4) stabilityIcon = '<i class="fas fa-star text-amber-400 text-xs"></i>'.repeat(stabilityVal);
+                else if(stabilityVal >= 2) stabilityIcon = '<i class="fas fa-star text-amber-300 text-xs"></i>'.repeat(stabilityVal);
+                else stabilityIcon = '<i class="fas fa-star-half-alt text-amber-200 text-xs"></i>';
+
+                html += `
+                    <tr class="border-b border-slate-100 hover:bg-blue-50/30 transition cursor-pointer" data-id="${record.id}">
+                        <td class="px-4 py-3 font-medium text-slate-800">${escapeHtml(record.className || '六(1)班')}</td>
+                        <td class="px-4 py-3 font-medium text-slate-800">${escapeHtml(record.groupName) || '未命名'}</td>
+                        <td class="px-4 py-3 text-slate-600" title="${escapeHtml(record.memberNames || '')}">${escapeHtml(membersBrief)}</td>
+                        <td class="px-4 py-3 text-slate-600">${escapeHtml(record.iteration || 'v1')}</td>
+                        <td class="px-4 py-3">${record.height ? Number(record.height).toFixed(1) : '—'}</td>
+                        <td class="px-4 py-3">${record.baseWidth ? Number(record.baseWidth).toFixed(1) : '—'}</td>
+                        <td class="px-4 py-3">${record.strawCount ?? '—'}</td>
+                        <td class="px-4 py-3">${record.tapeRolls !== undefined && record.tapeRolls !== null ? Number(record.tapeRolls).toFixed(1) + ' 卷' : '—'}</td>
+                        <td class="px-4 py-3"><div class="flex items-center gap-1">${stabilityIcon}<span class="ml-1 text-xs">(${record.stability})</span></div></td>
+                        <td class="px-4 py-3">${record.weightCapacity ? record.weightCapacity + ' g' : '—'}</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${record.windResistance === '优秀' ? 'bg-green-100 text-green-700' : (record.windResistance === '通过' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700')}">${record.windResistance || '—'}</span></td>
+                        <td class="px-4 py-3">${record.cost !== undefined && record.cost !== null ? Number(record.cost).toFixed(1) + ' 币' : '—'}</td>
+                        <td class="px-4 py-3 text-slate-500 max-w-[140px] truncate" title="${escapeHtml(record.designIdea || '')}">${escapeHtml(designBrief)}</td>
+                        <td class="px-4 py-3 text-slate-500 max-w-[140px] truncate" title="${escapeHtml(record.improvement || '')}">${escapeHtml(improveBrief)}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex justify-center gap-2">
+                                <button class="edit-record-btn text-indigo-500 hover:text-indigo-800 transition px-1" data-id="${record.id}" title="编辑"><i class="fas fa-edit"></i></button>
+                                <button class="delete-record-btn text-rose-400 hover:text-rose-700 transition px-1" data-id="${record.id}" title="删除"><i class="fas fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+
+            // 双击行快速编辑
+            document.querySelectorAll('#dataTableBody tr[data-id]').forEach(row => {
+                row.addEventListener('dblclick', (e) => {
+                    if(e.target.closest('.edit-record-btn') || e.target.closest('.delete-record-btn')) return;
+                    const id = row.getAttribute('data-id');
+                    if(id) enterEditModeById(id);
+                });
+            });
+            attachTableActions();
+            updateRecordCount();
+        }
+
+        // 表格按钮事件委托
+        function attachTableActions() {
+            if (window.tableEventsBound) return;
+            document.body.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-record-btn');
+                if (editBtn) {
+                    const id = editBtn.getAttribute('data-id');
+                    if (id) enterEditModeById(id);
+                    e.stopPropagation();
+                }
+                const delBtn = e.target.closest('.delete-record-btn');
+                if (delBtn) {
+                    const id = delBtn.getAttribute('data-id');
+                    if (id && confirm('删除这条记录？证据链将移除，不可撤销。')) {
+                        deleteRecordById(id);
+                    }
+                    e.stopPropagation();
+                }
+            });
+            window.tableEventsBound = true;
+        }
+
+        // 编辑模式填充表单
+        function enterEditModeById(id) {
+            const record = engineeringRecords.find(r => r.id == id);
+            if (!record) return;
+            currentEditId = id;
+            // 基础信息
+            document.getElementById('className').value = record.className || '六(1)班';
+            document.getElementById('groupName').value = record.groupName || '';
+            document.getElementById('memberNames').value = record.memberNames || '';
+            // 工程数据
+            document.getElementById('iteration').value = record.iteration || '';
+            document.getElementById('height').value = record.height ?? '';
+            document.getElementById('baseWidth').value = record.baseWidth ?? '';
+            document.getElementById('strawCount').value = record.strawCount ?? '';
+            document.getElementById('tapeRolls').value = record.tapeRolls ?? '';
+            document.getElementById('stability').value = record.stability || 3;
+            document.getElementById('weightCapacity').value = record.weightCapacity ?? '';
+            document.getElementById('windResistance').value = record.windResistance || '通过';
+            document.getElementById('cost').value = record.cost ?? '';
+            document.getElementById('designIdea').value = record.designIdea || '';
+            document.getElementById('improvement').value = record.improvement || '';
+            
+            document.getElementById('editModeBadge').classList.remove('hidden');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitSpan = document.getElementById('submitBtnText');
+            submitSpan.innerHTML = '<i class="fas fa-pen"></i> 更新记录';
+            submitBtn.classList.add('bg-amber-600', 'hover:bg-amber-700');
+            submitBtn.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-indigo-600');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteRecordById(id) {
+            const deletedRecord = engineeringRecords.find(r => r.id == id);
+            engineeringRecords = engineeringRecords.filter(r => r.id != id);
+            if (currentEditId == id) cancelEditMode();
+            saveToLocalStorage();
+            renderTable();
+            // 可选：删除时也可同步通知API，但按需求仅新增/编辑同步，删除不同步。
+        }
+
+        function cancelEditMode() {
+            currentEditId = null;
+            document.getElementById('editModeBadge').classList.add('hidden');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitSpan = document.getElementById('submitBtnText');
+            submitSpan.innerHTML = '保存记录';
+            submitBtn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+            submitBtn.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-indigo-600');
+            resetFormFields();
+        }
+
+        function resetFormFields() {
+            document.getElementById('className').value = '六(1)班';
+            document.getElementById('groupName').value = '';
+            document.getElementById('memberNames').value = '';
+            document.getElementById('iteration').value = 'v1';
+            document.getElementById('height').value = '';
+            document.getElementById('baseWidth').value = '';
+            document.getElementById('strawCount').value = '';
+            document.getElementById('tapeRolls').value = '';
+            document.getElementById('stability').value = '3';
+            document.getElementById('weightCapacity').value = '';
+            document.getElementById('windResistance').value = '通过';
+            document.getElementById('cost').value = '';
+            document.getElementById('designIdea').value = '';
+            document.getElementById('improvement').value = '';
+        }
+
+        function getFormData() {
+            const className = document.getElementById('className').value;
+            const groupName = document.getElementById('groupName').value.trim();
+            if (!groupName) {
+                alert('请填写小组名称，便于追溯证据链');
+                return null;
+            }
+            const memberNames = document.getElementById('memberNames').value.trim();
+            const height = parseFloat(document.getElementById('height').value);
+            if (isNaN(height) || height <= 0) {
+                alert('塔台高度必须为正数 (cm)，体现结构挑战');
+                return null;
+            }
+            const baseWidth = parseFloat(document.getElementById('baseWidth').value);
+            if (isNaN(baseWidth) || baseWidth <= 0) {
+                alert('请输入底座宽度 (cm) 结构基础数据');
+                return null;
+            }
+            const strawCount = parseInt(document.getElementById('strawCount').value);
+            if (isNaN(strawCount) || strawCount < 0) {
+                alert('吸管用量需为有效数字');
+                return null;
+            }
+            let tapeRolls = parseFloat(document.getElementById('tapeRolls').value);
+            if (isNaN(tapeRolls)) tapeRolls = 0;
+            const stability = parseInt(document.getElementById('stability').value);
+            let weightCapacity = parseFloat(document.getElementById('weightCapacity').value);
+            if (isNaN(weightCapacity)) weightCapacity = null;
+            const windResistance = document.getElementById('windResistance').value;
+            let cost = parseFloat(document.getElementById('cost').value);
+            if (isNaN(cost)) cost = null;
+            const designIdea = document.getElementById('designIdea').value.trim();
+            const improvement = document.getElementById('improvement').value.trim();
+            const iteration = document.getElementById('iteration').value.trim() || 'v1';
+            
+            return {
+                className,
+                groupName,
+                memberNames,
+                height,
+                baseWidth,
+                strawCount,
+                tapeRolls,
+                stability,
+                weightCapacity,
+                windResistance,
+                cost,
+                designIdea,
+                improvement,
+                iteration
+            };
+        }
+
+        // 核心提交函数（新增/编辑 + 本地存储 + POST云端）
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const formData = getFormData();
+            if (!formData) return;
+            
+            let recordToSend = null;
+            let actionType = 'create';
+            
+            if (currentEditId) {
+                const index = engineeringRecords.findIndex(r => r.id == currentEditId);
+                if (index !== -1) {
+                    const updatedRecord = {
+                        ...engineeringRecords[index],
+                        ...formData,
+                        updatedAt: new Date().toISOString()
+                    };
+                    engineeringRecords[index] = updatedRecord;
+                    recordToSend = updatedRecord;
+                    actionType = 'update';
+                    saveToLocalStorage();
+                    cancelEditMode();
+                    renderTable();
+                    showMessage('本地更新成功，正在同步云端...');
+                    await sendRecordToAPI(recordToSend, actionType);
+                } else {
+                    alert('编辑的记录不存在，已退出编辑模式');
+                    cancelEditMode();
+                }
+            } else {
+                const newRecord = {
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 6),
+                    ...formData,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                engineeringRecords.unshift(newRecord);
+                recordToSend = newRecord;
+                actionType = 'create';
+                saveToLocalStorage();
+                resetFormFields();
+                renderTable();
+                showMessage('本地保存成功，正在同步云端...');
+                await sendRecordToAPI(recordToSend, actionType);
+            }
+        }
+
+        // 导出 JSON
+        function exportToJSON() {
+            if (engineeringRecords.length === 0) {
+                alert('暂无数据可导出，请先添加记录');
+                return;
+            }
+            const exportData = {
+                project: "六年级吸管塔台项目过程性数据",
+                exportTime: new Date().toISOString(),
+                totalRecords: engineeringRecords.length,
+                records: engineeringRecords
+            };
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `straw_tower_evidence_${new Date().toISOString().slice(0,19)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showMessage('数据已导出为 JSON 文件');
+        }
+
+        function clearAllData() {
+            if (engineeringRecords.length && confirm('⚠️ 此操作将永久清除所有小组的过程性数据，证据链将被清空。确定吗？')) {
+                engineeringRecords = [];
+                saveToLocalStorage();
+                cancelEditMode();
+                renderTable();
+                showMessage('所有数据已清空');
+            }
+        }
+
+        function loadExampleData() {
+            if (engineeringRecords.length > 0 && !confirm('当前已有数据，添加示例数据会追加记录，确定继续吗？')) return;
+            const exampleRecords = [
+                { className: "六(1)班", groupName: "星际建筑师组", memberNames: "李星宇、王晴、张逸飞", iteration: "v1", height: 48.5, baseWidth: 22.0, strawCount: 42, tapeRolls: 1.8, stability: 3, weightCapacity: 650, windResistance: "通过", cost: 28.5, designIdea: "三角形底座+交叉支撑，胶带缠绕节点加固。", improvement: "顶端承重偏弱，下一版增加斜撑结构。" },
+                { className: "六(2)班", groupName: "塔台梦想家", memberNames: "赵思敏、周子涵", iteration: "v2", height: 52.0, baseWidth: 24.5, strawCount: 56, tapeRolls: 2.1, stability: 4, weightCapacity: 820, windResistance: "优秀", cost: 32.0, designIdea: "采用桁架结构，吸管双层复合增加刚性。", improvement: "高度达52cm但抗风优秀，继续优化吸管排列效率。" },
+                { className: "六(3)班", groupName: "创新实验组", memberNames: "陈子轩、刘一诺、吴欣怡", iteration: "初代", height: 36.2, baseWidth: 30.0, strawCount: 38, tapeRolls: 1.5, stability: 2, weightCapacity: 340, windResistance: "未通过", cost: 19.0, designIdea: "方形底座+单柱，连接处胶带较少。", improvement: "重心不稳，需加大底座面积并加固连接点。" }
+            ];
+            exampleRecords.forEach(ex => {
+                const newId = Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+                engineeringRecords.push({
+                    id: newId,
+                    ...ex,
+                    weightCapacity: ex.weightCapacity || null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+            });
+            saveToLocalStorage();
+            renderTable();
+            showMessage('示例数据已添加');
+        }
+
+        function updateRecordCount() {
+            document.getElementById('recordCount').innerText = engineeringRecords.length;
+        }
+
+        function initEventListeners() {
+            const form = document.getElementById('projectForm');
+            form.addEventListener('submit', handleSubmit);
+            document.getElementById('resetFormBtn').addEventListener('click', () => {
+                if (currentEditId) cancelEditMode();
+                else resetFormFields();
+            });
+            document.getElementById('cancelEditBtn').addEventListener('click', cancelEditMode);
+            document.getElementById('exportJsonBtn').addEventListener('click', exportToJSON);
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllData);
+            document.getElementById('loadExampleBtn').addEventListener('click', loadExampleData);
+        }
+
+        function init() {
+            loadFromLocalStorage();
+            initEventListeners();
+            attachTableActions();
+            cancelEditMode();
+        }
+        init();
+    </script>
+</body>
+</html>

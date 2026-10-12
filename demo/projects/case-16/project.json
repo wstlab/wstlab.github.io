@@ -1,0 +1,13 @@
+{
+  "id": "case-16",
+  "title": "小林的财富人生",
+  "category": "simulation",
+  "description": "财富决策研究所：围绕得分、关卡、决策开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "财商教育",
+    "数学"
+  ],
+  "order": 16,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

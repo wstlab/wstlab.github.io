@@ -1,0 +1,13 @@
+{
+  "id": "case-32",
+  "title": "土壤湿度监测系统 · 虚拟实验",
+  "category": "simulation",
+  "description": "土壤反馈控制台：围绕阈值、湿度、采样记录开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技",
+    "科学"
+  ],
+  "order": 32,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

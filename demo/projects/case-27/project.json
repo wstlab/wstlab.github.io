@@ -1,0 +1,12 @@
+{
+  "id": "case-27",
+  "title": "汽车行驶中的正比例关系",
+  "category": "exploration",
+  "description": "速度与路程实验：围绕速度、时间、路程开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 27,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

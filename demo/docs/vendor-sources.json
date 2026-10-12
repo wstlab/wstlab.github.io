@@ -1,0 +1,87 @@
+[
+  {
+    "url": "https://metis-online.fbcontent.cn/metis-misc/zZZY40t7WJC7UdQCPACm.js",
+    "local": "/projects/shared/vendor/0d368ede1398edd6.js",
+    "bytes": 31180
+  },
+  {
+    "url": "https://metis-online.fbcontent.cn/metis-misc/zgLDUdmazTYc0B4K6Cor.js",
+    "local": "/projects/shared/vendor/30c21e1e15960fe9.js",
+    "bytes": 786613
+  },
+  {
+    "url": "https://metis-online.fbcontent.cn/metis-misc/blER0Bn7vsa2JER9IEssf8.js",
+    "local": "/projects/shared/vendor/417d600d29aeb971.js",
+    "bytes": 1173819
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/chart.js",
+    "local": "/projects/shared/vendor/459cd6d7de2fb24b.js",
+    "bytes": 208522
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+    "local": "/projects/shared/vendor/db43a3a48e4777e7.js",
+    "bytes": 205222
+  },
+  {
+    "url": "https://lf-cdn.coze.cn/obj/unpkg/coze-webapp/console-bridge/0.0.1-alpha.b2eb33/dist/index.js",
+    "local": "/projects/shared/vendor/314b61c69d12172c.js",
+    "bytes": 14429
+  },
+  {
+    "url": "https://lf-cdn.coze.cn/obj/unpkg/coze-webapp/history-bridge/0.0.1-alpha.9e64d9/dist/index.min.js",
+    "local": "/projects/shared/vendor/e3da34c321ce5ed9.js",
+    "bytes": 9336
+  },
+  {
+    "url": "https://lf-cdn.coze.cn/obj/unpkg/coze-space/page-editor-general-web/0.1.0-alpha.274555/dist/umd/index.js",
+    "local": "/projects/shared/vendor/234a24dcc0c25b96.js",
+    "bytes": 4279096
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/marked/marked.min.js",
+    "local": "/projects/shared/vendor/d599aafcd4b89ac3.js",
+    "bytes": 39903
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js",
+    "local": "/projects/shared/vendor/55ad8e2f266fdc0e.js",
+    "bytes": 1029203
+  },
+  {
+    "url": "https://cdn.tailwindcss.com",
+    "local": "/projects/shared/vendor/3f13e7495584e13d.js",
+    "bytes": 407279
+  },
+  {
+    "url": "https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js",
+    "local": "/projects/shared/vendor/d6df4ca4c3629205.js",
+    "bytes": 17741
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js",
+    "local": "/projects/shared/vendor/433051aeee8c94a3.js",
+    "bytes": 9250
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js",
+    "local": "/projects/shared/vendor/d3151b18997cb51c.js",
+    "bytes": 1469843
+  },
+  {
+    "url": "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js",
+    "local": "/projects/shared/vendor/4ad6e54ad2183574.js",
+    "bytes": 19927
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    "local": "/projects/shared/vendor/7738d2c15a2eb80e.js",
+    "bytes": 881727
+  },
+  {
+    "url": "https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js",
+    "local": "/projects/shared/vendor/8a15bf70d406aa22.js",
+    "bytes": 321138
+  }
+]

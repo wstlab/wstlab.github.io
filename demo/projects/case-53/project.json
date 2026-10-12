@@ -1,0 +1,13 @@
+{
+  "id": "case-53",
+  "title": "交通信号灯控制（全亮播放音乐）",
+  "category": "simulation",
+  "description": "信号灯状态记录：围绕红灯、黄灯、绿灯开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "科学",
+    "信息科技"
+  ],
+  "order": 53,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

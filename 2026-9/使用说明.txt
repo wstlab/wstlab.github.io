@@ -1,0 +1,33 @@
+学员作品中心 · 本地副本
+========================================
+
+【在线地址】
+https://student-works-center.app.workbuddy.host/
+
+按栏目直达：
+  提交作品   https://student-works-center.app.workbuddy.host/#/submit
+  作品展示   https://student-works-center.app.workbuddy.host/#/gallery
+  课件下载   https://student-works-center.app.workbuddy.host/#/courseware
+  学习资料   https://student-works-center.app.workbuddy.host/#/resource
+  学员留言   https://student-works-center.app.workbuddy.host/#/message
+投屏演示（隐藏除作品展示外的栏目）：地址后加 ?stage=1
+
+【本地打开】
+双击 index.html 即可（它会自动跳到 center.html）。
+不要单独移动或重命名 center.html，也不要把它和 index.html 分开存放——
+index.html 只是一个"入口跳转页"，主页面是 center.html。
+
+【文件说明】
+  index.html        入口页，双击这个（约 2 KB）
+  center.html       主页面，含 5 个栏目（约 80 KB）
+  courseware-1.pdf  课件 1《从 PPT 到交互网页：AI 赋能课堂教学创新》约 16 MB
+  courseware-2.pdf  课件 2《AI + QuickForm：数据驱动下的交互网页课件设计》约 17 MB
+
+【联网说明】
+  · 课件下载 —— 本地离线可用，PDF 就在同一目录。
+  · 作品展示 / 学员留言 —— 数据存放在线上（QuickForm），需要联网才能读取和提交；
+    离线打开时这几栏会显示加载失败，属正常现象。
+
+【给他人分发】
+把整个「学员作品中心」文件夹打包发出去即可；对方解压后双击 index.html 就能看到完整页面。
+只发 center.html 是不行的——课件 PDF 会缺失。

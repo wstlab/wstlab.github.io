@@ -1,0 +1,12 @@
+{
+  "id": "case-41",
+  "title": "中国行政区划挑战赛（语音版）",
+  "category": "practice",
+  "description": "行政区划足迹：围绕得分、正确数、错误开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "地理"
+  ],
+  "order": 41,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

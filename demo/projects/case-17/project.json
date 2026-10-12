@@ -1,0 +1,12 @@
+{
+  "id": "case-17",
+  "title": "小组协作与积分",
+  "category": "activities",
+  "description": "以模拟成员开展分组与积分活动，保存小组快照，观察协作中的变化。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 17,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

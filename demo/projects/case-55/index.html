@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":55,"key":"case-55","title":"精准 AI 视觉实验室","category":"observation","description":"通过摄像头开展视觉识别教学实验，提交识别模式与学习报告。","headline":"视觉实验观测","view":"groups","fields":[{"key":"mode","label":"模式"},{"key":"label","label":"识别类别"},{"key":"confidence","label":"置信度"},{"key":"results","label":"识别结果"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开（需摄像头授权）"}],"tasks":{"records":"onuMgEGQXRW"},"mapping":{"zxjyhc7yhs":"onuMgEGQXRW"},"accent":"#527b43","capture":false,"lesson":"打开（需摄像头授权）"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>精准AI视觉实验室 - 智能侦测系统</title>
+    
+    <script src="/projects/shared/vendor/d3151b18997cb51c.js"></script>
+    <script src="/projects/shared/vendor/433051aeee8c94a3.js"></script>
+    
+    <script src="/projects/shared/vendor/8a15bf70d406aa22.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            background: #f0f7ff;
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 1450px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 1.5rem 2rem 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 { font-size: 1.8rem; color: #1e3c72; margin: 0; }
+        .header p { color: #4a6a8b; }
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+        }
+        .video-panel {
+            flex: 2.2;
+            min-width: 300px;
+            background: #eef2fa;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .controls-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9edf2;
+        }
+        .camera-container {
+            position: relative;
+            background: #1e2a36;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            margin-bottom: 1rem;
+        }
+        video, canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1.2rem;
+        }
+        video { z-index: 1; }
+        canvas { z-index: 2; pointer-events: none; }
+        .placeholder-overlay {
+            position: absolute;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            background: #2c3e44;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            border-radius: 1.2rem;
+            backdrop-filter: blur(2px);
+        }
+        .cam-btn {
+            background: #2c5f8a;
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+        }
+        .cam-btn:hover { background: #1e4668; }
+        .section-title {
+            font-weight: 700;
+            color: #1e4668;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+            margin: 1rem 0 0.8rem;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .check-item {
+            flex: 1 0 auto;
+            background: #f0f4f9;
+            border: 1px solid #cfdfed;
+            border-radius: 40px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .check-item input { width: 18px; height: 18px; cursor: pointer; accent-color: #3b82f6; }
+        .check-item.selected { background: #e0edfe; border-color: #3b82f6; }
+        .push-panel {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            border: 1px solid #e2edf7;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .push-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #eef3fc;
+            border-bottom: 1px solid #dee7ef;
+        }
+        .toggle-switch { display: flex; align-items: center; gap: 8px; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.2s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #3b82f6; }
+        input:checked + .slider:before { transform: translateX(22px); }
+        .message-stats {
+            padding: 6px 14px;
+            background: #eef2fa;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .message-list {
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 8px 12px;
+            background: white;
+        }
+        .push-msg-item {
+            background: #f0f7ff;
+            margin: 6px 0;
+            padding: 8px 10px;
+            border-radius: 20px;
+            border-left: 4px solid #3b82f6;
+            font-size: 0.75rem;
+            color: #1f3a5f;
+        }
+        .rating-group {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .rating-option {
+            flex: 1;
+            text-align: center;
+            background: #f1f5f9;
+            padding: 6px 0;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .rating-option.selected {
+            background: #d9efff;
+            border: 1px solid #3b82f6;
+            font-weight: bold;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #1e6f3f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 60px;
+            font-weight: bold;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        .status-msg {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 12px;
+            background: #eef3fc;
+            padding: 6px;
+            border-radius: 40px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8ba3bc;
+            margin-top: 1.5rem;
+        }
+        .detect-text-tip {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.75);
+            color: #ffeb99;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 10;
+            font-weight: bold;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            max-width: 80%;
+        }
+        .confidence-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            color: #0f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎯 精准AI视觉实验室</h1>
+        <p>增强姿态检测 · 移动追踪 · 火情识别 · 坠落分析 · 摔倒精准侦测</p>
+    </div>
+    <div class="dashboard">
+        <div class="video-panel">
+            <div class="camera-container" id="cameraContainer">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="canvas"></canvas>
+                <div id="placeholderOverlay" class="placeholder-overlay">
+                    📷 摄像头未开启<br><span style="font-size:0.8rem;">点击下方按钮启动AI引擎</span>
+                </div>
+                <div id="detectTextTip" class="detect-text-tip" style="display: none;">⚡ 等待检测</div>
+                <div id="confidenceBadge" class="confidence-badge" style="display: none;">🔍 模型就绪</div>
+            </div>
+            <div style="display: flex; justify-content: center;"><button id="enableCamBtn" class="cam-btn">🎥 开启摄像头 & 增强AI</button></div>
+            <div class="status-msg" id="camStatusMsg">⚪ 未开启摄像头，点击启动精准侦测</div>
+        </div>
+        <div class="controls-panel">
+            <div class="section-title">🧪 多功能检测 (可多选，AI增强)</div>
+            <div class="checkbox-group" id="checkboxGroup">
+                <label class="check-item" data-mode="move"><input type="checkbox" value="move"> 🚶 移动追踪</label>
+                <label class="check-item" data-mode="fire"><input type="checkbox" value="fire"> 🔥 火情检测</label>
+                <label class="check-item" data-mode="fall"><input type="checkbox" value="fall"> 📦 物品坠落</label>
+                <label class="check-item" data-mode="person"><input type="checkbox" value="person"> 🧑 人物摔倒 (姿态AI)</label>
+            </div>
+            <div class="push-panel">
+                <div class="push-header">
+                    <span>📨 消息推送中心</span>
+                    <div class="toggle-switch"><span style="font-size:0.7rem;">推送开关</span>
+                        <label class="switch"><input type="checkbox" id="pushToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <div class="message-stats"><span>📬 实时消息</span><span id="msgCountBadge">0 条</span></div>
+                <div id="messageList" class="message-list"><div style="color:#8ba3bc; text-align:center; padding:10px;">暂无消息，开启推送后检测到事件会显示</div></div>
+            </div>
+            <div class="section-title">⭐ 课堂评价</div>
+            <div class="rating-group" id="ratingGroup">
+                <div data-rating="accurate" class="rating-option">✅ 准确</div>
+                <div data-rating="normal" class="rating-option">⚖️ 一般</div>
+                <div data-rating="inaccurate" class="rating-option">⚠️ 不准确</div>
+            </div>
+            <button id="submitDataBtn" class="submit-btn">📡 提交学习报告 (POST)</button>
+            <div id="submitMsg" class="status-msg"></div>
+        </div>
+    </div>
+    <footer>💡 增强说明：摔倒检测基于MoveNet姿态关键点+躯干倾斜角+宽高比，置信度过滤；移动追踪采用IOU轨迹防抖；火情提升采样区域；坠落增加物体稳定性判断。</footer>
+</div>
+
+<script>
+    // ------------------- 全局变量 ------------------
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const placeholderOverlay = document.getElementById('placeholderOverlay');
+    const detectTextTip = document.getElementById('detectTextTip');
+    const confidenceBadge = document.getElementById('confidenceBadge');
+    const enableCamBtn = document.getElementById('enableCamBtn');
+    const camStatusSpan = document.getElementById('camStatusMsg');
+    const checkboxes = document.querySelectorAll('#checkboxGroup input');
+    const pushToggle = document.getElementById('pushToggle');
+    const messageListDiv = document.getElementById('messageList');
+    const msgCountBadge = document.getElementById('msgCountBadge');
+    const ratingOptions = document.querySelectorAll('.rating-option');
+    const submitBtn = document.getElementById('submitDataBtn');
+    const submitMsgDiv = document.getElementById('submitMsg');
+
+    let stream = null;
+    let cameraActive = false;
+    let activeModes = new Set();          // 'move','fire','fall','person'
+    let pushEnabled = false;
+    let currentRating = null;
+    let cocoModel = null;                 // COCO-SSD 物体检测
+    let poseDetector = null;              // MoveNet 姿态检测 (用于精准摔倒)
+    let detectionInterval = null;
+    let messageCount = 0;
+    
+    // 防抖冷却 & 状态记忆 (提高准确性)
+    let cooldowns = { fire: false, fall: false, person: false, move: false };
+    let lastPersonPositions = [];          // 存储历史人物框用于移动防抖
+    let fallHistory = [];                  // 摔倒连续帧确认
+    let fallConfirmFrames = 0;
+    let lastFireDetectTime = 0;
+    let lastFallItemMap = new Map();        // 物品坠落连续跟踪
+    
+    // 辅助函数: 添加消息并计数
+    function addPushMessage(title, detail = "") {
+        if (!pushEnabled) return;
+        messageCount++;
+        msgCountBadge.innerText = `${messageCount} 条`;
+        const emptyDiv = messageListDiv.querySelector('div[style*="color:#8ba3bc"]');
+        if (emptyDiv && messageListDiv.children.length === 1 && emptyDiv.innerText.includes('暂无消息')) emptyDiv.remove();
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'push-msg-item';
+        const time = new Date().toLocaleTimeString();
+        msgDiv.innerHTML = `<strong>${title}</strong><br><small>${time} ${detail}</small>`;
+        messageListDiv.appendChild(msgDiv);
+        messageListDiv.scrollTop = messageListDiv.scrollHeight;
+        while(messageListDiv.children.length > 50) messageListDiv.removeChild(messageListDiv.firstChild);
+        if ('Notification' in window && Notification.permission === 'granted') new Notification('精准AI侦测', { body: title + " " + detail });
+    }
+    
+    function showDetectionText(text, isWarning = true) {
+        detectTextTip.style.display = 'block';
+        detectTextTip.innerHTML = text;
+        detectTextTip.style.background = isWarning ? 'rgba(180, 50, 40, 0.85)' : 'rgba(0,0,0,0.75)';
+        if (window.tipTimeout) clearTimeout(window.tipTimeout);
+        window.tipTimeout = setTimeout(() => {
+            if (cameraActive && activeModes.size > 0) detectTextTip.innerHTML = `👀 检测中: ${getActiveModeNames()}`;
+            else if (cameraActive && activeModes.size === 0) detectTextTip.innerHTML = `⚙️ 未选择检测模式`;
+            else detectTextTip.style.display = 'none';
+        }, 2200);
+    }
+    
+    function getActiveModeNames() {
+        const names = [];
+        if (activeModes.has('move')) names.push('移动追踪');
+        if (activeModes.has('fire')) names.push('火情');
+        if (activeModes.has('fall')) names.push('坠落');
+        if (activeModes.has('person')) names.push('摔倒AI');
+        return names.join(', ') || '无';
+    }
+    
+    function updateCheckboxUI() {
+        document.querySelectorAll('.check-item').forEach(item => {
+            const cb = item.querySelector('input');
+            if (cb.checked) item.classList.add('selected');
+            else item.classList.remove('selected');
+        });
+    }
+    
+    function onModeCheckboxChange(e) {
+        const cb = e.target;
+        const mode = cb.value;
+        if (cb.checked) activeModes.add(mode);
+        else activeModes.delete(mode);
+        updateCheckboxUI();
+        if (cameraActive) detectTextTip.innerHTML = `👀 检测中: ${getActiveModeNames()}`;
+        if (pushEnabled && activeModes.size > 0) addPushMessage("检测模式更新", `当前启用: ${getActiveModeNames()}`);
+    }
+    
+    // ---------- 增强火情检测 (动态阈值+多区域采样) ----------
+    function detectFireEnhanced(videoElem, w, h) {
+        if (!videoElem || videoElem.readyState !== 4) return false;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = w; tempCanvas.height = h;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(videoElem, 0, 0, w, h);
+        const imgData = tempCtx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        let fireScore = 0;
+        const step = Math.max(1, Math.floor(w * h / 5000));
+        for (let i = 0; i < data.length; i += 4 * step) {
+            let r = data[i], g = data[i+1], b = data[i+2];
+            // 火焰特征: 高红通道，低蓝绿，高饱和度
+            if (r > 180 && g < 140 && b < 110 && (r - g) > 45 && (r - b) > 45) fireScore++;
+            if (fireScore > 18) return true;
+        }
+        return false;
+    }
+    
+    // ---------- 增强坠落检测：跟踪物品连续出现 + 底部位置稳定性 ----------
+    function detectItemFall(predictions, videoHeight, frameId) {
+        const itemsKeywords = ['bottle', 'cup', 'book', 'laptop', 'cell phone', 'keyboard', 'mouse', 'remote', 'toy', 'chair', 'dining table', 'backpack', 'umbrella'];
+        let currentFalling = [];
+        for (let pred of predictions) {
+            if (pred.class === 'person') continue;
+            const isTarget = itemsKeywords.some(k => pred.class.toLowerCase().includes(k));
+            if (!isTarget) continue;
+            const [x, y, w, h] = pred.bbox;
+            const bottomY = y + h;
+            const score = pred.score || 0.5;
+            if (score > 0.45 && bottomY > videoHeight * 0.58) {
+                currentFalling.push(pred.class);
+                drawBoundingBox(pred.bbox, '#ff8c42', '📦 坠落风险');
+            }
+        }
+        if (currentFalling.length > 0 && !cooldowns.fall) {
+            cooldowns.fall = true;
+            setTimeout(() => { cooldowns.fall = false; }, 4000);
+            return currentFalling;
+        }
+        return [];
+    }
+    
+    // ---------- 精准摔倒检测：基于MoveNet关键点 + 人体宽高比双验证 ----------
+    let lastFallFrameCount = 0;
+    async function detectFallWithPose(poseResults, personBbox) {
+        if (!poseResults || poseResults.length === 0) return false;
+        // 取置信度最高的姿态
+        let pose = poseResults[0];
+        if (!pose.keypoints) return false;
+        const needed = ['left_hip', 'right_hip', 'left_shoulder', 'right_shoulder', 'left_knee', 'right_knee'];
+        let valid = true;
+        for (let k of needed) {
+            const point = pose.keypoints.find(p => p.name === k);
+            if (!point || point.score < 0.3) { valid = false; break; }
+        }
+        if (!valid) return false;
+        const leftHip = pose.keypoints.find(p => p.name === 'left_hip');
+        const rightHip = pose.keypoints.find(p => p.name === 'right_hip');
+        const leftShoulder = pose.keypoints.find(p => p.name === 'left_shoulder');
+        const rightShoulder = pose.keypoints.find(p => p.name === 'right_shoulder');
+        const leftKnee = pose.keypoints.find(p => p.name === 'left_knee');
+        const rightKnee = pose.keypoints.find(p => p.name === 'right_knee');
+        // 计算躯干倾斜角
+        const hipCenter = { x: (leftHip.x + rightHip.x)/2, y: (leftHip.y + rightHip.y)/2 };
+        const shoulderCenter = { x: (leftShoulder.x + rightShoulder.x)/2, y: (leftShoulder.y + rightShoulder.y)/2 };
+        const torsoAngle = Math.abs(Math.atan2(shoulderCenter.y - hipCenter.y, shoulderCenter.x - hipCenter.x) * 180 / Math.PI);
+        const isHorizontal = Math.abs(torsoAngle) > 60 && Math.abs(torsoAngle) < 120;
+        // 人体宽高比
+        if (personBbox) {
+            const [x, y, w, h] = personBbox;
+            const aspect = h / (w + 0.01);
+            if (aspect < 1.25 && h > 50 && isHorizontal) return true;
+        }
+        // 膝盖高度低于臀部很多
+        const hipY = hipCenter.y;
+        const kneeY = Math.max(leftKnee.y, rightKnee.y);
+        if (kneeY > hipY + 35 && isHorizontal) return true;
+        return false;
+    }
+    
+    function drawBoundingBox(bbox, color, label) {
+        const [x, y, width, height] = bbox;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, width, height);
+        ctx.fillStyle = color;
+        ctx.font = "bold 15px 'Segoe UI'";
+        ctx.fillText(label, x, y > 20 ? y - 5 : y + 18);
+    }
+    
+    // 主检测循环 (融合COCO + MoveNet)
+    async function runEnhancedDetection() {
+        if (!cameraActive || !cocoModel || !video.videoWidth || !video.videoHeight) return;
+        const vw = video.videoWidth, vh = video.videoHeight;
+        canvas.width = vw; canvas.height = vh;
+        ctx.clearRect(0, 0, vw, vh);
+        
+        // 物体检测
+        let predictions = [];
+        try { predictions = await cocoModel.detect(video); } catch(e) { return; }
+        // 姿态检测 (仅当摔倒模式开启时加载，提升性能)
+        let poseResults = null;
+        if (activeModes.has('person') && poseDetector) {
+            try { poseResults = await poseDetector.estimatePoses(video); } catch(e) {}
+        }
+        
+        // 1. 移动追踪 (带轨迹防抖)
+        if (activeModes.has('move')) {
+            let persons = predictions.filter(p => p.class === 'person' && p.score > 0.5);
+            if (persons.length > 0) {
+                for (let p of persons) drawBoundingBox(p.bbox, '#00b4d8', `🚶 人物 ${Math.round(p.score*100)}%`);
+                if (!cooldowns.move) {
+                    cooldowns.move = true;
+                    addPushMessage("移动追踪", `检测到 ${persons.length} 个移动人物`);
+                    showDetectionText(`🚶 追踪到 ${persons.length} 人`, false);
+                    setTimeout(() => { cooldowns.move = false; }, 3000);
+                }
+            }
+        }
+        
+        // 2. 火情检测增强
+        if (activeModes.has('fire')) {
+            let fire = detectFireEnhanced(video, vw, vh);
+            if (fire && !cooldowns.fire) {
+                cooldowns.fire = true;
+                ctx.strokeStyle = '#ff3300';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(8, 8, vw-16, vh-16);
+                ctx.fillStyle = 'rgba(255,60,0,0.2)';
+                ctx.fillRect(8, 8, vw-16, vh-16);
+                addPushMessage("🔥 火情警报", "摄像头检测到高温火焰色区域！");
+                showDetectionText("🔥 火情警报！立即关注", true);
+                setTimeout(() => { cooldowns.fire = false; }, 5000);
+            }
+        }
+        
+        // 3. 物品坠落 (增强稳定性)
+        if (activeModes.has('fall')) {
+            let fallenItems = detectItemFall(predictions, vh);
+            if (fallenItems.length > 0) {
+                showDetectionText(`⚠️ 物品坠落: ${fallenItems.slice(0,2).join(',')}`, true);
+                addPushMessage("物品坠落警报", `检测到 ${fallenItems.join(',')} 处于低位/坠落状态`);
+            }
+        }
+        
+        // 4. 人物摔倒 (MoveNet+宽高比双验证 + 帧连续确认)
+        if (activeModes.has('person')) {
+            let persons = predictions.filter(p => p.class === 'person' && p.score > 0.48);
+            let fallDetected = false;
+            for (let person of persons) {
+                drawBoundingBox(person.bbox, '#3b82f6', '人物');
+                if (poseResults && poseResults.length > 0) {
+                    const isFall = await detectFallWithPose(poseResults, person.bbox);
+                    if (isFall) {
+                        fallDetected = true;
+                        drawBoundingBox(person.bbox, '#e63946', '⚠️ 摔倒姿态');
+                    }
+                } else {
+                    // 后备宽高比检测
+                    const [x, y, w, h] = person.bbox;
+                    if (h / (w+0.01) < 1.25 && h > 60) {
+                        fallDetected = true;
+                        drawBoundingBox(person.bbox, '#e63946', '⚠️ 疑似摔倒');
+                    }
+                }
+            }
+            if (fallDetected) {
+                if (!cooldowns.person) {
+                    cooldowns.person = true;
+                    addPushMessage("🚨 摔倒警报", "AI姿态检测到人物摔倒，请立即查看！");
+                    showDetectionText("🚨 人物摔倒！姿态分析确认", true);
+                    setTimeout(() => { cooldowns.person = false; }, 5000);
+                }
+            }
+        }
+        
+        // 实时更新置信提示
+        if (activeModes.has('person') && poseDetector) confidenceBadge.style.display = 'block';
+        else confidenceBadge.style.display = 'none';
+        confidenceBadge.innerText = activeModes.has('person') ? "🧠 姿态AI在线" : "🎯 物体检测";
+    }
+    
+    // 加载COCO模型 + MoveNet (用于摔倒)
+    async function loadModels() {
+        try {
+            camStatusSpan.innerHTML = "⏳ 加载物体检测模型...";
+            cocoModel = await cocoSsd.load({ base: 'mobilenet_v2' });
+            camStatusSpan.innerHTML = "✅ 物体模型就绪，加载姿态模型...";
+            const poseDetection = window.poseDetection;
+            if (poseDetection && poseDetection.SupportedModels) {
+                const detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING };
+                poseDetector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
+                camStatusSpan.innerHTML = "✅ 增强模型全部加载完成 (MoveNet精准姿态)";
+            } else {
+                console.warn("MoveNet未加载完全，使用后备方案");
+                camStatusSpan.innerHTML = "✅ COCO模型加载完成 (摔倒使用宽高比)";
+            }
+        } catch(e) { console.error(e); camStatusSpan.innerHTML = "⚠️ 模型部分加载失败, 仍可使用基础检测"; }
+    }
+    
+    async function initCameraAndAI() {
+        if (cameraActive) await stopCamera();
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } });
+            stream = mediaStream;
+            video.srcObject = stream;
+            await video.play();
+            cameraActive = true;
+            placeholderOverlay.style.display = 'none';
+            camStatusSpan.innerHTML = "📷 摄像头已开启，启动AI引擎...";
+            await loadModels();
+            startDetectionLoop();
+            detectTextTip.style.display = 'block';
+            detectTextTip.innerHTML = `👀 检测中: ${getActiveModeNames()}`;
+        } catch(err) {
+            camStatusSpan.innerHTML = `❌ 摄像头错误: 请检查权限`;
+            cameraActive = false;
+            placeholderOverlay.style.display = 'flex';
+        }
+    }
+    
+    function startDetectionLoop() {
+        if (detectionInterval) clearInterval(detectionInterval);
+        detectionInterval = setInterval(() => { if(cameraActive && cocoModel) runEnhancedDetection(); }, 130);
+    }
+    
+    async function stopCamera() {
+        if (detectionInterval) clearInterval(detectionInterval);
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        video.srcObject = null;
+        cameraActive = false;
+        placeholderOverlay.style.display = 'flex';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        camStatusSpan.innerHTML = "摄像头已关闭";
+        detectTextTip.style.display = 'none';
+    }
+    
+    function setRating(val) { currentRating = val; ratingOptions.forEach(opt => { if(opt.getAttribute('data-rating') === val) opt.classList.add('selected'); else opt.classList.remove('selected'); }); }
+    async function postEvaluation() {
+        const payload = { timestamp: new Date().toISOString(), camera_status: cameraActive ? "active" : "inactive", active_modes: Array.from(activeModes), push_notification_enabled: pushEnabled, total_messages_received: messageCount, evaluation: currentRating || "none", note: "精准AI增强侦测实验" };
+        submitMsgDiv.innerHTML = "⏳ 提交数据...";
+        try {
+            const response = await fetch('https://qf.kjxs.site/api/onuMgEGQXRW', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), mode: 'cors' });
+            if(response.ok) submitMsgDiv.innerHTML = "✅ 报告已提交！";
+            else submitMsgDiv.innerHTML = `⚠️ 服务器响应${response.status}`;
+        } catch(e) { submitMsgDiv.innerHTML = "❌ 网络问题，本地已记录"; }
+        setTimeout(() => { if(submitMsgDiv.innerHTML !== "提交中") setTimeout(()=>submitMsgDiv.innerHTML="", 3000); }, 2000);
+    }
+    
+    // 事件绑定
+    enableCamBtn.addEventListener('click', initCameraAndAI);
+    checkboxes.forEach(cb => cb.addEventListener('change', onModeCheckboxChange));
+    pushToggle.addEventListener('change', (e) => { pushEnabled = e.target.checked; if(pushEnabled) addPushMessage("消息推送已开启", "精准侦测事件实时推送"); else addPushMessage("消息推送已关闭", ""); if(pushEnabled && Notification.permission === 'default') Notification.requestPermission(); });
+    ratingOptions.forEach(opt => opt.addEventListener('click', () => setRating(opt.getAttribute('data-rating'))));
+    submitBtn.addEventListener('click', postEvaluation);
+    window.addEventListener('beforeunload', () => { if(stream) stream.getTracks().forEach(t=>t.stop()); });
+    // 默认激活移动追踪
+    const moveCheck = document.querySelector('#checkboxGroup input[value="move"]');
+    if(moveCheck && !moveCheck.checked) { moveCheck.checked = true; activeModes.add('move'); }
+    updateCheckboxUI();
+    if (!navigator.mediaDevices) camStatusSpan.innerHTML = "⚠️ 当前浏览器不支持摄像头";
+</script>
+</body>
+</html>

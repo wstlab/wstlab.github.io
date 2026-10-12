@@ -1,0 +1,12 @@
+{
+  "id": "case-59",
+  "title": "QuickPrompt · 教学网页提示词构建器",
+  "category": "design",
+  "description": "按教学场景组织网页设计提示词，分享场景、风格和使用反馈，不提交密钥或私人提示词。",
+  "subjects": [
+    "教师备课"
+  ],
+  "order": 59,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

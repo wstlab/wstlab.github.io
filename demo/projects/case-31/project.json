@@ -1,0 +1,12 @@
+{
+  "id": "case-31",
+  "title": "神经智学舱 · 神经系统交互学习平台",
+  "category": "exploration",
+  "description": "走进脑、脊髓、周围神经和传导通路四个模块，记录学习过程。",
+  "subjects": [
+    "生物"
+  ],
+  "order": 31,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

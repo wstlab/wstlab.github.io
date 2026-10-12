@@ -1,0 +1,12 @@
+{
+  "id": "case-35",
+  "title": "海上日出 · 分层挑战",
+  "category": "assessment",
+  "description": "日出分层学习谱：围绕挑战层级、正确数、题目数开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 35,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

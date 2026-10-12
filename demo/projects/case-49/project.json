@@ -1,0 +1,12 @@
+{
+  "id": "case-49",
+  "title": "六下单词默写大赛",
+  "category": "practice",
+  "description": "单词默写档案：围绕单元、得分、正确率开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "英语"
+  ],
+  "order": 49,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":33,"key":"case-33","title":"阅读打卡与互评","category":"creation","description":"书页之间：围绕书名、阅读心得、书籍开展交互学习，在数据大屏中回看记录。","headline":"书页之间","view":"wall","fields":[{"key":"book_title","label":"书名"},{"key":"content","label":"阅读心得"},{"key":"bookName","label":"书籍"},{"key":"review","label":"互评"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"GekUNkiraVM"},"mapping":{"7qgfj8i2cz":"GekUNkiraVM"},"accent":"#916749","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名著互动阅读 · 心得共赏</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f5ecd9;
+            --paper-deep: #ebe0c5;
+            --ink: #2b2218;
+            --ink-soft: #5a4a35;
+            --vermilion: #b3261e;
+            --vermilion-deep: #8b1c15;
+            --gold: #b8860b;
+            --gold-soft: #c9a227;
+            --jade: #5a7a5a;
+            --shadow: rgba(43, 34, 24, 0.18);
+            --border: rgba(139, 28, 21, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: "Noto Serif SC", "Songti SC", serif;
+            color: var(--ink);
+            background-color: var(--paper);
+            background-image:
+                radial-gradient(circle at 20% 10%, rgba(184, 134, 11, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(179, 38, 30, 0.06) 0%, transparent 45%),
+                repeating-linear-gradient(0deg, transparent 0px, transparent 28px, rgba(139, 111, 71, 0.04) 28px, rgba(139, 111, 71, 0.04) 29px);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        /* 顶部装饰条 */
+        .top-bar {
+            height: 6px;
+            background: linear-gradient(90deg,
+                var(--vermilion) 0%, var(--vermilion) 30%,
+                var(--gold) 30%, var(--gold) 50%,
+                var(--ink) 50%, var(--ink) 70%,
+                var(--vermilion) 70%, var(--vermilion) 100%);
+        }
+
+        /* file:// 协议警告横幅 */
+        .protocol-warn {
+            max-width: 900px;
+            margin: 0 auto 16px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe9a8 100%);
+            border: 1px solid #e0a800;
+            border-left: 4px solid #d39e00;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .protocol-warn .warn-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .protocol-warn b {
+            color: var(--vermilion-deep);
+            background: rgba(179, 38, 30, 0.08);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            padding: 48px 20px 32px;
+            position: relative;
+        }
+
+        header::before, header::after {
+            content: "❖";
+            color: var(--gold);
+            font-size: 14px;
+            display: block;
+            letter-spacing: 8px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-family: "Ma Shan Zheng", "Noto Serif SC", serif;
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 400;
+            color: var(--vermilion-deep);
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 rgba(184, 134, 11, 0.15);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-family: "ZCOOL XiaoWei", serif;
+            color: var(--ink-soft);
+            font-size: clamp(15px, 2vw, 18px);
+            letter-spacing: 3px;
+        }
+
+        .seal {
+            display: inline-block;
+            background: var(--vermilion);
+            color: #fff;
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 16px;
+            padding: 6px 12px;
+            margin: 16px 6px 0;
+            letter-spacing: 4px;
+            transform: rotate(-2deg);
+            box-shadow: 2px 2px 6px var(--shadow);
+            border-radius: 2px;
+        }
+
+        /* 书籍展示区 */
+        .books-section {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px 24px 40px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 32px;
+            font-family: "ZCOOL XiaoWei", serif;
+            font-size: 26px;
+            color: var(--ink);
+            letter-spacing: 4px;
+        }
+
+        .section-title::before, .section-title::after {
+            content: "";
+            height: 1px;
+            width: 60px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .books-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 22px;
+        }
+
+        .book-card {
+            background: linear-gradient(180deg, #fdf6e3 0%, #f1e4c3 100%);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 24px 18px 20px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 4px 14px var(--shadow);
+        }
+
+        .book-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--vermilion);
+            transition: height 0.3s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 14px 30px rgba(139, 28, 21, 0.25);
+            border-color: var(--vermilion);
+        }
+
+        .book-card:hover::before {
+            height: 6px;
+        }
+
+        /* 书籍封面（CSS艺术封面） */
+        .book-cover {
+            width: 88px;
+            height: 120px;
+            margin: 0 auto 16px;
+            border-radius: 3px;
+            position: relative;
+            box-shadow: 3px 3px 10px rgba(43, 34, 24, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 26px;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            letter-spacing: 2px;
+            writing-mode: vertical-rl;
+            padding: 8px 0;
+            transition: transform 0.4s;
+        }
+
+        .book-card:hover .book-cover {
+            transform: rotate(-3deg) scale(1.05);
+        }
+
+        .book-cover::after {
+            content: "";
+            position: absolute;
+            top: 6px; bottom: 6px; left: 6px; right: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        /* 每本书的封面颜色 */
+        .cover-honglou { background: linear-gradient(135deg, #b3261e 0%, #7a1812 100%); }
+        .cover-xiyou { background: linear-gradient(135deg, #d4a017 0%, #8b6914 100%); }
+        .cover-sanguo { background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%); }
+        .cover-shuihu { background: linear-gradient(135deg, #5a7a5a 0%, #2d4a2d 100%); }
+        .cover-liaozhai { background: linear-gradient(135deg, #4a3a5a 0%, #2d2238 100%); }
+
+        .book-title {
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 22px;
+            color: var(--ink);
+            margin-bottom: 4px;
+            letter-spacing: 2px;
+        }
+
+        .book-author {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .book-desc {
+            font-size: 13px;
+            color: var(--ink-soft);
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        .book-cta {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+            font-size: 13px;
+            color: var(--vermilion);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .book-cta::before {
+            content: "✎ ";
+        }
+
+        /* 心得展示区 */
+        .notes-section {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 30px 24px 60px;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+            padding: 7px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: "Noto Serif SC", serif;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: all 0.25s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+
+        .filter-btn.active {
+            background: var(--vermilion);
+            color: #fff;
+            border-color: var(--vermilion);
+        }
+
+        .filter-count {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+
+        .note-card {
+            background: linear-gradient(180deg, #fffaeb 0%, #f3e8c8 100%);
+            border-left: 4px solid var(--vermilion);
+            border-radius: 4px;
+            padding: 18px 20px;
+            box-shadow: 0 3px 10px var(--shadow);
+            position: relative;
+            transition: transform 0.25s, box-shadow 0.25s;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .note-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(139, 28, 21, 0.18);
+        }
+
+        .note-book {
+            display: inline-block;
+            background: var(--vermilion);
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .sync-tag {
+            display: inline-block;
+            background: var(--gold);
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 8px;
+            margin-left: 6px;
+            vertical-align: middle;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .note-pending {
+            border-left-color: var(--gold);
+            background: linear-gradient(180deg, #fffaeb 0%, #f5ecc4 100%);
+        }
+
+        .note-content {
+            font-size: 15px;
+            color: var(--ink);
+            line-height: 1.75;
+            margin-bottom: 14px;
+            min-height: 50px;
+        }
+
+        .note-content::before {
+            content: "「";
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .note-content::after {
+            content: "」";
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--ink-soft);
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+        }
+
+        .note-name {
+            font-weight: 600;
+            color: var(--vermilion-deep);
+        }
+
+        .note-name::before {
+            content: "♤ ";
+        }
+
+        .note-time {
+            font-style: italic;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink-soft);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state .hint {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(43, 34, 24, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: overlayIn 0.25s ease-out;
+        }
+
+        @keyframes overlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--paper);
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(184, 134, 11, 0.06) 0%, transparent 40%),
+                repeating-linear-gradient(0deg, transparent 0px, transparent 28px, rgba(139, 111, 71, 0.03) 28px, rgba(139, 111, 71, 0.03) 29px);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 480px;
+            padding: 32px 30px 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold);
+            position: relative;
+            animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.85) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--ink-soft);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--vermilion);
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .modal-header .label {
+            font-size: 12px;
+            color: var(--gold);
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+        }
+
+        .modal-header h3 {
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 28px;
+            color: var(--vermilion-deep);
+            letter-spacing: 3px;
+            font-weight: 400;
+        }
+
+        .modal-header .author {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--ink);
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .form-group label .req {
+            color: var(--vermilion);
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: rgba(255, 250, 235, 0.7);
+            font-family: "Noto Serif SC", serif;
+            font-size: 15px;
+            color: var(--ink);
+            transition: all 0.2s;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--vermilion);
+            background: #fffaf0;
+            box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 110px;
+            line-height: 1.7;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-top: 4px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--vermilion) 0%, var(--vermilion-deep) 100%);
+            color: #fff;
+            border: none;
+            padding: 13px;
+            border-radius: 4px;
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 18px;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 6px;
+            box-shadow: 0 4px 12px rgba(139, 28, 21, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(139, 28, 21, 0.4);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--ink);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 15px;
+            z-index: 2000;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 4px solid var(--gold);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { border-left-color: var(--jade); }
+        .toast.error { border-left-color: var(--vermilion); }
+
+        /* 加载动画 */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--ink-soft);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.5); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 刷新按钮 */
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: "Noto Serif SC", serif;
+            margin-left: 12px;
+            transition: all 0.25s;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+
+        .refresh-btn.spinning .icon {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--ink-soft);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        footer .quote {
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 16px;
+            color: var(--vermilion-deep);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .books-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .books-row {
+                grid-template-columns: 1fr;
+            }
+            header { padding: 32px 16px 24px; }
+            .books-section, .notes-section { padding: 16px; }
+            .modal { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar"></div>
+
+    <header>
+        <h1>名著互动阅读</h1>
+        <p class="subtitle">读千古奇书　录心中所感</p>
+        <div>
+            <span class="seal">读</span>
+            <span class="seal">思</span>
+            <span class="seal">录</span>
+        </div>
+    </header>
+
+    
+    <div class="protocol-warn" id="protocolWarn" style="display:none;">
+        <span class="warn-icon">⚠</span>
+        <span class="warn-text">当前通过本地文件打开，浏览器会拦截心得提交。请改用地址 <b>https://quick.kjxs.site</b> 访问本页。</span>
+    </div>
+
+    <section class="books-section">
+        <h2 class="section-title">经典名著</h2>
+        <div class="books-row" id="booksRow"></div>
+    </section>
+
+    <section class="notes-section">
+        <h2 class="section-title">
+            阅读心得共赏
+            <button class="refresh-btn" id="refreshBtn" title="刷新心得列表">
+                <span class="icon">↻</span> 刷新
+            </button>
+        </h2>
+        <div class="filter-bar" id="filterBar"></div>
+        <div class="notes-grid" id="notesGrid">
+            <div class="empty-state">
+                <div class="loading-dots"><span></span><span></span><span></span></div>
+                <p style="margin-top:12px;">正在载入心得…</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p class="quote">「读书破万卷，下笔如有神」</p>
+        <p>名著互动阅读 · 心得共赏平台</p>
+    </footer>
+
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+            <div class="modal-header">
+                <div class="label">撰写阅读心得</div>
+                <h3 id="modalBookTitle">书名</h3>
+                <div class="author" id="modalBookAuthor">作者</div>
+            </div>
+            <form id="noteForm">
+                <div class="form-group">
+                    <label for="inputName">您的姓名<span class="req">*</span></label>
+                    <input type="text" id="inputName" maxlength="20" placeholder="请输入您的姓名或笔名" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputContent">阅读心得<span class="req">*</span></label>
+                    <textarea id="inputContent" maxlength="500" placeholder="写下您对这部名著的感悟、思考或最喜欢的情节…" required></textarea>
+                    <div class="char-count"><span id="charCount">0</span> / 500</div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">提交心得</button>
+            </form>
+        </div>
+    </div>
+
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============ 数据 ============
+        const BOOKS = [
+            {
+                id: '红楼梦',
+                title: '红楼梦',
+                author: '清 · 曹雪芹',
+                desc: '贾府兴衰，宝黛情缘，封建末世的百科全书。',
+                coverClass: 'cover-honglou'
+            },
+            {
+                id: '西游记',
+                title: '西游记',
+                author: '明 · 吴承恩',
+                desc: '师徒西行，降妖除魔，浪漫主义的神魔长篇。',
+                coverClass: 'cover-xiyou'
+            },
+            {
+                id: '三国演义',
+                title: '三国演义',
+                author: '元末明初 · 罗贯中',
+                desc: '群雄逐鹿，智勇交锋，百年三国风云录。',
+                coverClass: 'cover-sanguo'
+            },
+            {
+                id: '水浒传',
+                title: '水浒传',
+                author: '元末明初 · 施耐庵',
+                desc: '一百单八将，逼上梁山，江湖义气悲歌。',
+                coverClass: 'cover-shuihu'
+            },
+            {
+                id: '聊斋志异',
+                title: '聊斋志异',
+                author: '清 · 蒲松龄',
+                desc: '花妖狐魅，借鬼言人，奇幻短篇的瑰宝。',
+                coverClass: 'cover-liaozhai'
+            }
+        ];
+
+        const API_BASE = 'https://qf.kjxs.site/api/GekUNkiraVM';
+        const API_ALL = API_BASE + '/all';
+
+        let allNotes = [];
+        let currentFilter = 'all';
+        let currentBook = null;
+
+        // ============ DOM ============
+        const booksRow = document.getElementById('booksRow');
+        const notesGrid = document.getElementById('notesGrid');
+        const filterBar = document.getElementById('filterBar');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const modalBookTitle = document.getElementById('modalBookTitle');
+        const modalBookAuthor = document.getElementById('modalBookAuthor');
+        const noteForm = document.getElementById('noteForm');
+        const inputName = document.getElementById('inputName');
+        const inputContent = document.getElementById('inputContent');
+        const charCount = document.getElementById('charCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // ============ 渲染书籍 ============
+        function renderBooks() {
+            booksRow.innerHTML = BOOKS.map(b => `
+                <div class="book-card" data-book="${b.id}">
+                    <div class="book-cover ${b.coverClass}">${b.title}</div>
+                    <div class="book-title">${b.title}</div>
+                    <div class="book-author">${b.author}</div>
+                    <div class="book-desc">${b.desc}</div>
+                    <div class="book-cta">点击撰写心得</div>
+                </div>
+            `).join('');
+
+            booksRow.querySelectorAll('.book-card').forEach(card => {
+                card.addEventListener('click', () => openModal(card.dataset.book));
+            });
+        }
+
+        // ============ 模态框 ============
+        function openModal(bookId) {
+            const book = BOOKS.find(b => b.id === bookId);
+            if (!book) return;
+            currentBook = book;
+            modalBookTitle.textContent = book.title;
+            modalBookAuthor.textContent = book.author;
+            noteForm.reset();
+            charCount.textContent = '0';
+            modalOverlay.classList.add('active');
+            setTimeout(() => inputName.focus(), 300);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            currentBook = null;
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', e => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
+        });
+
+        // 字数统计
+        inputContent.addEventListener('input', () => {
+            charCount.textContent = inputContent.value.length;
+        });
+
+        // ============ Toast ============
+        let toastTimer = null;
+        function showToast(msg, type = '') {
+            clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            toastTimer = setTimeout(() => {
+                toast.className = 'toast ' + type;
+            }, 2600);
+        }
+
+        // ============ 提交心得 ============
+        noteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentBook) return;
+
+            const name = inputName.value.trim();
+            const content = inputContent.value.trim();
+            if (!name || !content) {
+                showToast('请填写姓名和心得', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中…';
+
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        book: currentBook.title,
+                        content: content
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast('心得提交成功！', 'success');
+                    // 乐观更新：立即在本地插入新心得（/all 有缓存，服务端可能延迟显示）
+                    const now = new Date();
+                    const pad = n => String(n).padStart(2, '0');
+                    const newNote = {
+                        name: name,
+                        book: currentBook.title,
+                        content: content,
+                        submitted_at: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+                        _pending: true
+                    };
+                    allNotes.unshift(newNote);
+                    // 切换到对应书籍过滤器，让用户立即看到自己的心得
+                    currentFilter = currentBook.title;
+                    renderFilter();
+                    renderNotes();
+                    closeModal();
+                    // 后台静默同步：服务端 /all 有 ~10 分钟缓存，多试几次
+                    silentSync();
+                } else {
+                    throw new Error(data.message || '提交失败');
+                }
+            } catch (err) {
+                console.error('提交失败:', err);
+                let reason = err && err.message ? err.message : '未知错误';
+                // file:// 协议下浏览器会拦截跨域请求
+                if (location.protocol === 'file:') {
+                    showToast('请通过 https://quick.kjxs.site 访问（file协议被浏览器拦截）', 'error');
+                } else if (err instanceof TypeError) {
+                    // fetch 网络错误（CORS/断网/服务器无响应）
+                    showToast('网络请求失败：' + reason, 'error');
+                } else {
+                    showToast('提交失败：' + reason, 'error');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交心得';
+            }
+        });
+
+        // ============ 加载心得 ============
+        async function loadNotes(isRefresh = false) {
+            if (isRefresh) {
+                refreshBtn.classList.add('spinning');
+            }
+            try {
+                const res = await fetch(API_ALL + '?_t=' + Date.now());
+                const data = await res.json();
+                allNotes = (data.submissions || []).slice().reverse(); // 最新在前
+                renderFilter();
+                renderNotes();
+            } catch (err) {
+                console.error('加载失败:', err);
+                notesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠</div>
+                        <p>心得加载失败</p>
+                        <p class="hint">请检查网络后点击刷新重试</p>
+                    </div>
+                `;
+            } finally {
+                refreshBtn.classList.remove('spinning');
+            }
+        }
+
+        // ============ 后台静默同步 ============
+        // /all 端点有 ~10 分钟缓存，新提交后需多次尝试才能拉到
+        let syncTimers = [];
+        function clearSyncTimers() {
+            syncTimers.forEach(t => clearTimeout(t));
+            syncTimers = [];
+        }
+
+        function silentSync() {
+            clearSyncTimers();
+            const delays = [4000, 9000, 20000, 45000]; // 渐进重试
+            delays.forEach((d, i) => {
+                const t = setTimeout(async () => {
+                    try {
+                        const res = await fetch(API_ALL + '?_t=' + Date.now());
+                        const data = await res.json();
+                        const serverNotes = (data.submissions || []).slice().reverse();
+                        // 检查 pending 心得是否已出现在服务端
+                        const pending = allNotes.filter(n => n._pending);
+                        if (pending.length === 0) return; // 没有需要同步的了
+                        let resolved = false;
+                        pending.forEach(p => {
+                            const matched = serverNotes.some(s =>
+                                s.name === p.name && s.book === p.book && s.content === p.content
+                            );
+                            if (matched) {
+                                p._pending = false;
+                                resolved = true;
+                            }
+                        });
+                        if (resolved) {
+                            renderNotes();
+                            // 全部 pending 都已同步，停止重试
+                            if (allNotes.every(n => !n._pending)) {
+                                clearSyncTimers();
+                            }
+                        }
+                    } catch (e) { /* 静默失败 */ }
+                }, d);
+                syncTimers.push(t);
+            });
+        }
+
+        // ============ 渲染过滤器 ============
+        function renderFilter() {
+            const counts = {};
+            BOOKS.forEach(b => counts[b.id] = 0);
+            allNotes.forEach(n => {
+                const key = n.book;
+                if (counts[key] === undefined) counts[key] = 0;
+                counts[key]++;
+            });
+
+            const allBtn = `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">全部<span class="filter-count">${allNotes.length}</span></button>`;
+            const bookBtns = BOOKS.map(b => `
+                <button class="filter-btn ${currentFilter === b.id ? 'active' : ''}" data-filter="${b.id}">
+                    ${b.title}<span class="filter-count">${counts[b.id] || 0}</span>
+                </button>
+            `).join('');
+
+            filterBar.innerHTML = allBtn + bookBtns;
+            filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentFilter = btn.dataset.filter;
+                    renderFilter();
+                    renderNotes();
+                });
+            });
+        }
+
+        // ============ 渲染心得 ============
+        function renderNotes() {
+            const list = currentFilter === 'all'
+                ? allNotes
+                : allNotes.filter(n => n.book === currentFilter);
+
+            if (list.length === 0) {
+                notesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">✎</div>
+                        <p>暂无阅读心得</p>
+                        <p class="hint">点击上方名著名字，写下第一条心得吧</p>
+                    </div>
+                `;
+                return;
+            }
+
+            notesGrid.innerHTML = list.map(n => `
+                <div class="note-card ${n._pending ? 'note-pending' : ''}">
+                    <span class="note-book">${escapeHtml(n.book || '佚名')}${n._pending ? '<span class="sync-tag">同步中</span>' : ''}</span>
+                    <div class="note-content">${escapeHtml(n.content || '')}</div>
+                    <div class="note-footer">
+                        <span class="note-name">${escapeHtml(n.name || '匿名读者')}</span>
+                        <span class="note-time">${escapeHtml(n.submitted_at || '')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // ============ 刷新按钮 ============
+        refreshBtn.addEventListener('click', () => loadNotes(true));
+
+        // ============ 启动 ============
+        // 检测 file:// 协议：浏览器会拦截跨域请求，提示用户用 http 访问
+        if (location.protocol === 'file:') {
+            document.getElementById('protocolWarn').style.display = 'flex';
+        }
+        renderBooks();
+        loadNotes();
+    </script>
+</body>
+</html>

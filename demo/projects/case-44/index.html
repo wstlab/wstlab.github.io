@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":44,"key":"case-44","title":"二叉查找树无限 PK","category":"programming","description":"搜索树操作图谱：围绕得分、轮次、错误开展交互学习，在数据大屏中回看记录。","headline":"搜索树操作图谱","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"round","label":"轮次"},{"key":"errors","label":"错误"},{"key":"sequence","label":"序列"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"AqfQw6d79EG"},"mapping":{"03s0hth1uo":"AqfQw6d79EG"},"accent":"#416d89","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏱️ 二叉查找树无限PK · 随机7~12元素</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #fce5cd 0%, #f5cba0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .game-card {
+            max-width: 1700px;
+            width: 100%;
+            background: rgba(255, 245, 230, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            box-shadow: 0 20px 30px -8px rgba(200, 120, 50, 0.3), 0 0 0 1px #f7b773 inset;
+            padding: 16px 18px 20px;
+        }
+
+        /* 头部：标题 + 班级姓名 */
+        .header-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #9e5e3a;
+            white-space: nowrap;
+        }
+        h1 span {
+            background: #e68a5e;
+            color: white;
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            border-radius: 40px;
+        }
+        .student-info {
+            display: flex;
+            gap: 8px;
+            background: #fbe7d4;
+            border-radius: 40px;
+            padding: 4px 14px;
+            border: 1px solid #f5bc8e;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .student-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #fffaf2;
+            padding: 3px 10px 3px 8px;
+            border-radius: 30px;
+            border: 1px solid #ed9f6b;
+            font-size: 0.8rem;
+        }
+        .student-item label {
+            font-weight: 700;
+            color: #a5542f;
+            font-size: 0.75rem;
+        }
+        .student-item input {
+            border: 2px solid #f5bc8e;
+            border-radius: 30px;
+            padding: 4px 8px;
+            width: 110px;
+            background: white;
+            font-size: 0.8rem;
+        }
+        /* 灰色提示文字样式 */
+        .student-item input.placeholder-gray::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* 第二行：倒计时 开始 下一题 提交 得分 */
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f5d5ba;
+            border-radius: 60px;
+            padding: 6px 16px;
+            margin: 8px 0 16px;
+            border: 1px solid #e68a5e;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .left-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .timer-box {
+            background: #2f1f15;
+            padding: 4px 18px;
+            border-radius: 50px;
+            color: #f5bc8e;
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: monospace;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #f5a65b;
+            line-height: 1.2;
+        }
+        .start-btn {
+            background: #f5bc8e;
+            border: none;
+            color: #5e3a2a;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 6px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b35f34;
+            transition: 0.1s;
+            border: 2px solid #ffe3c0;
+        }
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #b35f34;
+        }
+        .start-btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            box-shadow: 0 4px 0 #7b4a2e;
+        }
+        .right-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #e68a5e;
+            color: #9e5e3a;
+            font-weight: 600;
+            padding: 8px 22px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.15s;
+            box-shadow: 0 4px 8px rgba(180,100,50,0.15);
+        }
+        .btn-success {
+            background: #c47a4d;
+            border-color: #b35f34;
+            color: white;
+        }
+        .btn-success:hover:not(:disabled) { background: #b35f34; }
+        .btn-primary {
+            background: #e68a5e;
+            border-color: #d9733f;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) { background: #d9733f; }
+        .btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .score-pill {
+            background: #e68a5e;
+            color: white;
+            font-weight: 700;
+            padding: 5px 20px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+
+        /* 元素池 */
+        .element-pool {
+            background: #fbe7d4;
+            border-radius: 50px;
+            padding: 8px 15px;
+            margin: 0 0 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 65px;
+            border: 2px dashed #e68a5e;
+        }
+        .draggable-item {
+            background: #e68a5e;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: grab;
+            box-shadow: 0 4px 6px rgba(180,90,40,0.2);
+            border: 2px solid #f5bc8e;
+            min-width: 55px;
+            text-align: center;
+            user-select: none; /* 防止拖拽时文本被选中 */
+        }
+        .draggable-item.placed {
+            background: #b47b5c;
+            opacity: 0.4;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        /* 树面板 */
+        .tree-panel {
+            background: #fff1e0;
+            border-radius: 24px;
+            padding: 12px;
+            border: 1px solid #f5bc8e;
+            margin-bottom: 14px;
+        }
+        .tree-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding: 0 5px;
+        }
+        .tree-header h3 {
+            color: #9e5e3a;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* 策略标签 - 在标题右侧醒目显示 */
+        .strategy-tag {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 4px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .strategy-left {
+            background: #4a7a9c;
+            color: white;
+        }
+        .strategy-right {
+            background: #c94f4f;
+            color: white;
+        }
+        .tree-col {
+            background: #fffaf2;
+            border-radius: 24px;
+            padding: 8px 5px;
+            overflow-x: auto;
+            min-height: 210px;
+            border: 1px solid #f5bc8e;
+        }
+        .svg-wrap {
+            background: #fffaf2;
+            border-radius: 24px;
+            padding: 12px 8px 5px;
+            min-width: min-content;
+        }
+
+        /* 日志 & 批改 */
+        .log-bar {
+            background: #a5542f;
+            border-radius: 30px;
+            padding: 8px 18px;
+            color: #fce5cd;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .grade-panel {
+            background: #c47a4d30;
+            border-radius: 40px;
+            padding: 8px 18px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #e68a5e;
+            font-size: 0.85rem;
+        }
+        .footer-note {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: #9e5e3a;
+            font-size: 0.8rem;
+        }
+        /* 发送状态提示 */
+        .send-status {
+            font-size: 0.8rem;
+            color: #2f1f15;
+            background: #f5bc8e;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+    </style>
+<style>@media(max-width:640px){.tree-panel,.tree-card,.manual-panel,.auto-panel{min-width:0!important}.svg-wrap{max-width:calc(100vw - 100px)!important}}</style></head>
+<body>
+<div class="game-card">
+    
+    <div class="header-row">
+        <h1>⏱️ 限时3分钟·BST PK <span>∞ 无限题</span></h1>
+        <div class="student-info">
+            <div class="student-item"><label>班级</label><input type="text" id="classInput" placeholder="211" class="placeholder-gray"></div>
+            <div class="student-item"><label>姓名</label><input type="text" id="nameInput" placeholder="你的姓名" class="placeholder-gray"></div>
+        </div>
+    </div>
+
+    
+    <div class="action-row">
+        <div class="left-group">
+            <div class="timer-box" id="timerDisplay">03:00</div>
+            <button class="start-btn" id="startGameBtn">🚀 开始</button>
+        </div>
+        <div class="right-group">
+            <button class="btn" id="newRoundBtn" disabled>⏩ 下一题</button>
+            <button class="btn btn-success" id="submitRoundBtn" disabled>✅ 提交</button>
+            <div class="score-pill" id="scoreDisplay">0 / 0</div>
+        </div>
+    </div>
+
+    
+    <div class="element-pool" id="elementPool"></div>
+
+    
+    <div class="tree-panel">
+        <div class="tree-header">
+            <h3>
+                👤 我的构建
+                <span id="manualStrategyTag" class="strategy-tag strategy-left">左偏</span>
+            </h3>
+            <h3>🤖 标准答案</h3>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+            <div class="tree-col" style="flex:1 1 400px;">
+                <div class="svg-wrap" id="manualSvgWrap">
+                    <svg id="manualTreeSvg" width="500" height="200"></svg>
+                </div>
+            </div>
+            <div class="tree-col" style="flex:1 1 400px;">
+                <div class="svg-wrap" id="autoSvgWrap">
+                    <svg id="autoTreeSvg" width="500" height="200"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="log-bar" id="historyBox">
+        <span style="font-size:1.3rem;">📋</span>
+        <div class="log-message" id="historyMessage"></div>
+    </div>
+
+    <div class="grade-panel" id="gradeDetailPanel">
+        <span>✅ 已提交: <span id="submittedCount">0</span></span>
+        <span>⭐ 正确: <span id="correctCount">0</span></span>
+        <span>❌ 错误: <span id="wrongCount">0</span></span>
+        <span id="finalGradeMessage"></span>
+        <span id="sendStatus" class="send-status">📤 等待发送</span>
+    </div>
+
+    <div class="footer-note">
+        <span>🔸 随机偏左/右，元素个数7~12，无限题目</span>
+        <span>⚡ 提交后显示标准答案，完成自动上报</span>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- 生成随机题目，元素个数 7~12 ----------
+        function generateRandomArray() {
+            const count = Math.floor(Math.random() * 6) + 7; // 7-12
+            const numbers = new Set();
+            while (numbers.size < count) {
+                numbers.add(Math.floor(Math.random() * 100) + 1);
+            }
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        // 存储题目序列及策略
+        let questionSequence = [];          
+        let roundStrategy = [];              
+
+        // 游戏状态
+        let gameActive = false;
+        let timerInterval = null;
+        let timeLeft = 180;               
+        const MAX_TIME = 180;
+
+        let submittedRounds = [];           
+        let roundCorrect = [];               
+
+        let currentRound = 0;                
+
+        // 当前题目数据
+        let sortedArray = [];  
+        let answerSteps = [];
+        let answerTreeRoot = null;
+        let manualRoot = null;
+        let placedElements = new Set();
+
+        // 数据上报URL
+        const SUBMIT_URL = 'https://qf.kjxs.site/api/AqfQw6d79EG';
+
+        // DOM
+        const classInput = document.getElementById('classInput');
+        const nameInput = document.getElementById('nameInput');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const newRoundBtn = document.getElementById('newRoundBtn');
+        const submitRoundBtn = document.getElementById('submitRoundBtn');
+        const elementPool = document.getElementById('elementPool');
+        const manualTreeSvg = document.getElementById('manualTreeSvg');
+        const autoTreeSvg = document.getElementById('autoTreeSvg');
+        const historyMessage = document.getElementById('historyMessage');
+        const submittedCountSpan = document.getElementById('submittedCount');
+        const correctCountSpan = document.getElementById('correctCount');
+        const wrongCountSpan = document.getElementById('wrongCount');
+        const finalGradeMessage = document.getElementById('finalGradeMessage');
+        const sendStatus = document.getElementById('sendStatus');
+        
+        // 策略标签
+        const manualStrategyTag = document.getElementById('manualStrategyTag');
+
+        // 生成随机策略 (每次调用保证随机)
+        function randomStrategy() {
+            return Math.random() < 0.5 ? 'left' : 'right';
+        }
+
+        // 初始化第一题
+        function resetGameSequences() {
+            const firstArr = generateRandomArray();
+            questionSequence = [firstArr];
+            roundStrategy = [randomStrategy()];   // 每次开始都随机
+            submittedRounds = [false];
+            roundCorrect = [false];
+            currentRound = 0;
+        }
+
+        // 确保下一题存在 (动态生成，策略随机)
+        function ensureNextRoundExists() {
+            if (currentRound + 1 >= questionSequence.length) {
+                const newArr = generateRandomArray();
+                questionSequence.push(newArr);
+                roundStrategy.push(randomStrategy());  // 新题生成新随机策略
+                submittedRounds.push(false);
+                roundCorrect.push(false);
+            }
+        }
+
+        // 加载指定题目
+        function loadRound(roundIdx) {
+            while (roundIdx >= questionSequence.length) {
+                const newArr = generateRandomArray();
+                questionSequence.push(newArr);
+                roundStrategy.push(randomStrategy());
+                submittedRounds.push(false);
+                roundCorrect.push(false);
+            }
+
+            sortedArray = [...questionSequence[roundIdx]];
+            const strat = roundStrategy[roundIdx];
+            answerSteps = generateStepsFromArray(sortedArray, strat);
+            answerTreeRoot = buildFullBST(sortedArray, strat);
+
+            // 更新策略标签
+            updateStrategyTag(strat);
+
+            manualRoot = null;
+            placedElements.clear();
+
+            renderElementPool();
+            renderManualTree();
+            if (submittedRounds[roundIdx]) {
+                renderAutoTree();
+            } else {
+                renderEmptyAutoTree();
+            }
+        }
+
+        // 根据策略生成插入步骤 (左偏/右偏)
+        function generateStepsFromArray(arr, strat) {
+            const n = arr.length;
+            if (n===0) return [];
+            const steps = [];
+            function recurse(i,j) {
+                if (i>j) return;
+                let mid = (strat === 'left') ? Math.floor((i+j)/2) : Math.floor((i+j+1)/2);
+                steps.push(arr[mid]);
+                recurse(i, mid-1);
+                recurse(mid+1, j);
+            }
+            recurse(0, n-1);
+            return steps;
+        }
+
+        function buildFullBST(arr, strat) {
+            let root = null;
+            const steps = generateStepsFromArray(arr, strat);
+            steps.forEach(val => { root = insertIntoTree(root, val); });
+            return root;
+        }
+
+        function insertIntoTree(root, val) {
+            const newNode = { val, left: null, right: null };
+            if (!root) return newNode;
+            let cur = root;
+            while (true) {
+                if (val < cur.val) { if (!cur.left) { cur.left = newNode; break; } cur = cur.left; }
+                else if (val > cur.val) { if (!cur.right) { cur.right = newNode; break; } cur = cur.right; }
+                else break;
+            }
+            return root;
+        }
+
+        function copyTree(root) {
+            if (!root) return null;
+            return { val: root.val, left: copyTree(root.left), right: copyTree(root.right) };
+        }
+
+        function treesEqual(a, b) {
+            if (!a && !b) return true;
+            if (!a || !b) return false;
+            if (a.val !== b.val) return false;
+            return treesEqual(a.left, b.left) && treesEqual(a.right, b.right);
+        }
+
+        // 更新策略标签
+        function updateStrategyTag(strat) {
+            if (strat === 'left') {
+                manualStrategyTag.innerText = '左偏';
+                manualStrategyTag.className = 'strategy-tag strategy-left';
+            } else {
+                manualStrategyTag.innerText = '右偏';
+                manualStrategyTag.className = 'strategy-tag strategy-right';
+            }
+        }
+
+        function renderEmptyAutoTree() {
+            while (autoTreeSvg.firstChild) autoTreeSvg.removeChild(autoTreeSvg.firstChild);
+            autoTreeSvg.setAttribute('width', '500');
+            autoTreeSvg.setAttribute('height', '200');
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute('x', 250);
+            text.setAttribute('y', 100);
+            text.setAttribute('font-size', '13');
+            text.setAttribute('fill', '#b47b5c');
+            text.setAttribute('text-anchor', 'middle');
+            text.textContent = '🤖 提交后显示答案';
+            autoTreeSvg.appendChild(text);
+        }
+
+        function updateScoreBoard() {
+            const submitted = submittedRounds.filter(v=>v).length;
+            const correct = roundCorrect.filter(v=>v).length;
+            submittedCountSpan.innerText = submitted;
+            correctCountSpan.innerText = correct;
+            wrongCountSpan.innerText = submitted - correct;
+            scoreDisplay.innerText = `${correct} / ${submitted}`;
+            
+            if (submitted === questionSequence.length && questionSequence.length > 0) {
+                finalGradeMessage.innerText = `🏁 当前所有题目已提交! 正确:${correct}`;
+            } else {
+                finalGradeMessage.innerText = '';
+            }
+        }
+
+        // 发送数据到服务器
+        function sendScoreToServer() {
+            const className = classInput.value.trim() || '211';
+            const studentName = nameInput.value.trim() || '你的姓名';
+            const correctCount = roundCorrect.filter(v=>v).length;
+            const totalSubmitted = submittedRounds.filter(v=>v).length;
+            
+            const data = {
+                class: className,
+                name: studentName,
+                score: correctCount,
+                total: totalSubmitted,
+                timestamp: new Date().toISOString()
+            };
+
+            sendStatus.innerText = '📤 发送中...';
+            
+            fetch(SUBMIT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    sendStatus.innerText = '✅ 已上报';
+                    updateHistory('📊 成绩已成功上报服务器');
+                } else {
+                    sendStatus.innerText = '❌ 上报失败';
+                    updateHistory('❌ 成绩上报失败，请检查网络');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                sendStatus.innerText = '❌ 上报失败';
+                updateHistory('❌ 成绩上报失败，请检查网络');
+            });
+        }
+
+        function submitCurrentRound() {
+            if (!gameActive) { updateHistory('⏳ 游戏未开始或已结束'); return; }
+            if (submittedRounds[currentRound]) { updateHistory('本题已提交'); return; }
+            if (placedElements.size !== sortedArray.length) {
+                updateHistory(`还有 ${sortedArray.length - placedElements.size} 个元素未放置`);
+                return;
+            }
+
+            const isCorrect = treesEqual(manualRoot, answerTreeRoot);
+            roundCorrect[currentRound] = isCorrect;
+            submittedRounds[currentRound] = true;
+
+            renderAutoTree();
+            updateScoreBoard();
+            updateHistory(isCorrect ? '✅ 正确！' : '❌ 错误，对比标准树');
+
+            ensureNextRoundExists();  // 预生成下一题
+
+            if (gameActive) newRoundBtn.disabled = false;
+        }
+
+        function goToNextRound() {
+            if (!gameActive) return;
+            if (currentRound + 1 < questionSequence.length) {
+                currentRound++;
+            } else {
+                ensureNextRoundExists();
+                currentRound++;
+            }
+            loadRound(currentRound);
+            newRoundBtn.disabled = true;
+            submitRoundBtn.disabled = false;
+            if (submittedRounds[currentRound]) renderAutoTree();
+            else renderEmptyAutoTree();
+            updateScoreBoard();
+        }
+
+        // 计时器
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timeLeft = MAX_TIME;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                if (!gameActive) return;
+                timeLeft -= 1;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    updateTimerDisplay();
+                    gameActive = false;
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    startGameBtn.disabled = false;
+                    newRoundBtn.disabled = true;
+                    submitRoundBtn.disabled = true;
+                    
+                    alert('⏰ 时间到！游戏结束。');
+                    
+                    updateHistory('⏰ 时间到！游戏结束。点击“开始”重玩。');
+                    renderElementPool();
+                    const submitted = submittedRounds.filter(v=>v).length;
+                    if (submitted > 0) {
+                        sendScoreToServer();
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        }
+
+        function resetAndStartGame() {
+            stopTimer();
+            resetGameSequences();   
+
+            currentRound = 0;
+            gameActive = true;
+            timeLeft = MAX_TIME;
+            updateTimerDisplay();
+
+            loadRound(0);
+            renderEmptyAutoTree();
+
+            startGameBtn.disabled = true;
+            newRoundBtn.disabled = true;
+            submitRoundBtn.disabled = false;
+            updateScoreBoard();
+            
+            sendStatus.innerText = '📤 等待发送';
+
+            startTimer();
+            updateHistory('⏳ 游戏开始！');
+        }
+
+        // 渲染树
+        function renderTree(svgElement, root, type) {
+            if (!root) {
+                while (svgElement.firstChild) svgElement.removeChild(svgElement.firstChild);
+                svgElement.setAttribute('width', '500');
+                svgElement.setAttribute('height', '200');
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute('x', 250);
+                text.setAttribute('y', 100);
+                text.setAttribute('font-size', '13');
+                text.setAttribute('fill', '#b47b5c');
+                text.setAttribute('text-anchor', 'middle');
+                text.textContent = type==='auto'? '🤖 标准树' : '👆 拖拽构建';
+                svgElement.appendChild(text);
+                return;
+            }
+            const levels = [];
+            function computePositions(node, depth, left, right) {
+                if (!node) return;
+                if (!levels[depth]) levels[depth] = [];
+                const x = (left+right)/2;
+                levels[depth].push({val: node.val, x, node});
+                const gap = (right-left)*0.4;
+                if (node.left) computePositions(node.left, depth+1, x-gap, x);
+                if (node.right) computePositions(node.right, depth+1, x, x+gap);
+            }
+            computePositions(root, 0, 0, 500);
+            let minX=9999,maxX=-9999;
+            levels.forEach(lev=>lev.forEach(item=>{if(item.x<minX)minX=item.x;if(item.x>maxX)maxX=item.x;}));
+            const pad=50; minX=Math.min(minX-pad,0); maxX=maxX+pad;
+            const svgW = Math.max(500, maxX-minX);
+            const svgH = Math.max(200, levels.length*50+50);
+            svgElement.setAttribute('width', svgW);
+            svgElement.setAttribute('height', svgH);
+            while(svgElement.firstChild) svgElement.removeChild(svgElement.firstChild);
+            const offsetX = -minX;
+
+            for(let d=0; d<levels.length-1; d++) {
+                levels[d].forEach(p => {
+                    const px = p.x+offsetX, py = 25+d*45;
+                    if(p.node.left) {
+                        let child = levels[d+1].find(c=>c.node===p.node.left);
+                        if(child) drawLine(svgElement, px, py+16, child.x+offsetX, 25+(d+1)*45-16);
+                    }
+                    if(p.node.right) {
+                        let child = levels[d+1].find(c=>c.node===p.node.right);
+                        if(child) drawLine(svgElement, px, py+16, child.x+offsetX, 25+(d+1)*45-16);
+                    }
+                });
+            }
+            levels.forEach((lev,d)=>{
+                lev.forEach(item=>{
+                    const cx = item.x+offsetX, cy = 25+d*45;
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute('cx', cx); circle.setAttribute('cy', cy);
+                    circle.setAttribute('r', '18');
+                    circle.setAttribute('fill', type==='auto'? '#e68a5e' : '#b47b5c');
+                    circle.setAttribute('stroke','#f5bc8e'); circle.setAttribute('stroke-width','2');
+                    svgElement.appendChild(circle);
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute('x', cx); text.setAttribute('y', cy+3);
+                    text.setAttribute('font-size','12'); text.setAttribute('fill','#2f1f15');
+                    text.setAttribute('font-weight','bold'); text.setAttribute('text-anchor','middle');
+                    text.setAttribute('dominant-baseline','middle'); text.textContent = item.val;
+                    svgElement.appendChild(text);
+                });
+            });
+        }
+        function drawLine(svg,x1,y1,x2,y2) {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+            line.setAttribute('stroke','#f5bc8e'); line.setAttribute('stroke-width','2');
+            svg.appendChild(line);
+        }
+        function renderManualTree() { renderTree(manualTreeSvg, manualRoot, 'manual'); }
+        function renderAutoTree() { renderTree(autoTreeSvg, answerTreeRoot, 'auto'); }
+
+        // 元素池渲染 (修复: 确保所有数字都可拖拽)
+        function renderElementPool() {
+            elementPool.innerHTML = '';
+            sortedArray.forEach(val => {
+                const div = document.createElement('div');
+                // 可拖拽条件：游戏进行中 && 当前题未提交 && 该元素尚未被放置
+                const canDrag = gameActive && !submittedRounds[currentRound] && !placedElements.has(val);
+                div.className = `draggable-item ${!canDrag ? 'placed' : ''}`;  // 使用placed样式表示不可拖拽
+                div.textContent = val;
+                if (canDrag) {
+                    div.setAttribute('draggable', true);
+                } else {
+                    div.setAttribute('draggable', false);
+                }
+                div.dataset.value = val;
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+                elementPool.appendChild(div);
+            });
+        }
+
+        let draggedValue = null;
+        function handleDragStart(e) {
+            if (!gameActive || submittedRounds[currentRound]) { 
+                e.preventDefault(); 
+                return false; 
+            }
+            const val = parseInt(e.target.dataset.value);
+            if (placedElements.has(val)) { 
+                e.preventDefault(); 
+                return false; 
+            }
+            draggedValue = val;
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', val);
+            // 修复：明确设置拖拽效果
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function handleDragEnd(e) { 
+            e.target.classList.remove('dragging'); 
+            draggedValue = null; 
+        }
+
+        // drop 处理
+        manualTreeSvg.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        manualTreeSvg.addEventListener('drop', e => {
+            e.preventDefault();
+            if (!gameActive || submittedRounds[currentRound]) { 
+                updateHistory('游戏已结束或本题已提交'); 
+                return; 
+            }
+            const val = draggedValue;  // 从 dragstart 保存的值
+            if (val === null || val === undefined) {
+                // 降级尝试从 dataTransfer 获取
+                const data = e.dataTransfer.getData('text/plain');
+                if (!data) return;
+                draggedValue = parseInt(data);
+            }
+            const finalVal = (val !== null && val !== undefined) ? val : parseInt(e.dataTransfer.getData('text/plain'));
+            if (isNaN(finalVal) || placedElements.has(finalVal)) return;
+
+            // 获取 drop 坐标
+            const pt = manualTreeSvg.createSVGPoint();
+            pt.x = e.clientX; pt.y = e.clientY;
+            const ctm = manualTreeSvg.getScreenCTM();
+            if (!ctm) return;
+            const svgPt = pt.matrixTransform(ctm.inverse());
+            const dropX = svgPt.x, dropY = svgPt.y;
+
+            if (!manualRoot) {
+                manualRoot = { val: finalVal, left: null, right: null };
+                placedElements.add(finalVal);
+                updateHistory(`根节点: ${finalVal}`);
+                renderManualTree(); 
+                renderElementPool(); 
+                draggedValue = null;
+                return;
+            }
+
+            // 查找最近的节点
+            const nodes = [];
+            function collect(node, depth, x, range) {
+                if (!node) return;
+                nodes.push({ node, x, y: 25 + depth*45 });
+                const gap = range*0.4;
+                if (node.left) collect(node.left, depth+1, x-gap, gap);
+                if (node.right) collect(node.right, depth+1, x+gap, gap);
+            }
+            collect(manualRoot, 0, 250, 200);
+            
+            let closest = null;
+            let minDist = Infinity;
+            nodes.forEach(n => {
+                let d = Math.hypot(n.x - dropX, n.y - dropY); 
+                if (d < minDist) {
+                    minDist = d; 
+                    closest = n;
+                }
+            });
+            
+            if (!closest) { 
+                draggedValue = null;
+                return; 
+            }
+
+            let success = false;
+            if (finalVal < closest.node.val && !closest.node.left) {
+                closest.node.left = { val: finalVal, left: null, right: null };
+                placedElements.add(finalVal); 
+                success = true;
+                updateHistory(`插入 ${finalVal} 到 ${closest.node.val} 左侧`);
+            } else if (finalVal > closest.node.val && !closest.node.right) {
+                closest.node.right = { val: finalVal, left: null, right: null };
+                placedElements.add(finalVal); 
+                success = true;
+                updateHistory(`插入 ${finalVal} 到 ${closest.node.val} 右侧`);
+            } else {
+                updateHistory(`❌ 无效放置`);
+            }
+            
+            if (success) {
+                renderManualTree(); 
+                renderElementPool();
+            }
+            draggedValue = null;
+        });
+
+        function updateHistory(msg) { historyMessage.innerText = msg; }
+
+        // 事件绑定
+        startGameBtn.addEventListener('click', resetAndStartGame);
+        newRoundBtn.addEventListener('click', goToNextRound);
+        submitRoundBtn.addEventListener('click', submitCurrentRound);
+
+        // 初始状态
+        resetGameSequences();        
+        loadRound(0);
+        renderEmptyAutoTree();
+        startGameBtn.disabled = false;
+        newRoundBtn.disabled = true;
+        submitRoundBtn.disabled = true;   
+        updateHistory('点击“开始”按钮开始游戏');
+        updateScoreBoard(); 
+    })();
+</script>
+</body>
+</html>

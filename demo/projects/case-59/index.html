@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":59,"key":"case-59","title":"QuickPrompt · 教学网页提示词构建器","category":"design","description":"按教学场景组织网页设计提示词，分享场景、风格和使用反馈，不提交密钥或私人提示词。","headline":"教学设计灵感集","view":"groups","fields":[{"key":"scenario","label":"教学场景"},{"key":"subject","label":"学科"},{"key":"style","label":"视觉风格"},{"key":"feedback","label":"使用反馈"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开工具"}],"tasks":{"records":"1Ay8vlN6DYE"},"mapping":{},"accent":"#7265a3","capture":true,"lesson":"打开工具"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickPrompt — 教学网页提示词构建器</title>
+<style>
+:root {
+  --primary: #0d9488; --primary-h: #0f766e; --primary-bg: #f0fdfa; --primary-border: #99f6e4;
+  --bg: #fafaf9; --surface: #fff;
+  --text: #1c1917; --text2: #57534e; --text3: #a8a29e;
+  --border: #e7e5e4; --border-light: #f0efed;
+  --green: #059669; --green-bg: #ecfdf5;
+  --amber: #b45309; --amber-bg: #fffbeb; --amber-border: #fde68a;
+  --red: #dc2626; --red-bg: #fef2f2;
+  --radius: 10px; --radius-sm: 7px; --radius-xs: 5px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+
+/* Header */
+.header { padding: 4px 0 24px; display: flex; align-items: baseline; }
+.header h1 { font-size: 1.2rem; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin-right: auto; }
+.header .help-link { font-size: 0.8rem; color: var(--text3); cursor: pointer; transition: color .12s; }
+.header .help-link:hover { color: var(--text2); }
+
+/* Step Indicator */
+.steps { display: flex; gap: 0; margin-bottom: 32px; }
+.step-dot-wrap { flex:1; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; cursor: pointer; }
+.step-dot-wrap::after { content:''; position: absolute; top: 15px; left: calc(50% + 18px); width: calc(100% - 36px); height: 2px; background: var(--border); z-index: 0; transition: background .3s; }
+.step-dot-wrap:last-child::after { display: none; }
+.step-dot-wrap.done::after { background: var(--primary); }
+.step-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; z-index: 1; transition: all .25s cubic-bezier(.4,0,.2,1); border: 2px solid var(--border); background: var(--surface); color: var(--text3); }
+.step-dot-wrap.done .step-dot { background: var(--primary); border-color: var(--primary); color: #fff; transform: scale(0.93); }
+.step-dot-wrap.current .step-dot { background: var(--primary-bg); border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 5px rgba(13,148,136,.08); }
+.step-label { font-size: 0.7rem; color: var(--text3); font-weight: 500; white-space: nowrap; transition: color .2s; }
+.step-dot-wrap.current .step-label { color: var(--primary); font-weight: 600; }
+.step-dot-wrap.done .step-label { color: var(--text2); }
+
+/* Panels */
+.panel { display: none; animation: fadeIn .25s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+.panel-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+.panel-desc { font-size: 0.84rem; color: var(--text3); margin-bottom: 22px; }
+
+/* Scenario Grid */
+.scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+.scenario-tile {
+  padding: 20px 12px 16px; text-align: center; border-radius: var(--radius);
+  border: 1.5px solid var(--border); cursor: pointer; transition: all .18s cubic-bezier(.4,0,.2,1);
+  background: var(--surface); position: relative;
+}
+.scenario-tile:hover { border-color: var(--primary-border); background: var(--primary-bg); transform: translateY(-1px); }
+.scenario-tile.active { border-color: var(--primary); background: var(--primary-bg); }
+.scenario-tile.active::after { content:'✓'; position:absolute; top:6px; right:10px; width:18px; height:18px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.scenario-tile .icon { font-size: 1.5rem; margin-bottom: 5px; display: block; }
+.scenario-tile .name { font-size: 0.84rem; font-weight: 600; color: var(--text); }
+.scenario-tile .hint { font-size: 0.7rem; color: var(--text3); margin-top: 1px; }
+
+/* Style Grid */
+.style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.style-tile {
+  padding: 14px 10px 12px; text-align: center; border-radius: var(--radius);
+  border: 1.5px solid var(--border); cursor: pointer; transition: all .18s cubic-bezier(.4,0,.2,1);
+  background: var(--surface); position: relative;
+}
+.style-tile:hover { border-color: var(--primary-border); transform: translateY(-1px); }
+.style-tile.active { border-color: var(--primary); background: var(--primary-bg); }
+.style-tile.active::after { content:'✓'; position:absolute; top:4px; right:8px; width:16px; height:16px; border-radius:50%; background:var(--primary); color:#fff; font-size:0.6rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.style-tile .swatch { display: flex; gap: 3px; justify-content: center; margin-bottom: 6px; }
+.style-tile .swatch span { width: 14px; height: 14px; border-radius: 50%; display: block; border: 1px solid rgba(0,0,0,.08); }
+.style-tile .sname { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+.style-tile .svibe { font-size: 0.68rem; color: var(--text3); }
+
+/* Form */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-row.col-1 { grid-template-columns: 1fr; }
+.form-row.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+.field label { display: block; font-size: 0.79rem; font-weight: 600; color: var(--text2); margin-bottom: 3px; }
+.field label .opt { font-weight: 400; color: var(--text3); }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-xs);
+  font-size: 0.87rem; font-family: inherit; background: var(--surface); outline: none;
+  transition: border .15s, box-shadow .15s; color: var(--text); resize: vertical;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,148,136,.07); }
+.field textarea { min-height: 72px; }
+.field input[type="number"] { max-width: 120px; }
+.field .hint { font-size: 0.73rem; color: var(--text3); margin-top: 2px; }
+
+/* Knowledge Match */
+.kb-card {
+  background: var(--primary-bg); border: 1px solid var(--primary-border); border-radius: var(--radius);
+  padding: 12px 16px; margin-top: 8px; font-size: 0.82rem; line-height: 1.6;
+}
+.kb-card .kb-title { font-weight: 600; color: var(--primary); margin-bottom: 4px; font-size:0.86rem; }
+.kb-card .kb-row { margin-top: 2px; }
+.kb-card .kb-label { color: var(--text3); font-size: 0.76rem; }
+
+/* Checkbox Row */
+.check-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.check-item { display: flex; align-items: center; gap: 5px; }
+.check-item input[type="checkbox"] { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+.check-item label { font-size: 0.83rem; color: var(--text2); cursor: pointer; user-select: none; }
+
+/* Toggle */
+.toggle-row { display: flex; border: 1.5px solid var(--border); border-radius: var(--radius-xs); overflow: hidden; margin-bottom: 12px; }
+.toggle-btn { flex:1; padding: 9px 12px; border: none; background: var(--surface); font-size: 0.83rem; font-family: inherit; cursor: pointer; transition: all .15s; color: var(--text2); }
+.toggle-btn.active { background: var(--primary); color: #fff; font-weight: 500; }
+.toggle-btn:not(.active):hover { background: var(--primary-bg); }
+
+/* Switch */
+.switch-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.switch-row label { font-size: 0.84rem; color: var(--text2); cursor: pointer; }
+
+/* Output */
+.output-wrap { margin-top: 32px; }
+.output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.output-header .label { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.output-header .stage-tag { font-size: 0.72rem; color: var(--primary); background: var(--primary-bg); padding: 2px 10px; border-radius: 10px; font-weight: 500; }
+.stage-tabs { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+.stage-tab { padding: 4px 12px; border-radius: 14px; border: 1.5px solid var(--border); font-size: 0.77rem; cursor: pointer; background: var(--surface); color: var(--text2); font-family: inherit; transition: all .15s; }
+.stage-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.stage-tab:hover:not(.active) { border-color: var(--primary-border); }
+.output-body {
+  background: #f7f6f5; border-radius: var(--radius); padding: 20px 22px;
+  font-family: 'SF Mono','Fira Code','Consolas','Courier New',monospace; font-size: 0.82rem;
+  color: var(--text); white-space: pre-wrap; line-height: 1.75; max-height: 440px; overflow-y: auto;
+  border: 1px solid var(--border);
+}
+.output-body::-webkit-scrollbar { width: 5px; }
+.output-body::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 9px 18px; border: 1.5px solid transparent; border-radius: var(--radius-xs); font-size: 0.85rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; white-space: nowrap; }
+.btn:active { transform: scale(.97); }
+.btn-p { background: var(--primary); color: #fff; }
+.btn-p:hover { background: var(--primary-h); }
+.btn-s { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-s:hover { background: var(--bg); border-color: #d6d3d1; }
+.nav-row { display: flex; justify-content: space-between; margin-top: 22px; }
+
+/* Tip */
+.tip { padding: 10px 14px; font-size: 0.78rem; color: var(--text3); margin-top: 12px; line-height: 1.5; }
+.tip strong { color: var(--text2); }
+
+/* Help */
+.help-panel { display: none; margin-top: 12px; padding: 18px 22px; border-radius: var(--radius); font-size: 0.83rem; color: var(--text2); line-height: 1.8; background: #f7f6f5; }
+.help-panel p { margin-bottom: 5px; }
+.help-panel strong { color: var(--text); }
+
+@media (max-width: 640px) {
+  .app { padding: 20px 14px 48px; }
+  .scenario-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .scenario-tile { padding: 16px 10px 14px; }
+  .form-row, .form-row.col-3 { grid-template-columns: 1fr; }
+  .step-label { font-size: 0.62rem; }
+  .output-body { font-size: 0.76rem; padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+
+<div class="header">
+  <span style="display:flex;align-items:baseline;gap:6px;">
+    <h1>QuickPrompt</h1>
+    <span style="font-weight:400;color:var(--text3);font-size:0.85rem;">教学网页提示词构建器</span>
+  </span>
+  <span class="help-link" onclick="toggleHelp()">📖 使用说明</span>
+</div>
+<div style="font-size:0.82rem;color:var(--text3);margin:-16px 0 0 0;">选择场景、填写需求、复制提示词，粘贴到任意 AI 工具即可生成课堂教学网页</div>
+
+
+<div class="steps" id="stepIndicator">
+  <div class="step-dot-wrap current" data-step="0">
+    <div class="step-dot">1</div><div class="step-label">场景</div>
+  </div>
+  <div class="step-dot-wrap" data-step="1">
+    <div class="step-dot">2</div><div class="step-label">内容</div>
+  </div>
+  <div class="step-dot-wrap" data-step="2">
+    <div class="step-dot">3</div><div class="step-label">背景</div>
+  </div>
+  <div class="step-dot-wrap" data-step="3">
+    <div class="step-dot">4</div><div class="step-label">设置</div>
+  </div>
+  <div class="step-dot-wrap" data-step="4">
+    <div class="step-dot">5</div><div class="step-label">生成</div>
+  </div>
+</div>
+
+
+<div class="panel active" id="panel-0">
+  <div class="panel-title">选择教学场景</div>
+  <div class="panel-desc">你要做一个什么样的网页？选一个最接近的</div>
+  <div class="scenario-grid" id="scenarioGrid">
+    <div class="scenario-tile active" data-scenario="quiz">
+      <div class="icon">📝</div><div class="name">互动练习题</div><div class="hint">选择题/填空/判断</div>
+    </div>
+    <div class="scenario-tile" data-scenario="demo">
+      <div class="icon">🎬</div><div class="name">课堂互动演示</div><div class="hint">动画/模拟/分步展示</div>
+    </div>
+    <div class="scenario-tile" data-scenario="survey">
+      <div class="icon">📊</div><div class="name">问卷数据收集</div><div class="hint">调查/反馈/表单</div>
+    </div>
+    <div class="scenario-tile" data-scenario="game">
+      <div class="icon">🎮</div><div class="name">课堂小游戏</div><div class="hint">配对/闯关/竞答</div>
+    </div>
+    <div class="scenario-tile" data-scenario="analysis">
+      <div class="icon">📈</div><div class="name">学情分析大屏</div><div class="hint">成绩/图表/AI分析</div>
+    </div>
+    <div class="scenario-tile" data-scenario="custom">
+      <div class="icon">✨</div><div class="name">自定义场景</div><div class="hint">自由描述需求</div>
+    </div>
+  </div>
+  <div class="nav-row"><span></span><button class="btn btn-p" onclick="goToStep(1)">下一步 →</button></div>
+</div>
+
+
+<div class="panel" id="panel-1">
+  <div class="panel-title">设定内容</div>
+  <div class="panel-desc" id="contentDesc">填写教学网页的具体内容</div>
+  <div id="contentFields"></div>
+  <div class="nav-row">
+    <button class="btn btn-s" onclick="goToStep(0)">← 上一步</button>
+    <button class="btn btn-p" onclick="goToStep(2)">下一步 →</button>
+  </div>
+</div>
+
+
+<div class="panel" id="panel-2">
+  <div class="panel-title">教学背景</div>
+  <div class="panel-desc">选择学科和年级，我们会自动匹配课本知识背景，让 AI 更懂你的教学场景</div>
+  <div class="form-row col-3">
+    <div class="field">
+      <label>学科</label>
+      <select id="subject"><option value="">请选择</option></select>
+    </div>
+    <div class="field">
+      <label>年级</label>
+      <select id="grade"><option value="">请先选学科</option></select>
+    </div>
+    <div class="field">
+      <label>AI 工具</label>
+      <select id="aiTool">
+        <option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option>
+        <option value="tongyi">通义千问</option><option value="doubao">豆包</option>
+        <option value="yuanbao">腾讯元宝</option><option value="gpt">ChatGPT</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+  </div>
+  <div id="kbMatch"></div>
+  <div class="check-row" style="margin-top:14px;">
+    <div class="check-item">
+      <input type="checkbox" id="useKB" checked><label for="useKB">将以上教学背景注入提示词（推荐）</label>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn btn-s" onclick="goToStep(1)">← 上一步</button>
+    <button class="btn btn-p" onclick="goToStep(3)">下一步 →</button>
+  </div>
+</div>
+
+
+<div class="panel" id="panel-3">
+  <div class="panel-title">设置选项</div>
+  <div class="panel-desc">配置数据收集、技术约束和提示词风格</div>
+
+  
+  <div class="switch-row">
+    <input type="checkbox" id="useQuickForm" checked style="accent-color:var(--primary);width:16px;height:16px;">
+    <label for="useQuickForm" style="font-weight:600;">包含 QuickForm 数据提交功能</label>
+  </div>
+  <div id="qfSettings">
+    <div class="form-row">
+      <div class="field">
+        <label>QuickForm API 地址 <span class="opt">（粘贴真实地址，提示词中直接使用）</span></label>
+        <input type="text" id="qfApiUrl" placeholder="https://quickform.cn/api/xxxxxxxxxx">
+      </div>
+      <div class="field">
+        <label>数据收集模式</label>
+        <select id="qfMode">
+          <option value="submit-only">仅提交（显示"提交成功"）</option>
+          <option value="submit-feedback">提交 + 即时反馈（对错/评语）</option>
+          <option value="submit-dashboard">提交 + 教师学情大屏</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="switch-row" style="margin-top:8px;">
+    <input type="checkbox" id="useAI" style="accent-color:var(--primary);width:16px;height:16px;">
+    <label for="useAI" style="font-weight:600;">网页需要调用 AI 功能（学情分析、智能批改、对话等）</label>
+  </div>
+  <div id="aiSettings" style="display:none;">
+    <div class="form-row">
+      <div class="field">
+        <label>AI 服务商</label>
+        <select id="aiProvider">
+          <option value="deepseek">DeepSeek</option>
+          <option value="qwen">通义千问 (Qwen)</option>
+          <option value="kimi">Kimi (Moonshot)</option>
+          <option value="doubao">豆包 (字节)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+          <option value="custom">自定义接口</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>模型 <span class="opt" id="modelHint"></span></label>
+        <select id="aiModel"></select>
+      </div>
+      <div class="field">
+        <label>API Key</label>
+        <input type="password" id="aiApiKey" placeholder="sk-xxxxxxxxxxxxxxxx">
+      </div>
+    </div>
+    <div class="form-row" id="customEndpoint" style="display:none;">
+      <div class="field"><label>自定义 API 地址</label><input type="text" id="aiEndpoint" placeholder="https://api.example.com/v1/chat/completions"></div>
+      <div class="field"><label>模型名称</label><input type="text" id="aiCustomModel" placeholder="model-name"></div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text3);margin-top:6px;cursor:pointer;" onclick="document.getElementById('advOptions').style.display=document.getElementById('advOptions').style.display==='none'?'block':'none'">⚙ 高级选项 ▾</div>
+    <div id="advOptions" style="display:none;margin-top:8px;">
+      <div class="form-row">
+        <div class="field"><label>Temperature <span class="opt">（0-2，默认0.7）</span></label><input type="number" id="aiTemperature" value="0.7" min="0" max="2" step="0.1"></div>
+        <div class="field"><label>Max Tokens <span class="opt">（默认4096）</span></label><input type="number" id="aiMaxTokens" value="4096" min="256" max="131072" step="256"></div>
+        <div class="field"><label>System Prompt <span class="opt">（选填）</span></label><input type="text" id="aiSystemPrompt" placeholder="自定义系统提示词"></div>
+      </div>
+    </div>
+    <div class="kb-card" style="margin-top:10px;background:var(--red-bg);border-color:#fecaca;">
+      <div class="kb-title" style="color:var(--red);">🔐 安全说明</div>
+      <div style="font-size:0.82rem;color:#991b1b;">生成的网页代码会使用 <strong>Base64 编码</strong> 存储 API Key（运行时解码），避免明文暴露。但这并非真正的加密——任何有技术能力的人仍可解码。<br>请勿将包含 Key 的 HTML 文件公开发布到互联网、GitHub 或分享给不受信任的第三方。</div>
+    </div>
+  </div>
+
+  
+  <div style="margin-top:20px;margin-bottom:8px;font-size:0.85rem;font-weight:600;color:var(--text2);">视觉风格 <span class="opt">— 选一个你喜欢的，告别千篇一律的AI风</span></div>
+  <div class="style-grid" id="styleGrid"></div>
+  <div class="check-row" style="margin-top:8px;">
+    <div class="check-item"><input type="checkbox" id="useStyle" checked><label for="useStyle">将视觉风格注入提示词（推荐勾选，生成的网页会好看很多）</label></div>
+  </div>
+
+  
+  <div style="margin-top:16px;margin-bottom:8px;font-size:0.85rem;font-weight:600;color:var(--text2);">技术约束（推荐全选）</div>
+  <div class="check-row" id="constraints">
+    <div class="check-item"><input type="checkbox" id="c-utf8" checked><label for="c-utf8">UTF-8 编码</label></div>
+    <div class="check-item"><input type="checkbox" id="c-mobile" checked><label for="c-mobile">移动端适配</label></div>
+    <div class="check-item"><input type="checkbox" id="c-no-cdn" checked><label for="c-no-cdn">不使用外部 CDN</label></div>
+    <div class="check-item"><input type="checkbox" id="c-inline" checked><label for="c-inline">CSS/JS 全内联</label></div>
+    <div class="check-item"><input type="checkbox" id="c-single-file" checked><label for="c-single-file">单 HTML 文件</label></div>
+    <div class="check-item"><input type="checkbox" id="c-comments"><label for="c-comments">代码带中文注释</label></div>
+    <div class="check-item"><input type="checkbox" id="c-no-jquery"><label for="c-no-jquery">不依赖 jQuery</label></div>
+  </div>
+
+  
+  <div style="margin-top:16px;margin-bottom:8px;font-size:0.85rem;font-weight:600;color:var(--text2);">提示词风格</div>
+  <div class="toggle-row" id="modeToggle">
+    <button class="toggle-btn active" data-mode="quick">⚡ 快速模式（一个完整提示词）</button>
+    <button class="toggle-btn" data-mode="scaffold">🪜 脚手架模式（分阶段提示词）</button>
+  </div>
+  <div class="check-row" id="scaffoldStages" style="display:none;">
+    <div class="check-item"><input type="checkbox" id="stage-analyze" checked><label for="stage-analyze">1.分析</label></div>
+    <div class="check-item"><input type="checkbox" id="stage-plan" checked><label for="stage-plan">2.方案</label></div>
+    <div class="check-item"><input type="checkbox" id="stage-generate" checked><label for="stage-generate">3.生成</label></div>
+    <div class="check-item"><input type="checkbox" id="stage-debug" checked><label for="stage-debug">4.调试</label></div>
+    <div class="check-item"><input type="checkbox" id="stage-optimize" checked><label for="stage-optimize">5.优化</label></div>
+  </div>
+  <div class="check-row">
+    <div class="check-item"><input type="checkbox" id="edu-guide"><label for="edu-guide">教学引导式（"不要直接给答案，用提问引导"）</label></div>
+    <div class="check-item"><input type="checkbox" id="student-friendly"><label for="student-friendly">学生友好语言</label></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-s" onclick="goToStep(2)">← 上一步</button>
+    <button class="btn btn-p" onclick="goToStep(4)">下一步 →</button>
+  </div>
+</div>
+
+
+<div class="panel" id="panel-4">
+  <div class="panel-title">提示词已生成</div>
+  <div class="panel-desc">复制下方提示词，粘贴到 DeepSeek / Kimi / 通义千问 等工具中使用</div>
+  <div class="nav-row" style="margin-bottom:16px;">
+    <button class="btn btn-s" onclick="goToStep(3)">← 上一步 修改设置</button>
+    <button class="btn btn-s" onclick="goToStep(0)">↺ 重新开始</button>
+  </div>
+</div>
+
+
+<div class="output-wrap">
+  <div class="output-header">
+    <span class="label">📄 生成的提示词</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="stage-tag" id="stageLabel">完整提示词</span>
+      <button class="btn btn-s" onclick="copyPrompt()" style="font-size:0.82rem;padding:5px 14px;">📋 复制</button>
+    </div>
+  </div>
+  <div class="stage-tabs" id="stageTabs" style="display:none;"></div>
+  <div class="output-body" id="output">← 选择场景并填写内容，提示词会在这里实时生成</div>
+</div>
+
+<div class="tip" id="tipBox">
+  <strong>提示：</strong>生成的提示词粘贴到任意 AI 工具中使用。如果 AI 生成的网页不满意，把网页代码和问题描述一起发给 AI，说"这个页面有以下问题……请帮我修改"。<br>
+  <span style="font-size:0.75rem;opacity:0.7;">点击右上角「📖 使用说明」了解更多</span>
+</div>
+
+<div class="help-panel" id="helpPanel">
+  <p><strong>QuickPrompt 是什么？</strong>一个帮你写出高质量 AI 提示词的工具。选择场景、填写需求，它帮你拼成结构完整的提示词。</p>
+  <p><strong>两种模式：</strong>⚡ 快速模式一个完整提示词；🪜 脚手架模式分 5 个阶段（分析→方案→生成→调试→优化）。</p>
+  <p><strong>提示词五要素：</strong>角色 / 任务 / 约束 / 格式 / 标准。所有生成的提示词都包含这五部分。</p>
+  <p><strong>学科知识库：</strong>选择学科和年级后，自动匹配课本单元背景（前置知识、常见迷思、教学建议），让 AI 更懂你的教学场景。</p>
+  <p><strong>API 注入：</strong>填入 QuickForm 地址和 DeepSeek Key 后，提示词中直接包含真实值，不需要搜索替换占位符。Key 仅用于生成提示词文本，不会上传。</p>
+  <p><strong>安全提醒：</strong>生成的代码如果包含 API Key，请勿公开分享到互联网。</p>
+</div>
+
+</div>
+
+<script>
+// =====================================================================
+// KNOWLEDGE BASE — 基于 K12 教材体系分析报告
+// =====================================================================
+const knowledgeBase = {
+  "语文": {
+    label:"语文", versions:"全国统编版（部编版），2019年起统一使用",
+    bands: {
+      "小学低段（1-2年级）":{textbook:"统编版",units:[
+        {name:"汉语拼音",keywords:["拼音","声母","韵母","声调","拼读"],prerequisites:[],nextSteps:["识字","阅读"],misconceptions:["bdpq混淆","前后鼻音不分"],teachingTips:["用儿歌和手指操辅助记忆拼音字母","多感官教学：看口型、听发音、写拼音"],suitableFor:["quiz","game"]},
+        {name:"识字与写字",keywords:["识字","写字","笔画","偏旁","部首","1600字"],prerequisites:["汉语拼音"],nextSteps:["阅读理解","习作"],misconceptions:["形近字混淆（如'人'和'入'）","笔顺错误"],teachingTips:["归类识字：按偏旁部首、形声字归类","在语境中识字，避免孤立抄写"],suitableFor:["quiz","game"]}
+      ]},
+      "小学中段（3-4年级）":{textbook:"统编版",units:[
+        {name:"阅读理解",keywords:["阅读","段落大意","主要内容","中心思想","默读"],prerequisites:["识字"],nextSteps:["习作","整本书阅读"],misconceptions:["把'抄写原文句子'当成概括大意","不理解段落之间的逻辑关系"],teachingTips:["教'找中心句'策略","用思维导图梳理文章结构"],suitableFor:["quiz","demo"]},
+        {name:"习作入门",keywords:["习作","作文","200字","300字","写人","记事","写景"],prerequisites:["识字","阅读"],nextSteps:["高段习作"],misconceptions:["流水账式叙述","开头千篇一律（'今天...'）"],teachingTips:["从仿写段落开始，降低心理门槛","用'五感法'丰富描写"],suitableFor:["quiz","demo"]}
+      ]},
+      "小学高段（5-6年级）":{textbook:"统编版",units:[
+        {name:"文章结构与表达方式",keywords:["记叙文","说明文","议论文","文章结构","表达方式","修辞"],prerequisites:["阅读理解","习作入门"],nextSteps:["初中语文"],misconceptions:["混淆'说明'和'议论'","修辞手法只会用比喻"],teachingTips:["用同一主题不同文体的对比阅读","让学生做'文体转换'练习（把说明文改记叙文）"],suitableFor:["quiz","demo"]},
+        {name:"古诗词积累",keywords:["古诗词","75首","唐诗","宋词","诗人","意境","鉴赏"],prerequisites:["阅读理解"],nextSteps:["初中文言文"],misconceptions:["把翻译当成鉴赏","忽略诗歌的节奏和韵律"],teachingTips:["先诵读感受韵律，再分析内容","用画面联想帮助理解意境"],suitableFor:["quiz","game","demo"]}
+      ]},
+      "初中（7-9年级）":{textbook:"统编版",units:[
+        {name:"文言文阅读",keywords:["文言文","实词","虚词","翻译","古文","论语","岳阳楼记"],prerequisites:["古诗词","阅读理解"],nextSteps:["高中文言文"],misconceptions:["逐字翻译，不考虑语境","忽略虚词在句中的作用"],teachingTips:["先通读感知大意，再逐句疏通","积累常用实词（约150个）和虚词用法"],suitableFor:["quiz","demo"]},
+        {name:"现代文阅读与写作",keywords:["现代文","阅读","写作","议论文","记叙文","说明文"],prerequisites:["小学阅读理解","习作"],nextSteps:["高中语文"],misconceptions:["答题套路化（'生动形象地写出了...'）","写作缺少论据支撑"],teachingTips:["教'文本细读'方法，关注语言细节","写作从身边事写起，先有内容再有技巧"],suitableFor:["quiz","demo"]}
+      ]},
+      "高中":{textbook:"统编版",units:[
+        {name:"思辨阅读与议论文写作",keywords:["议论文","论证","论据","思辨","任务驱动型作文","整本书阅读"],prerequisites:["初中语文"],nextSteps:[],misconceptions:["堆砌事例代替论证","不区分'观点'和'论证'"],teachingTips:["用'论证结构图'分析范文","进行'一句话论证'训练，强制逻辑精炼"],suitableFor:["quiz","demo"]}
+      ]}
+    }
+  },
+  "数学": {
+    label:"数学", versions:"人教版主流，北师大版/苏教版也有广泛使用",
+    bands: {
+      "小学低段（1-2年级）":{textbook:"人教版",units:[
+        {name:"数的认识与加减法",keywords:["数数","0-20","加减法","进位","退位","100以内"],prerequisites:[],nextSteps:["乘法","除法"],misconceptions:["进位加时忘记加进位1","退位减时忘记借位后十位少1"],teachingTips:["用小棒、计数器等教具建立十进制直观","先练20以内口算，形成肌肉记忆再推至100"],suitableFor:["quiz","game"]},
+        {name:"认识图形",keywords:["图形","长方形","正方形","三角形","圆","立体图形"],prerequisites:[],nextSteps:["长度测量","角的认识"],misconceptions:["把'球'说成'圆'","认为正方形不是长方形"],teachingTips:["让学生摸一摸、画一画实物","分类游戏：按形状/大小/颜色分"],suitableFor:["demo","game"]}
+      ]},
+      "小学中段（3-4年级）":{textbook:"人教版",units:[
+        {name:"乘除法与四则运算",keywords:["乘法","除法","乘法口诀","多位数乘除","混合运算"],prerequisites:["加减法"],nextSteps:["小数","分数"],misconceptions:["乘法竖式进位位置写错","除法试商偏大或偏小"],teachingTips:["乘法口诀要背到脱口而出","用'分糖果'情境理解除法含义"],suitableFor:["quiz","game"]},
+        {name:"分数初步认识",keywords:["分数","几分之几","分数比较","同分母分数"],prerequisites:["整数除法","平均分"],nextSteps:["分数运算","小数"],misconceptions:["认为分母大的分数反而大（受整数比较影响）","不理解分数单位的意义"],teachingTips:["用折纸、涂色建立分数的面积模型","强调'平均分'是分数的前提"],suitableFor:["quiz","demo"]}
+      ]},
+      "小学高段（5-6年级）":{textbook:"人教版",units:[
+        {name:"分数的意义和性质",keywords:["分数","真分数","假分数","分数的基本性质","约分","通分","分数小数互化"],prerequisites:["分数初步认识","整数乘除"],nextSteps:["分数加减法","百分数"],misconceptions:["认为分子分母同加减相同数结果不变","约分时找不到最大公因数","混淆分数的基本性质与商不变性质"],teachingTips:["用面积模型（长方形纸条、圆形披萨）建立分数等值直观","设计对比练习：同分母→异分母梯度递进"],suitableFor:["quiz","demo","game"]},
+        {name:"小数四则运算",keywords:["小数","小数点","小数加减","小数乘除","小数位"],prerequisites:["整数四则运算","分数初步"],nextSteps:["百分数","方程"],misconceptions:["小数乘法小数点位置点错","除法中除数是小数时不会转化"],teachingTips:["联系人民币（元角分）建立小数概念","强调小数点对齐（加减）和积的小数位数（乘）"],suitableFor:["quiz"]},
+        {name:"简易方程",keywords:["方程","未知数","x","等式","解方程","列方程"],prerequisites:["四则运算"],nextSteps:["初中代数"],misconceptions:["不理解等式的平衡含义","解方程时移项忘记变号"],teachingTips:["用天平模型直观展示等式两边平衡","先练'找等量关系'再列方程"],suitableFor:["quiz","demo"]},
+        {name:"图形与几何",keywords:["三角形","平行四边形","梯形","多边形面积","圆","圆柱","圆锥"],prerequisites:["基本图形认识","长度单位"],nextSteps:["初中几何"],misconceptions:["混淆面积公式和周长公式","忘记面积单位换算（1m²≠100cm²）"],teachingTips:["用割补法推导面积公式，理解'为什么'","动手操作：剪纸拼图验证公式"],suitableFor:["demo","game"]}
+      ]},
+      "初中（7-9年级）":{textbook:"人教版",units:[
+        {name:"有理数与整式运算",keywords:["有理数","绝对值","整式","合并同类项","分解因式","一元一次方程"],prerequisites:["小学四则运算","分数","方程初步"],nextSteps:["函数","二次方程"],misconceptions:["负负得正只记得规则不理解原理","分解因式时漏项或符号错误"],teachingTips:["用数轴直观理解负数加减","整式运算类比数的运算，降低抽象门槛"],suitableFor:["quiz"]},
+        {name:"函数基础",keywords:["函数","一次函数","二次函数","反比例函数","坐标系","图像"],prerequisites:["代数运算"],nextSteps:["高中函数"],misconceptions:["把函数图像当成点的连线而非点的集合","不理解k和b的几何含义"],teachingTips:["用GeoGebra动态演示函数图像变化","先列表-再描点-再连线，建立数形对应"],suitableFor:["quiz","demo"]},
+        {name:"几何证明",keywords:["三角形","全等","相似","勾股定理","平行四边形","圆"],prerequisites:["小学图形认识"],nextSteps:["高中立体几何"],misconceptions:["证明时跳步，缺少中间推理","混淆判定定理和性质定理"],teachingTips:["从'找条件'开始训练，再逐步写完整证明","用折纸/模型操作先猜想再证明"],suitableFor:["quiz","demo"]}
+      ]},
+      "高中":{textbook:"人教A版",units:[
+        {name:"函数与导数",keywords:["集合","函数","指数","对数","三角函数","导数","单调性","极值"],prerequisites:["初中函数"],nextSteps:[],misconceptions:["混淆f(x)和f(a)的含义","导数符号理解不到位"],teachingTips:["用动态软件（Desmos/GeoGebra）可视化函数变化","从瞬时速度引入导数概念，建立直观理解"],suitableFor:["quiz","demo"]},
+        {name:"数列与不等式",keywords:["数列","等差数列","等比数列","通项公式","求和","不等式","线性规划"],prerequisites:["函数"],nextSteps:[],misconceptions:["混淆等差数列和等比数列公式","不等式两边乘负数忘变号"],teachingTips:["用'存钱利息''细胞分裂'等生活场景引入数列","不等式用数轴辅助理解"],suitableFor:["quiz","demo"]}
+      ]}
+    }
+  },
+  "英语": {
+    label:"英语", versions:"人教版（PEP/GO for it!）主流，外研版、译林版也有使用",
+    bands: {
+      "小学高段（5-6年级）":{textbook:"人教版PEP",units:[
+        {name:"词汇与句型",keywords:["英语","单词","词汇","句型","对话","What","How","there be"],prerequisites:[],nextSteps:["初中英语"],misconceptions:["用中文语序硬套英语","be动词和人称不匹配"],teachingTips:["用TPR（全身反应法）在动作中学词汇","句型替换练习，保持结构、换内容"],suitableFor:["quiz","game"]}
+      ]},
+      "初中（7-9年级）":{textbook:"人教版GO for it!",units:[
+        {name:"语法体系构建",keywords:["语法","时态","一般现在","一般过去","现在完成","被动语态","定语从句"],prerequisites:["小学词汇句型"],nextSteps:["高中英语"],misconceptions:["现在完成时和一般过去时混用","被动语态be动词忘记变形"],teachingTips:["用时间轴可视化各时态的时间关系","对比中英文表达差异（中文无时态变化）"],suitableFor:["quiz","demo"]},
+        {name:"阅读与写作",keywords:["阅读","完形填空","阅读理解","写作","书面表达"],prerequisites:["词汇","语法"],nextSteps:["高中英语"],misconceptions:["逐词翻译而不是理解大意","写作先想中文再翻译"],teachingTips:["教'扫读+精读'两步阅读法","用思维导图组织写作内容"],suitableFor:["quiz"]}
+      ]},
+      "高中":{textbook:"人教版",units:[
+        {name:"综合语言运用",keywords:["高考","阅读","写作","语法填空","续写","概要写作"],prerequisites:["初中英语"],nextSteps:[],misconceptions:["阅读过度依赖词典","写作模板化严重"],teachingTips:["大量阅读输入是基础，不急于刷题","写作从模仿范文结构开始"],suitableFor:["quiz"]}
+      ]}
+    }
+  },
+  "科学": {
+    label:"科学", versions:"教科版主流（2024新版从一年级起），苏教版为辅",
+    bands: {
+      "小学中段（3-4年级）":{textbook:"教科版",units:[
+        {name:"生命科学基础",keywords:["植物","动物","生命周期","生长","繁殖"],prerequisites:[],nextSteps:["生物"],misconceptions:["认为所有植物都开花","混淆昆虫和蜘蛛的分类"],teachingTips:["长期观察记录（如养蚕、种豆子）","用比较表整理不同动物的生命周期"],suitableFor:["demo","quiz"]},
+        {name:"物质与材料",keywords:["液体","固体","材料","磁铁","声音"],prerequisites:[],nextSteps:["物理","化学"],misconceptions:["认为'重的东西一定沉'","混淆'溶解'和'融化'"],teachingTips:["预测-实验-验证的探究流程","用生活材料做低成本实验"],suitableFor:["demo","quiz"]}
+      ]},
+      "小学高段（5-6年级）":{textbook:"教科版",units:[
+        {name:"物理科学",keywords:["光","热","电路","简单机械","杠杆","滑轮"],prerequisites:["物质基础"],nextSteps:["初中物理"],misconceptions:["认为电流'用完了'","混淆影子和反射"],teachingTips:["用光线盒实验探索光的传播","搭建简单电路（电池+灯泡+开关）"],suitableFor:["demo","game"]},
+        {name:"地球与宇宙",keywords:["地球","自转","公转","月相","四季","太阳系"],prerequisites:[],nextSteps:["初中地理"],misconceptions:["认为四季变化是因为地球离太阳远近","分不清自转和公转各导致什么现象"],teachingTips:["用三球仪演示天体运动","模拟实验：手电筒+地球仪演示昼夜"],suitableFor:["demo"]}
+      ]}
+    }
+  },
+  "物理": {
+    label:"物理", versions:"人教版主流，沪科版华东地区使用",
+    bands: {
+      "初中（7-9年级）":{textbook:"人教版",units:[
+        {name:"力学基础",keywords:["力","重力","弹力","摩擦力","压强","浮力","简单机械","机械能"],prerequisites:["小学数学","科学"],nextSteps:["高中物理"],misconceptions:["认为'有力就有运动，没力就静止'（亚里士多德观念）","混淆压力和压强概念"],teachingTips:["用弹簧测力计做定量实验","从生活现象引入（游泳浮力、书包压强）"],suitableFor:["demo","quiz"]},
+        {name:"电学基础",keywords:["电路","电流","电压","电阻","欧姆定律","电功率"],prerequisites:["小学数学"],nextSteps:["高中电磁学"],misconceptions:["认为'电流从正极流到负极，越流越少'","并联电路电阻计算错误"],teachingTips:["用水流类比电流、水压类比电压","从实际电路连接入手，再做抽象分析"],suitableFor:["demo","quiz"]},
+        {name:"光学",keywords:["光","反射","折射","平面镜","凸透镜","成像"],prerequisites:["小学科学"],nextSteps:["高中光学"],misconceptions:["认为'我们看到东西是眼睛发出光'","混淆实像和虚像"],teachingTips:["用光线盒和光学元件做探究实验","画光路图是基本功，多练"],suitableFor:["demo","quiz"]}
+      ]},
+      "高中":{textbook:"人教版",units:[
+        {name:"运动与力学",keywords:["匀变速运动","牛顿定律","曲线运动","万有引力","动量","能量守恒"],prerequisites:["初中物理"],nextSteps:[],misconceptions:["混淆速度和加速度","认为向心力是一种'新的力'"],teachingTips:["用Tracker软件分析运动视频","先分析受力再列方程，形成解题规范"],suitableFor:["demo","quiz"]},
+        {name:"电磁学",keywords:["电场","磁场","电磁感应","洛伦兹力","交流电"],prerequisites:["初中电学"],nextSteps:[],misconceptions:["混淆电场线和运动轨迹","左右手定则用混"],teachingTips:["用仿真软件可视化电磁场","多做'判断方向'类练习"],suitableFor:["demo","quiz"]}
+      ]}
+    }
+  },
+  "化学": {
+    label:"化学", versions:"人教版主流",
+    bands: {
+      "初中（7-9年级）":{textbook:"人教版（九年级）",units:[
+        {name:"物质构成与变化",keywords:["原子","分子","元素","化学式","化合价","化学方程式","质量守恒"],prerequisites:[],nextSteps:["高中化学"],misconceptions:["认为'分子是保持物质性质的最小微粒'（应为化学性质）","化学方程式配平靠猜"],teachingTips:["用球棍模型搭建分子结构","从宏观现象→微观解释→符号表达三步走"],suitableFor:["demo","quiz"]},
+        {name:"溶液与酸碱盐",keywords:["溶液","溶解度","酸碱盐","pH","中和反应","金属活动性"],prerequisites:["物质构成"],nextSteps:["高中化学"],misconceptions:["认为'浓溶液一定是饱和溶液'","混淆电离和电解"],teachingTips:["多做试管实验观察沉淀/气体/颜色变化","用'离子反应'视角统一理解酸碱盐反应"],suitableFor:["demo","quiz"]}
+      ]},
+      "高中":{textbook:"人教版",units:[
+        {name:"化学反应原理",keywords:["反应速率","化学平衡","勒夏特列","电离平衡","水解","电化学"],prerequisites:["初中化学"],nextSteps:[],misconceptions:["认为加入催化剂改变平衡（只改变速率）","混淆原电池和电解池"],teachingTips:["用模拟软件演示平衡移动","从能量角度统一理解化学反应"],suitableFor:["demo","quiz"]}
+      ]}
+    }
+  },
+  "生物": {
+    label:"生物", versions:"人教版主流",
+    bands: {
+      "初中（7-9年级）":{textbook:"人教版",units:[
+        {name:"生物体结构",keywords:["细胞","组织","器官","系统","显微镜"],prerequisites:[],nextSteps:["高中生物"],misconceptions:["认为'所有细胞都有细胞核'（红细胞没有）","混淆植物细胞和动物细胞结构"],teachingTips:["用显微镜观察洋葱表皮和口腔上皮","制作细胞模型（橡皮泥/3D打印）"],suitableFor:["demo","quiz"]},
+        {name:"遗传与变异",keywords:["基因","DNA","染色体","孟德尔","显性","隐性","遗传病"],prerequisites:["细胞"],nextSteps:["高中遗传学"],misconceptions:["认为'显性性状一定更常见'","混淆基因型和表现型"],teachingTips:["用抛硬币模拟等位基因分离","计算家族遗传病概率让学生理解遗传规律"],suitableFor:["quiz","demo"]}
+      ]},
+      "高中":{textbook:"人教版",units:[
+        {name:"分子与细胞",keywords:["蛋白质","酶","光合作用","呼吸作用","细胞分裂"],prerequisites:["初中生物"],nextSteps:[],misconceptions:["认为光合作用只在白天进行","混淆有氧呼吸和无氧呼吸的产物"],teachingTips:["用流程图梳理代谢途径","实验验证：光照对光合作用的影响"],suitableFor:["demo","quiz"]}
+      ]}
+    }
+  },
+  "历史": {
+    label:"历史", versions:"统编版",
+    bands: {
+      "初中（7-9年级）":{textbook:"统编版",units:[
+        {name:"中国古代史",keywords:["朝代","秦汉","隋唐","宋元","明清","皇帝","变法"],prerequisites:[],nextSteps:["高中历史"],misconceptions:["把历史当成孤立事件记忆","混淆朝代顺序"],teachingTips:["用时间轴串联事件","从'因果链'角度理解历史（为什么发生→导致什么）"],suitableFor:["quiz","game"]},
+        {name:"中国近代史",keywords:["鸦片战争","五四运动","抗日战争","解放战争","新中国成立"],prerequisites:["古代史"],nextSteps:["高中历史"],misconceptions:["把复杂历史简化为'好人vs坏人'","忽略国际背景对历史事件的影响"],teachingTips:["用地图标注关键地点","分析历史文献原文，训练史料解读能力"],suitableFor:["quiz","demo"]}
+      ]}
+    }
+  },
+  "地理": {
+    label:"地理", versions:"人教版主流",
+    bands: {
+      "初中（7-9年级）":{textbook:"人教版",units:[
+        {name:"地球与地图",keywords:["经纬度","地图","地形","气候","板块"],prerequisites:[],nextSteps:["高中地理"],misconceptions:["分不清经线和纬线哪个指示东西方向","不会读等高线地形图"],teachingTips:["用地球仪和世界地图实物教学","画简易等高线图让学生判断地形"],suitableFor:["demo","quiz"]},
+        {name:"中国地理",keywords:["地形","气候","河流","农业","工业","区域","四大区域"],prerequisites:["地球与地图"],nextSteps:["高中地理"],misconceptions:["把自然地理和人文地理割裂开","记不住省份位置"],teachingTips:["用拼图游戏熟悉中国政区","结合新闻时事理解区域地理"],suitableFor:["quiz","game"]}
+      ]}
+    }
+  },
+  "道德与法治": {
+    label:"道德与法治", versions:"统编版",
+    bands: {
+      "小学低段（1-2年级）":{textbook:"统编版",units:[
+        {name:"生活习惯与安全",keywords:["习惯","安全","卫生","交通规则","自我保护"],prerequisites:[],nextSteps:["社会规则"],misconceptions:[],teachingTips:["用绘本故事和角色扮演学习安全知识","家长配合打卡完成好习惯任务"],suitableFor:["quiz","game"]}
+      ]},
+      "小学高段（5-6年级）":{textbook:"统编版",units:[
+        {name:"公民意识与社会生活",keywords:["规则","诚信","网络","权利","义务","法律"],prerequisites:[],nextSteps:["初中道德与法治"],misconceptions:["认为'法律是大人的事，跟小孩无关'","混淆道德和法律的区别"],teachingTips:["从班级规则制定入手理解规则的意义","用生活案例讨论权利与义务"],suitableFor:["survey","quiz"]}
+      ]},
+      "初中（7-9年级）":{textbook:"统编版",units:[
+        {name:"法律与公民",keywords:["宪法","全国人大","公民","权利","义务","法治"],prerequisites:["小学道法"],nextSteps:["高中政治"],misconceptions:["认为'宪法离日常生活很远'","不区分公民权利和法定权利"],teachingTips:["用真实案例分析法条","模拟法庭活动体验法律程序"],suitableFor:["survey","quiz"]}
+      ]}
+    }
+  },
+  "信息科技": {
+    label:"信息科技", versions:"2022新课标，各地选用不同出版社版本",
+    bands: {
+      "小学高段（5-6年级）":{textbook:"新课标通用",units:[
+        {name:"算法与编程入门",keywords:["编程","图形化","Scratch","算法","流程图","顺序","循环","条件"],prerequisites:[],nextSteps:["初中信息科技"],misconceptions:["认为'编程就是写代码'（忽略算法设计）","把循环条件写错导致死循环"],teachingTips:["先用流程图画出逻辑，再拖积木","从模仿到修改再到创造：三段式教学"],suitableFor:["demo","quiz"]}
+      ]},
+      "初中（7-9年级）":{textbook:"新课标通用",units:[
+        {name:"AI与数据",keywords:["人工智能","机器学习","数据","Python","物联网","网络"],prerequisites:["小学编程入门"],nextSteps:["高中信息技术"],misconceptions:["认为AI'有智能就是有意识'","把训练数据和测试数据混为一谈"],teachingTips:["用可解释的简单AI案例（如决策树）入门","强调'数据质量决定AI质量'"],suitableFor:["demo","quiz"]}
+      ]}
+    }
+  }
+};
+
+// Build subject dropdown from knowledge base
+function buildSubjectOptions() {
+  const sel = document.getElementById('subject');
+  sel.innerHTML = '<option value="">请选择学科</option>';
+  Object.keys(knowledgeBase).forEach(k => {
+    sel.innerHTML += `<option value="${k}">${k}</option>`;
+  });
+}
+
+// Update grade options when subject changes
+function updateGradeOptions() {
+  const subject = document.getElementById('subject').value;
+  const gradeSel = document.getElementById('grade');
+  if (!subject || !knowledgeBase[subject]) {
+    gradeSel.innerHTML = '<option value="">请先选学科</option>';
+    document.getElementById('kbMatch').innerHTML = '';
+    return;
+  }
+  const bands = knowledgeBase[subject].bands;
+  gradeSel.innerHTML = '<option value="">请选择年级段</option>';
+  Object.keys(bands).forEach(b => {
+    gradeSel.innerHTML += `<option value="${b}">${b}</option>`;
+  });
+  // Trigger grade change to update KB match
+  gradeSel.addEventListener('change', updateKBMatch);
+}
+
+function updateKBMatch() {
+  const subject = document.getElementById('subject').value;
+  const grade = document.getElementById('grade').value;
+  const container = document.getElementById('kbMatch');
+  if (!subject || !grade || !knowledgeBase[subject] || !knowledgeBase[subject].bands[grade]) {
+    container.innerHTML = '';
+    return;
+  }
+  const band = knowledgeBase[subject].bands[grade];
+  const units = band.units;
+  let html = `<div style="font-size:0.82rem;color:var(--text2);margin-bottom:8px;">📚 ${knowledgeBase[subject].label} · ${grade} · ${band.textbook}</div>`;
+  units.forEach(u => {
+    html += `<div class="kb-card">
+      <div class="kb-title">${u.name}</div>
+      ${u.prerequisites.length ? `<div class="kb-row"><span class="kb-label">前置：</span>${u.prerequisites.join('、')}</div>` : ''}
+      ${u.nextSteps.length ? `<div class="kb-row"><span class="kb-label">后续：</span>${u.nextSteps.join('、')}</div>` : ''}
+      ${u.misconceptions.length ? `<div class="kb-row"><span class="kb-label">常见迷思：</span>${u.misconceptions.join('；')}</div>` : ''}
+      ${u.teachingTips.length ? `<div class="kb-row"><span class="kb-label">教学建议：</span>${u.teachingTips[0]}</div>` : ''}
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// Match topic to knowledge base units
+function matchKB(subject, grade, topic) {
+  if (!subject || !grade || !knowledgeBase[subject]) return [];
+  const band = knowledgeBase[subject].bands[grade];
+  if (!band) return [];
+  const units = band.units;
+  if (!topic) return units.slice(0, 2); // Return first 2 as context
+  const topicLower = topic.toLowerCase();
+  // Score each unit
+  const scored = units.map(u => {
+    let score = 0;
+    if (topic.includes(u.name) || u.name.includes(topic)) score += 100;
+    u.keywords.forEach(kw => {
+      if (topicLower.includes(kw.toLowerCase()) || kw.toLowerCase().includes(topicLower)) score += 30;
+    });
+    return { unit: u, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.filter(s => s.score > 0).map(s => s.unit);
+}
+
+// =====================================================================
+// AI PROVIDER & MODEL DATA
+// =====================================================================
+const aiProviders = {
+  deepseek: {
+    name:'DeepSeek', endpoint:'https://api.deepseek.com/v1/chat/completions',
+    models:[
+      {id:'deepseek-chat',name:'DeepSeek V3',desc:'通用对话，性价比最高'},
+      {id:'deepseek-reasoner',name:'DeepSeek R1',desc:'深度推理，适合复杂分析'}
+    ]
+  },
+  qwen: {
+    name:'通义千问', endpoint:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    models:[
+      {id:'qwen-turbo',name:'Qwen Turbo',desc:'快速响应，适合简单任务'},
+      {id:'qwen-plus',name:'Qwen Plus',desc:'平衡效果与速度'},
+      {id:'qwen-max',name:'Qwen Max',desc:'最强效果，复杂推理'}
+    ]
+  },
+  kimi: {
+    name:'Kimi (Moonshot)', endpoint:'https://api.moonshot.cn/v1/chat/completions',
+    models:[
+      {id:'moonshot-v1-8k',name:'Moonshot 8K',desc:'短文本，快速响应'},
+      {id:'moonshot-v1-32k',name:'Moonshot 32K',desc:'中等长度，性价比'},
+      {id:'moonshot-v1-128k',name:'Moonshot 128K',desc:'超长上下文'}
+    ]
+  },
+  doubao: {
+    name:'豆包 (字节)', endpoint:'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+    models:[
+      {id:'doubao-lite-32k',name:'豆包 Lite 32K',desc:'轻量快速'},
+      {id:'doubao-pro-32k',name:'豆包 Pro 32K',desc:'性能更强'}
+    ]
+  },
+  openai: {
+    name:'OpenAI', endpoint:'https://api.openai.com/v1/chat/completions',
+    models:[
+      {id:'gpt-4o',name:'GPT-4o',desc:'最新多模态旗舰'},
+      {id:'gpt-4o-mini',name:'GPT-4o Mini',desc:'轻量高性价比'},
+      {id:'o4-mini',name:'o4-mini',desc:'推理增强'}
+    ]
+  },
+  custom: {
+    name:'自定义', endpoint:'', models:[]
+  }
+};
+
+// =====================================================================
+// VISUAL STYLE DATA
+// =====================================================================
+const visualStyles = [
+  { id:'clean', name:'极简学术', vibe:'清爽专业', colors:['#1a1a2e','#ffffff','#e8e8e8','#4a90d9'],
+    css:'整体风格极简学术，大量留白，清晰的网格布局。配色克制（深色文字+白色背景+一个强调色），字体使用系统原生无衬线栈（-apple-system等），不要用花哨的渐变和阴影。适合中学生、测验考试场景。参考：Apple Notes、Notion、Linear的简洁风格。' },
+  { id:'warm', name:'温暖童趣', vibe:'柔和友好', colors:['#fef7ed','#fff5e6','#ffbd59','#e07b4c'],
+    css:'整体风格温暖柔和，适合小学生。使用暖色调（奶油色背景+暖橙暖黄点缀），圆角较大（12-16px），字体略大（15-16px），图标和插画风格的元素（emoji即可）。按钮有微微的阴影和hover上浮效果。参考：Khan Academy Kids、可汗学院儿童版的友好风格。' },
+  { id:'nature', name:'自然清新', vibe:'治愈绿色', colors:['#f6f9f5','#e8f0e3','#7ab86c','#3d6b35'],
+    css:'整体风格自然清新，适合科学、生物、地理等学科。使用自然色系（浅绿、薄荷、大地色），植物感配色。卡片可以有不规则的柔和阴影，细微的圆角。字体清晰，行距宽松。参考：Notion的清新模板、Headspace的自然配色。' },
+  { id:'dark', name:'暗色科技', vibe:'酷炫现代', colors:['#0f172a','#1e293b','#38bdf8','#818cf8'],
+    css:'整体风格暗色科技风，适合信息科技、STEM学科。深色背景（slate-900系列）+亮色点缀（cyan/indigo），高对比度。使用现代几何感的布局，代码块风格的数据展示。适合大屏投影展示。参考：VS Code Dark+、Vercel、Linear dark mode。' },
+  { id:'paper', name:'纸质书卷', vibe:'人文古雅', colors:['#faf5ed','#f3e8d6','#b8956a','#5c3d2e'],
+    css:'整体风格仿纸质书卷，适合语文、历史、道法等人文学科。使用暖米色/象牙白背景（类似纸张），棕褐色文字和分割线。衬线字体（Georgia/宋体）用于标题，正文字体略大。分割线可以用细线或装饰性元素。参考：Medium、纽约时报、古籍排版。' },
+  { id:'glass', name:'毛玻璃现代', vibe:'时尚层次', colors:['#f0f4ff','#e8ecf8','#6366f1','#a78bfa'],
+    css:'整体风格毛玻璃现代（Glassmorphism），适合展示型页面、学情大屏。使用半透明背景（backdrop-filter: blur()），多层叠加的玻璃卡片营造深度感。鲜艳的渐变背景色，白色文字带阴影。参考：macOS Big Sur、iOS控制中心、Microsoft Fluent Design。' },
+  { id:'neo', name:'新拟态柔和', vibe:'细腻触感', colors:['#e8eef2','#d5dde3','#7c9eb3','#4a6d82'],
+    css:'整体风格新拟态（Neumorphism），适合低龄学生或特殊教育场景。使用柔和的单色系背景，元素通过浅色高光和暗色阴影凸起/凹陷（box-shadow双方向），按钮按下有"真的被按压"的视觉反馈。颜色柔和，对比度适中不刺眼。参考：Dribbble热门Neumorphism作品。' },
+  { id:'pop', name:'活泼波普', vibe:'趣味醒目', colors:['#fef9c3','#fde047','#f97316','#ef4444'],
+    css:'整体风格活泼波普，适合课堂游戏、闯关挑战、知识竞答。使用高饱和度的明亮色块、粗边框（3-4px）、大号圆角和夸张的阴影偏移（类似漫画风格）。字体可以用圆体/粗体，动画可以夸张一点（弹跳、翻转）。参考：Duolingo、Poppins字体风格、麦当劳广告。' }
+];
+
+function renderStyleGrid() {
+  const grid = document.getElementById('styleGrid');
+  if (!grid) return;
+  grid.innerHTML = visualStyles.map(s => `
+    <div class="style-tile${currentStyle === s.id ? ' active' : ''}" data-style="${s.id}" onclick="selectStyle('${s.id}')">
+      <div class="swatch">${s.colors.map(c => `<span style="background:${c}"></span>`).join('')}</div>
+      <div class="sname">${s.name}</div>
+      <div class="svibe">${s.vibe}</div>
+    </div>
+  `).join('');
+}
+
+function selectStyle(id) {
+  currentStyle = id;
+  document.querySelectorAll('.style-tile').forEach(t => t.classList.remove('active'));
+  const tile = document.querySelector(`.style-tile[data-style="${id}"]`);
+  if (tile) tile.classList.add('active');
+  generatePrompt();
+}
+
+function buildStyleSection() {
+  if (!gc('useStyle')) return '';
+  const style = visualStyles.find(s => s.id === currentStyle);
+  if (!style) return '';
+  return `【视觉风格】\n${style.css}`;
+}
+
+function updateModelOptions() {
+  const provider = gv('aiProvider','deepseek');
+  const sel = document.getElementById('aiModel');
+  const hint = document.getElementById('modelHint');
+  const customEp = document.getElementById('customEndpoint');
+  const data = aiProviders[provider];
+  if (!data) return;
+
+  if (provider === 'custom') {
+    customEp.style.display = 'grid';
+    sel.innerHTML = '';
+    hint.textContent = '';
+    return;
+  }
+  customEp.style.display = 'none';
+  hint.textContent = data.models.length > 1 ? `共${data.models.length}个模型可选` : '';
+  sel.innerHTML = data.models.map(m =>
+    `<option value="${m.id}">${m.name} — ${m.desc}</option>`
+  ).join('');
+}
+let currentStep = 0;
+let currentScenario = 'quiz';
+let currentMode = 'quick';
+let currentScaffoldStage = 0;
+let currentStyle = 'clean';
+
+// =====================================================================
+// STEP NAVIGATION
+// =====================================================================
+function goToStep(n) {
+  if (n === currentStep) return;
+  // Hide all panels
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  // Show target
+  const panel = document.getElementById('panel-' + n);
+  if (panel) panel.classList.add('active');
+  currentStep = n;
+  // Update step indicator
+  document.querySelectorAll('.step-dot-wrap').forEach((wrap, i) => {
+    wrap.classList.remove('current', 'done');
+    if (i < n) wrap.classList.add('done');
+    if (i === n) wrap.classList.add('current');
+  });
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Generate
+  generatePrompt();
+}
+
+// Step dot click
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.step-dot-wrap').forEach(wrap => {
+    wrap.addEventListener('click', () => {
+      const n = parseInt(wrap.dataset.step);
+      if (n <= currentStep + 1 || n <= 4) goToStep(n);
+    });
+  });
+});
+
+// =====================================================================
+// SCENARIO SWITCHING
+// =====================================================================
+const scenarioFields = {
+  quiz: `
+    <div class="form-row">
+      <div class="field"><label>知识点 / 主题</label><input type="text" id="topic" placeholder="例：分数的基本性质"></div>
+      <div class="field"><label>题目数量</label><select id="questionCount"><option value="5">5道</option><option value="10" selected>10道</option><option value="15">15道</option><option value="20">20道</option></select></div>
+      <div class="field"><label>题型</label><select id="questionType"><option value="choice" selected>选择题（单选）</option><option value="multi-choice">选择题（多选）</option><option value="fill-blank">填空题</option><option value="true-false">判断题</option><option value="mixed">混合题型</option></select></div>
+      <div class="field"><label>交互风格</label><select id="interaction"><option value="instant" selected>即时反馈（每题显示对错解析）</option><option value="final">最终评分（全部提交后显示总分）</option><option value="game">闯关模式（答对进入下一题）</option><option value="race">计时挑战（限时作答+排名）</option></select></div>
+    </div>
+    <div class="form-row col-1"><div class="field"><label>额外需求 <span class="opt">（选填）</span></label><textarea id="extraRequirement" placeholder="例：每道题配示意图、错误选项给出解释、题目按基础/中等/拔高分三档……"></textarea></div></div>`,
+  demo: `
+    <div class="form-row">
+      <div class="field"><label>演示主题</label><input type="text" id="topic" placeholder="例：一笔画问题、凸透镜成像"></div>
+      <div class="field"><label>演示类型</label><select id="demoType"><option value="animation" selected>动画演示</option><option value="interactive">可交互模型</option><option value="simulation">模拟实验</option><option value="stepbystep">分步展示</option></select></div>
+      <div class="field"><label>核心概念</label><input type="text" id="coreConcept" placeholder="例：奇点偶点决定一笔画可行性"></div>
+      <div class="field"><label>控件需求</label><select id="controls"><option value="basic" selected>基础（播放/暂停/重播）</option><option value="advanced">进阶（+速度/步骤切换）</option><option value="full">完整（+参数调节/数据记录）</option></select></div>
+    </div>
+    <div class="form-row col-1"><div class="field"><label>额外需求 <span class="opt">（选填）</span></label><textarea id="extraRequirement" placeholder="例：用SVG绘制、标注关键点、显示步骤和进度条……"></textarea></div></div>`,
+  survey: `
+    <div class="form-row">
+      <div class="field"><label>收集目的</label><input type="text" id="topic" placeholder="例：课前预习调查、课堂反馈"></div>
+      <div class="field"><label>问题数量</label><select id="questionCount"><option value="3">3道</option><option value="5" selected>5道</option><option value="8">8道</option><option value="10">10道</option></select></div>
+      <div class="field"><label>字段类型</label><select id="fieldTypes"><option value="basic" selected>基础（姓名+单选+文本）</option><option value="likert">量表题（1-5分评价）</option><option value="full">完整（含文件上传）</option></select></div>
+      <div class="field"><label>填写对象</label><select id="audience"><option value="student" selected>学生</option><option value="parent">家长</option><option value="teacher">同行教师</option></select></div>
+    </div>
+    <div class="form-row col-1"><div class="field"><label>额外需求 <span class="opt">（选填）</span></label><textarea id="extraRequirement" placeholder="例：匿名填写、特定跳转逻辑、手机扫码友好……"></textarea></div></div>`,
+  game: `
+    <div class="form-row">
+      <div class="field"><label>游戏主题</label><input type="text" id="topic" placeholder="例：古诗词配对、化学方程式闯关"></div>
+      <div class="field"><label>游戏类型</label><select id="gameType"><option value="match" selected>配对连线</option><option value="sort">拖拽排序</option><option value="levelup">闯关挑战</option><option value="quizshow">知识竞答</option><option value="puzzle">拼图解密</option></select></div>
+      <div class="field"><label>适用人数</label><select id="playerCount"><option value="single" selected>单人</option><option value="group">小组（3-6人）</option><option value="class">全班（大屏+扫码）</option></select></div>
+      <div class="field"><label>游戏时长</label><select id="duration"><option value="3min">3分钟</option><option value="5min" selected>5分钟</option><option value="10min">10分钟</option><option value="15min">15分钟</option></select></div>
+    </div>
+    <div class="form-row col-1"><div class="field"><label>额外需求 <span class="opt">（选填）</span></label><textarea id="extraRequirement" placeholder="例：有倒计时、音效反馈、排行榜……"></textarea></div></div>`,
+  analysis: `
+    <div class="form-row">
+      <div class="field"><label>分析内容</label><input type="text" id="topic" placeholder="例：单元测验成绩分析"></div>
+      <div class="field"><label>数据来源</label><select id="dataSource"><option value="qf" selected>QuickForm API</option><option value="manual">手动导入（Excel/CSV）</option></select></div>
+      <div class="field"><label>展示图表</label><select id="chartTypes"><option value="basic" selected>基础（柱状图+表格）</option><option value="advanced">进阶（+雷达图/热力图）</option></select></div>
+      <div class="field"><label>AI 分析</label><select id="aiAnalysis"><option value="yes" selected>需要（薄弱点识别+建议）</option><option value="no">不需要</option></select></div>
+    </div>
+    <div class="form-row col-1"><div class="field"><label>额外需求 <span class="opt">（选填）</span></label><textarea id="extraRequirement" placeholder="例：显示分数段分布、标注低于平均分的学生、生成家长会图表……"></textarea></div></div>`,
+  custom: `
+    <div class="form-row col-1"><div class="field"><label>你想做什么？<span style="color:var(--red);">*</span></label><textarea id="topic" placeholder="用你自己的话描述。例：英语单词听写工具——AI朗读单词，学生输入拼写，自动判断正误并记录成绩。越具体越好。" style="min-height:88px;"></textarea><div class="hint">至少包含：给谁用、做什么、有什么关键功能</div></div></div>
+    <div class="form-row"><div class="field"><label>参考风格</label><select id="refStyle"><option value="quiz">练习题风格</option><option value="demo" selected>交互演示风格</option><option value="survey">表单收集风格</option><option value="game">游戏化风格</option><option value="dashboard">数据大屏风格</option></select></div></div>`
+};
+
+function switchScenario(scenario) {
+  currentScenario = scenario;
+  document.getElementById('contentFields').innerHTML = scenarioFields[scenario];
+  // Re-bind
+  document.querySelectorAll('#contentFields input, #contentFields select, #contentFields textarea').forEach(el => {
+    el.addEventListener('input', generatePrompt);
+    el.addEventListener('change', generatePrompt);
+  });
+  document.getElementById('contentDesc').textContent =
+    {quiz:'填写互动练习的具体内容',demo:'填写课堂互动演示的具体内容',survey:'填写数据收集表单的具体内容',game:'填写课堂小游戏的具体内容',analysis:'填写学情分析大屏的具体内容',custom:'自由描述你的教学网页需求'}[scenario];
+  generatePrompt();
+}
+
+// =====================================================================
+// HELPERS
+// =====================================================================
+function gv(id, fallback) { const el = document.getElementById(id); return (el && el.value) ? el.value : (fallback || ''); }
+function gc(id) { const el = document.getElementById(id); return el && el.checked; }
+function getConstraints() {
+  const cs = [];
+  if(gc('c-utf8')) cs.push('文件使用 UTF-8 编码');
+  if(gc('c-mobile')) cs.push('响应式设计，手机和平板都能正常使用');
+  if(gc('c-no-cdn')) cs.push('不使用任何外部 CDN 资源');
+  if(gc('c-inline')) cs.push('CSS 和 JavaScript 全部内联');
+  if(gc('c-single-file')) cs.push('生成一个完整的单 HTML 文件');
+  if(gc('c-comments')) cs.push('代码中加入必要的中文注释');
+  if(gc('c-no-jquery')) cs.push('使用原生 JavaScript，不依赖 jQuery');
+  return cs;
+}
+
+// =====================================================================
+// PROMPT BUILDING
+// =====================================================================
+function buildTeachingContext() {
+  const subject = gv('subject');
+  const grade = gv('grade');
+  const topic = gv('topic', '');
+  if (!subject || !grade || !gc('useKB')) return '';
+
+  const matched = matchKB(subject, grade, topic);
+  if (matched.length === 0) return '';
+
+  const u = matched[0];
+  let ctx = `【教学背景】
+本提示词基于以下学科教学背景：
+- 学科：${subject} / ${grade}
+- 关联单元：${u.name}
+${u.misconceptions.length ? '- 常见迷思：' + u.misconceptions.join('；') + '\n' : ''}${u.teachingTips.length ? '- 教学建议：' + u.teachingTips.join('；') + '\n' : ''}`;
+  return ctx;
+}
+
+function buildScenarioPrompt() {
+  const s = currentScenario, subject = gv('subject','数学'), grade = gv('grade','小学高段'), topic = gv('topic','');
+  const extra = gv('extraRequirement','');
+  let task = '';
+  switch(s) {
+    case 'quiz': {
+      const tMap={choice:'选择题（单选）','multi-choice':'选择题（多选）','fill-blank':'填空题','true-false':'判断题',mixed:'混合题型'};
+      const iMap={instant:'即时反馈——每答完一题立即显示对错、正确答案和解析',final:'最终评分——完成所有题目后统一提交，显示总分和错题集',game:'闯关模式——答对当前题才能进入下一题',race:'计时挑战——限时作答，完成后显示用时和排名'};
+      task=`请生成一个${subject}学科的${tMap[gv('questionType','choice')]}练习网页，面向${grade}学生，主题为"${topic || subject+'知识点练习'}"。包含 ${gv('questionCount','10')} 道题目。交互方式：${iMap[gv('interaction','instant')]}。`;
+      break;
+    }
+    case 'demo': {
+      const dMap={animation:'自动动画演示——用SVG+JavaScript动画展示过程',interactive:'可交互模型——学生可拖拽/点击/调参',simulation:'模拟实验——改变变量观察结果',stepbystep:'分步展示——拆解为可前进/后退的步骤'};
+      const core=gv('coreConcept',''); const cMap={basic:'播放、暂停、重播',advanced:'播放、暂停、重播、速度调节、步骤切换',full:'播放、暂停、重播、速度、步骤切换、参数调节、数据记录'};
+      task=`请生成一个${subject}学科的课堂互动演示网页，面向${grade}学生，主题为"${topic || subject+'互动演示'}"。演示类型：${dMap[gv('demoType','animation')]}。${core ? '核心概念：'+core+'。' : ''}控件需求：${cMap[gv('controls','basic')]}。`;
+      break;
+    }
+    case 'survey': {
+      const aMap={student:'学生',parent:'家长',teacher:'同行教师'}; const fMap={basic:'姓名+单选题/多选题+文本输入',likert:'1-5分李克特量表+开放题',full:'姓名、单选/多选、文本、文件上传、图片提交'};
+      task=`请生成一个数据收集表单网页，面向${aMap[gv('audience','student')]}，收集目的为"${topic || '课堂反馈'}"。包含字段：${fMap[gv('fieldTypes','basic')]}。共计 ${gv('questionCount','5')} 个问题。`;
+      break;
+    }
+    case 'game': {
+      const gMap={match:'配对连线——左右两组内容正确配对',sort:'拖拽排序——按正确顺序排列',levelup:'闯关挑战——逐关升级',quizshow:'知识竞答——含积分榜',puzzle:'拼图解密——完成解锁'};
+      const pMap={single:'单人独立完成',group:'3-6人小组合作',class:'全班参与（教师大屏+学生扫码）'};
+      task=`请生成一个${subject}学科的课堂小游戏网页，面向${grade}学生，主题为"${topic || subject+'课堂游戏'}"。游戏类型：${gMap[gv('gameType','match')]}。适用人数：${pMap[gv('playerCount','single')]}。预计时长：约 ${gv('duration','5min')}。`;
+      break;
+    }
+    case 'analysis': {
+      const dsMap={qf:'从QuickForm API读取数据',manual:'支持手动导入Excel/CSV'};
+      const ctMap={basic:'柱状图+数据表格',advanced:'柱状图、雷达图、热力图、数据表格'};
+      task=`请生成一个学情分析数据大屏网页，面向${grade}${subject}学科，分析内容为"${topic || '学情分析'}"。数据来源：${dsMap[gv('dataSource','qf')]}。图表：${ctMap[gv('chartTypes','basic')]}。${gv('aiAnalysis','yes')==='yes' ? '需要接入AI自动学情分析（薄弱点识别+教学建议）。' : '仅做数据可视化。'}`;
+      break;
+    }
+    case 'custom':
+      task = topic || '（请在上方填写需求）'; break;
+  }
+  if(extra) task += `\n额外要求：${extra}`;
+  return task;
+}
+
+function buildRoleSection() {
+  const subject = gv('subject','数学'), grade = gv('grade','小学高段'), eduGuide = gc('edu-guide'), studentFriendly = gc('student-friendly');
+  const matched = matchKB(subject, grade, gv('topic',''));
+  let role = `你是一位经验丰富的${subject}教师，擅长${grade}的信息化教学设计`;
+  if (matched.length > 0) {
+    role += `，对"${matched[0].name}"教学单元有深入研究`;
+    if (matched[0].misconceptions.length) role += `（尤其了解学生常见迷思：${matched[0].misconceptions[0]}）`;
+  }
+  role += `。你精通 HTML/CSS/JavaScript 和 SVG 动画`;
+  if (eduGuide) role += `。你的回答风格是引导式教学——不是直接给答案，而是用提问和提示引导学生自己发现规律`;
+  if (studentFriendly) role += `，能用适合${grade}学生理解的语言解释复杂概念`;
+  role += `。`;
+  return role;
+}
+
+function buildQuickFormSection() {
+  if (!gc('useQuickForm')) return null;
+  const qfApiUrl = gv('qfApiUrl',''), qfMode = gv('qfMode','submit-only');
+  const modes = {'submit-only':'学生提交后显示"提交成功"，数据进入QuickForm后台','submit-feedback':'学生提交后即时显示对错和解析','submit-dashboard':'学生提交后进入QF后台，配套教师学情分析大屏'};
+  let s = `本页面需要接入 QuickForm 进行数据回收。${modes[qfMode] || modes['submit-only']}。`;
+  if (qfApiUrl) s += `\nQuickForm 提交地址：${qfApiUrl}\n请在生成的代码中直接使用以上地址。`;
+  else s += `\nQuickForm 提交地址：请将代码中的 QF_API_URL 替换为你的实际地址。`;
+
+  // AI Integration
+  if (gc('useAI')) {
+    const provider = gv('aiProvider','deepseek');
+    const data = aiProviders[provider];
+    const apiKey = gv('aiApiKey','');
+    const temperature = gv('aiTemperature','0.7');
+    const maxTokens = gv('aiMaxTokens','4096');
+    const sysPrompt = gv('aiSystemPrompt','');
+
+    if (provider === 'custom') {
+      const ep = gv('aiEndpoint',''), cm = gv('aiCustomModel','');
+      if (ep && cm && apiKey) {
+        s += `\n\nAI 功能使用自定义接口：\n- API 地址：${ep}\n- 模型：${cm}\n- Temperature：${temperature}\n- Max Tokens：${maxTokens}`;
+      }
+    } else if (data && gv('aiModel','')) {
+      const model = gv('aiModel','');
+      s += `\n\nAI 功能使用 ${data.name}：\n- API 地址：${data.endpoint}\n- 模型：${model}\n- Temperature：${temperature}\n- Max Tokens：${maxTokens}`;
+      if (sysPrompt) s += `\n- System Prompt：${sysPrompt}`;
+    }
+
+    if (apiKey) {
+      s += `\n\n🔐 安全要求（重要）：\n`;
+      s += `1. 不要将 API Key 以明文形式写在代码中。将 Key 进行 Base64 编码后存储为常量：const _K = atob("BASE64编码后的Key")。\n`;
+      s += `2. 在代码顶部用注释标注 "// 配置区：修改此处" 方便教师替换。\n`;
+      s += `3. 不要在 console.log 或错误信息中输出 API Key。\n`;
+      s += `4. 请求 AI API 时使用 Authorization: Bearer 头携带解码后的 Key。\n`;
+      s += `\nBase64 编码方法：打开浏览器控制台，输入 btoa("你的APIKey") 即可获得编码后的字符串。`;
+      s += `\n本提示词使用的 Key 为：${apiKey}`;
+      s += `\n⚠️ 包含 API Key 的 HTML 文件请勿公开发布到互联网、GitHub 或分享给不受信任的第三方。`;
+    } else {
+      s += `\n\n请在代码中配置区填入你的 API Key（使用 Base64 编码存储）。`;
+    }
+  }
+  return { description: s };
+}
+
+function buildQuickPrompt() {
+  const role = buildRoleSection();
+  const kbCtx = buildTeachingContext();
+  const task = buildScenarioPrompt();
+  const style = buildStyleSection();
+  const constraints = getConstraints();
+  const qf = buildQuickFormSection();
+  const studentFriendly = gc('student-friendly');
+
+  let p = `【角色设定】\n${role}`;
+  if (kbCtx) p += `\n\n${kbCtx}`;
+  p += `\n\n【任务描述】\n${task}`;
+  if (style) p += `\n\n${style}`;
+  p += `\n\n【技术约束】\n${constraints.map((c,i) => `${i+1}. ${c}`).join('\n')}`;
+  if (qf) p += `\n\n【数据收集】\n${qf.description}`;
+  p += `\n\n【输出格式】\n请输出完整的单 HTML 文件代码，包含 HTML 结构、CSS 样式和 JavaScript 逻辑。\n1. 直接在代码块中输出，不要省略任何部分\n2. 严格遵循上方【视觉风格】中描述的设计方向，不要使用通用AI风格（紫渐变/白底圆角卡片）\n3. ${studentFriendly ? '界面文字和提示使用适合'+gv('grade','学生')+'理解的语言' : '界面文字清晰友好'}\n4. 确保代码可以直接在浏览器中打开运行\n\n【质量标准】\n- 功能完整：所有描述功能都能正常运行\n- 视觉清晰：布局合理，颜色区分明确，适合课堂投影展示\n- 代码规范：结构清晰，变量命名有意义，有适当注释\n- 用户体验：操作流畅，反馈及时`;
+  return p;
+}
+
+function buildScaffoldPrompts() {
+  const subject = gv('subject','数学'), grade = gv('grade','小学高段'), topic = gv('topic',''), extra = gv('extraRequirement','');
+  const constraints = getConstraints(), qf = buildQuickFormSection(), eduGuide = gc('edu-guide'), studentFriendly = gc('student-friendly');
+  const prompts = [];
+
+  if (gc('stage-analyze')) {
+    let p = `【阶段一：分析需求】\n你是一位${subject}教师，我正在准备一节${grade}的课。我想做一个网页工具，用途是：${topic || '（请补充具体需求）'}\n\n请你帮我分析：\n1. 这个网页的核心教学目标是什么？\n2. 学生需要经历哪些操作步骤？\n3. 需要哪些关键功能才能达成目标？\n4. 从技术实现角度有哪些注意点？${eduGuide ? '\n\n注意：请用提问引导我思考，不要直接给所有答案。' : ''}\n\n先帮我理清思路，不要急着写代码。`;
+    prompts.push({id:'analyze',label:'1.分析',prompt:p});
+  }
+  if (gc('stage-plan')) {
+    let p = `【阶段二：设计方案】\n基于之前的需求分析（${topic || '教学网页工具'}），请帮我设计技术方案。\n\n一、HTML 结构：页面分为几个区域？需要哪些 DOM 元素？\n二、CSS 样式：整体视觉风格、布局方案、适配策略\n三、JavaScript 功能：核心交互、数据流转、事件处理${qf ? '\n四、QuickForm 对接：API 请求格式、字段映射' : ''}\n\n技术约束：\n${constraints.map((c,i) => `${i+1}. ${c}`).join('\n')}\n\n请给出方案，先不要写完整代码。`;
+    prompts.push({id:'plan',label:'2.方案',prompt:p});
+  }
+  if (gc('stage-generate')) {
+    let p = `【阶段三：生成代码】\n${buildQuickPrompt()}\n\n请生成完整代码。不要省略，不要使用"// ……其余代码略"这样的占位符。`;
+    prompts.push({id:'generate',label:'3.生成',prompt:p});
+  }
+  if (gc('stage-debug')) {
+    let p = `【阶段四：调试修复】\n我运行了你生成的代码，但出现了问题：（请在此处描述具体问题）\n\n请从以下方面排查：\n1. JavaScript 语法错误或逻辑问题？\n2. CSS 样式冲突或遗漏？\n3. DOM 选择器是否正确？\n4. 事件绑定是否在 DOM 加载完成后？\n5. 浏览器兼容性问题？${qf ? '\n6. QuickForm API 请求格式和字段名是否正确？' : ''}\n\n请先分析可能原因，再给出修改建议。`;
+    prompts.push({id:'debug',label:'4.调试',prompt:p});
+  }
+  if (gc('stage-optimize')) {
+    let p = `【阶段五：优化美化】\n网页基本功能可运行了，请从教学展示角度帮我优化：\n1. 布局是否适合${grade}课堂投影展示？\n2. 颜色搭配是否清晰？关键信息是否突出？${studentFriendly ? '\n3. 文字和图标是否适合'+grade+'学生理解？' : ''}\n4. 交互细节：反馈是否及时？动画是否流畅？\n5. 是否需要添加使用说明/学习目标/鼓励反馈？${eduGuide ? '\n\n如你觉得某些地方可保留原样，请说明理由。不要为了改而改。' : ''}`;
+    prompts.push({id:'optimize',label:'5.优化',prompt:p});
+  }
+
+  const active = prompts.filter(p => document.getElementById('stage-'+p.id) && gc('stage-'+p.id));
+  return active.length > 0 ? active : prompts;
+}
+
+function generatePrompt() {
+  if (currentMode === 'scaffold') {
+    const stages = buildScaffoldPrompts();
+    if (currentScaffoldStage >= stages.length) currentScaffoldStage = 0;
+    // Render stage tabs
+    const tabsHtml = stages.map((s,i) =>
+      `<button class="stage-tab${i===currentScaffoldStage?' active':''}" onclick="currentScaffoldStage=${i};generatePrompt();">${s.label}</button>`
+    ).join('');
+    document.getElementById('stageTabs').innerHTML = tabsHtml;
+    document.getElementById('stageTabs').style.display = 'flex';
+    document.getElementById('stageLabel').textContent = `阶段 ${currentScaffoldStage+1}/${stages.length}`;
+    document.getElementById('output').textContent = stages[currentScaffoldStage].prompt;
+  } else {
+    document.getElementById('stageTabs').style.display = 'none';
+    document.getElementById('stageLabel').textContent = '完整提示词';
+    document.getElementById('output').textContent = buildQuickPrompt();
+  }
+}
+
+function copyPrompt() {
+  const text = document.getElementById('output').textContent;
+  if (!text || text.startsWith('←')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = document.querySelectorAll('.output-header .btn-s');
+    btns.forEach(b => { b.textContent = '✅ 已复制!'; b.style.background='var(--green-bg)'; b.style.color='var(--green)'; b.style.borderColor='var(--green)'; });
+    setTimeout(() => btns.forEach(b => { b.textContent = '📋 复制'; b.style.background=''; b.style.color=''; b.style.borderColor=''; }), 1500);
+  }).catch(() => {
+    const range = document.createRange(); range.selectNodeContents(document.getElementById('output'));
+    window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+  });
+}
+
+function toggleHelp() {
+  const p = document.getElementById('helpPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  buildSubjectOptions();
+
+  // Scenario tiles
+  document.querySelectorAll('.scenario-tile').forEach(tile => {
+    tile.addEventListener('click', function() {
+      document.querySelectorAll('.scenario-tile').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      switchScenario(this.dataset.scenario);
+    });
+  });
+
+  // Mode toggle
+  document.querySelectorAll('#modeToggle .toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#modeToggle .toggle-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentMode = this.dataset.mode;
+      document.getElementById('scaffoldStages').style.display = currentMode === 'scaffold' ? 'flex' : 'none';
+      currentScaffoldStage = 0;
+      generatePrompt();
+    });
+  });
+
+  // Subject → Grade → KB
+  document.getElementById('subject').addEventListener('change', () => { updateGradeOptions(); updateKBMatch(); generatePrompt(); });
+  document.getElementById('grade').addEventListener('change', () => { updateKBMatch(); generatePrompt(); });
+
+  // QuickForm toggle
+  document.getElementById('useQuickForm').addEventListener('change', function() {
+    document.getElementById('qfSettings').style.opacity = this.checked ? '1' : '0.4';
+    generatePrompt();
+  });
+
+  // AI toggle
+  document.getElementById('useAI').addEventListener('change', function() {
+    document.getElementById('aiSettings').style.display = this.checked ? 'block' : 'none';
+    generatePrompt();
+  });
+
+  // AI provider → model options
+  document.getElementById('aiProvider').addEventListener('change', () => { updateModelOptions(); generatePrompt(); });
+  document.getElementById('aiModel').addEventListener('change', generatePrompt);
+
+  // All inputs trigger regeneration
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (!el.dataset.bound) {
+      el.addEventListener('input', generatePrompt);
+      el.addEventListener('change', generatePrompt);
+      el.dataset.bound = '1';
+    }
+  });
+
+  // Constraints & Style
+  document.querySelectorAll('#constraints input, #scaffoldStages input, #edu-guide, #student-friendly, #useKB, #useStyle').forEach(cb => {
+    cb.addEventListener('change', generatePrompt);
+  });
+
+
+  // Init model dropdown
+  updateModelOptions();
+
+  // Render style grid
+  renderStyleGrid();
+
+  // Initial render
+  switchScenario('quiz');
+  goToStep(0);
+});
+</script>
+
+<script>window.captureLesson=()=>({scenario:document.querySelector('#scenario')?.value||'',subject:document.querySelector('#subject')?.value||'',style:document.querySelector('#style')?.value||''});</script><script src="/projects/shared/case-evidence.js"></script></body>
+</html>

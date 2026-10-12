@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":27,"key":"case-27","title":"汽车行驶中的正比例关系","category":"exploration","description":"速度与路程实验：围绕速度、时间、路程开展交互学习，在数据大屏中回看记录。","headline":"速度与路程实验","view":"scatter","fields":[{"key":"speed","label":"速度"},{"key":"time","label":"时间"},{"key":"distance","label":"路程"},{"key":"discovery","label":"发现"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"学习课件"}],"tasks":{"records":"8TlY4Lvx9JX"},"mapping":{"yndywjinec":"8TlY4Lvx9JX"},"accent":"#327a72","capture":false,"lesson":"学习课件"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>汽车行驶中的正比例关系探索 | 数学互动教学</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .explore-card {
+            max-width: 1200px;
+            width: 100%;
+            background: #fff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .header h1 { margin: 0; font-size: 1.8rem; }
+        .header p { margin: 0.5rem 0 0; opacity: 0.8; }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+        .info-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .info-item b { color: #2c3e50; }
+        .ratio-display {
+            text-align: center;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 0.5rem;
+            color: #1976d2;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .animation-container {
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #9e9e9e;
+        }
+        .road-line {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 20px, transparent 20px, transparent 40px);
+        }
+        .car {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 80px;
+            height: 40px;
+            transition: left 0.1s linear;
+            z-index: 2;
+        }
+        .car-body {
+            width: 100%;
+            height: 25px;
+            background: #e74c3c;
+            border-radius: 10px 20px 5px 5px;
+            position: relative;
+        }
+        .car-top {
+            width: 50px;
+            height: 15px;
+            background: #e74c3c;
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            border-radius: 10px 10px 0 0;
+        }
+        .wheel {
+            width: 15px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -7px;
+            border: 2px solid #fff;
+        }
+        .wheel-front { right: 10px; }
+        .wheel-back { left: 10px; }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #d7dcdf;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #2c3e50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .graph-panel {
+            background: #fff;
+            padding: 10px;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .graph-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-secondary {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-secondary:hover { background: #2980b9; }
+
+        .record-table-section {
+            padding: 20px;
+            background: #fff;
+            margin: 0 20px 20px;
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .record-table-section h3 { margin-top: 0; color: #2c3e50; font-size: 1.2rem; }
+        .record-table-wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .record-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .record-table th, .record-table td {
+            padding: 10px;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+        .record-table th { background: #f8f9fa; color: #666; }
+
+        .discovery-section {
+            padding: 20px;
+            background: #fff9c4;
+            margin: 0 20px 20px;
+            border-radius: 1rem;
+            border: 2px dashed #fbc02d;
+        }
+        .discovery-section h3 { margin-top: 0; color: #f57f17; }
+        .discovery-section p { margin: 5px 0 15px; color: #5d4037; }
+        
+        /* 新增学生信息样式 */
+        .student-info {
+            background: #fff3e0;
+            border-radius: 1rem;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ffe0b2;
+        }
+        .student-info h4 {
+            margin: 0 0 12px 0;
+            color: #e65100;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .student-info .input-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .student-info .input-group-item {
+            flex: 1;
+            min-width: 180px;
+        }
+        .student-info label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #bf360c;
+            margin-bottom: 5px;
+        }
+        .student-info input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ffcc80;
+            border-radius: 0.8rem;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+        .student-info input:focus {
+            outline: none;
+            border-color: #f57c00;
+            box-shadow: 0 0 0 2px rgba(245,124,0,0.2);
+        }
+        .required-star {
+            color: #e53935;
+            margin-left: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #discoveryInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #fbc02d;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        #submitDiscovery {
+            padding: 10px 25px;
+            background: #f57f17;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        #feedbackArea {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 0.5rem;
+            display: none;
+            line-height: 1.5;
+        }
+        .feedback-success { background: #c8e6c9; color: #2e7d32; border: 1px solid #81c784; }
+        .feedback-error { background: #ffcdd2; color: #c62828; border: 1px solid #e57373; }
+        .feedback-warning { background: #fff3e0; color: #e65100; border: 1px solid #ffb74d; }
+    </style>
+</head>
+<body>
+<div class="explore-card">
+    <div class="header">
+        <h1>🚗 汽车行驶中的正比例关系</h1>
+        <p>探索路程与时间的关系 · 北师大版六年级数学</p>
+    </div>
+
+    <div class="main-content">
+        <div class="left-column">
+            <div class="animation-container">
+                <div class="road-line"></div>
+                <div class="car" id="car">
+                    <div class="car-top"></div>
+                    <div class="car-body">
+                        <div class="wheel wheel-back"></div>
+                        <div class="wheel wheel-front"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="info-box">
+                    <div class="info-item">
+                        <span>⏱️ 行驶时间 (t):</span>
+                        <b id="timeVal">0</b> 小时
+                    </div>
+                    <div class="info-item">
+                        <span>📏 行驶路程 (s):</span>
+                        <b id="distVal">0</b> 千米
+                    </div>
+                    <div class="info-item">
+                        <span>🚀 行驶速度 (v):</span>
+                        <b>90</b> 千米/时 (固定)
+                    </div>
+                    <div class="ratio-display" id="ratioText">
+                        路程 ÷ 时间 = 90 (比值固定)
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label>拖动滑块改变时间：</label>
+                    <input type="range" id="timeSlider" min="0" max="10" step="1" value="0">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; color: #666; font-size: 0.8rem;">
+                        <span>0小时</span>
+                        <span>5小时</span>
+                        <span>10小时</span>
+                    </div>
+                </div>
+                
+                <button id="recordBtn" style="width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: bold;">
+                    📍 记录当前坐标点
+                </button>
+            </div>
+        </div>
+
+        <div class="graph-panel">
+            <canvas id="graphCanvas"></canvas>
+            <div class="graph-controls">
+                <button id="connectBtn" class="btn-secondary">📏 将“所描的点连线”</button>
+                <button id="clearPointsBtn" class="btn-secondary" style="background:#95a5a6">🗑️ 清除记录</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="record-table-section">
+        <h3>📋 实验记录表</h3>
+        <div class="record-table-wrapper">
+            <table class="record-table">
+                <thead>
+                    <tr>
+                        <th>记录序号</th>
+                        <th>时间 (小时)</th>
+                        <th>路程 (千米)</th>
+                        <th>路程 ÷ 时间 (比值)</th>
+                    </tr>
+                </thead>
+                <tbody id="recordTableBody">
+                    <tr>
+                        <td colspan="4" style="color:#999; font-style:italic;">暂无记录，请点击“记录当前坐标点”</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="discovery-section">
+        <h3>💡 我的发现</h3>
+        <p>观察图像和实验记录表，你发现了路程和时间之间有什么关系？（提示：图像是什么形状？比值有什么特点？）</p>
+        
+        
+        <div class="student-info">
+            <h4>📝 学生信息 <span style="font-size:12px; color:#e65100;">(请如实填写)</span></h4>
+            <div class="input-row">
+                <div class="input-group-item">
+                    <label>学生姓名 <span class="required-star">*</span></label>
+                    <input type="text" id="studentName" placeholder="例如：张明" autocomplete="off">
+                </div>
+                <div class="input-group-item">
+                    <label>学号 <span class="required-star">*</span></label>
+                    <input type="text" id="studentId" placeholder="例如：2024001" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="discoveryInput" placeholder="在这里输入你的发现...">
+            <button id="submitDiscovery">提交发现</button>
+        </div>
+        <div id="feedbackArea"></div>
+    </div>
+</div>
+
+<script>
+    const SPEED = 90;
+    const MAX_TIME = 10;
+    const MAX_DIST = 900;
+
+    const slider = document.getElementById('timeSlider');
+    const timeDisp = document.getElementById('timeVal');
+    const distDisp = document.getElementById('distVal');
+    const car = document.getElementById('car');
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const recordBtn = document.getElementById('recordBtn');
+    const connectBtn = document.getElementById('connectBtn');
+    const clearPointsBtn = document.getElementById('clearPointsBtn');
+    const discoveryInput = document.getElementById('discoveryInput');
+    const submitDiscovery = document.getElementById('submitDiscovery');
+    const feedbackArea = document.getElementById('feedbackArea');
+    const recordTableBody = document.getElementById('recordTableBody');
+    
+    // 新增学生信息元素
+    const studentNameInput = document.getElementById('studentName');
+    const studentIdInput = document.getElementById('studentId');
+
+    let recordedPoints = [];
+    let isConnected = false;
+
+    function initCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth * 2;
+        canvas.height = 400 * 2;
+        canvas.style.width = container.clientWidth + 'px';
+        canvas.style.height = '400px';
+        ctx.scale(2, 2);
+        drawGraph();
+    }
+
+    function update() {
+        const t = parseInt(slider.value);
+        const s = t * SPEED;
+        timeDisp.innerText = t;
+        distDisp.innerText = s;
+        const carPos = (t / MAX_TIME) * 85;
+        car.style.left = carPos + '%';
+        drawGraph();
+    }
+
+    function drawGraph() {
+        const w = canvas.width / 2;
+        const h = 400;
+        const margin = { top: 40, right: 40, bottom: 50, left: 60 };
+        const innerW = w - margin.left - margin.right;
+        const innerH = h - margin.top - margin.bottom;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(margin.left, margin.top);
+        ctx.lineTo(margin.left, h - margin.bottom);
+        ctx.lineTo(w - margin.right, h - margin.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.moveTo(margin.left - 5, margin.top);
+        ctx.lineTo(margin.left + 5, margin.top);
+        ctx.lineTo(margin.left, margin.top - 10);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(w - margin.right, h - margin.bottom - 5);
+        ctx.lineTo(w - margin.right, h - margin.bottom + 5);
+        ctx.lineTo(w - margin.right + 10, h - margin.bottom);
+        ctx.fill();
+
+        ctx.font = '14px Arial';
+        ctx.fillText('时间 (时)', w - margin.right - 20, h - margin.bottom + 35);
+        ctx.save();
+        ctx.translate(20, margin.top + 50);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText('路程 (千米)', 0, 0);
+        ctx.restore();
+
+        ctx.textAlign = 'center';
+        for(let i=0; i<=MAX_TIME; i+=1) {
+            const x = margin.left + (i / MAX_TIME) * innerW;
+            ctx.fillText(i, x, h - margin.bottom + 20);
+            ctx.beginPath();
+            ctx.moveTo(x, h - margin.bottom);
+            ctx.lineTo(x, h - margin.bottom - 5);
+            ctx.stroke();
+        }
+
+        ctx.textAlign = 'right';
+        for(let i=0; i<=MAX_DIST; i+=90) {
+            const y = h - margin.bottom - (i / MAX_DIST) * innerH;
+            ctx.fillText(i, margin.left - 10, y + 5);
+            ctx.beginPath();
+            ctx.moveTo(margin.left, y);
+            ctx.lineTo(margin.left + 5, y);
+            ctx.stroke();
+        }
+
+        if (isConnected && recordedPoints.length > 0) {
+            const sortedPoints = [...recordedPoints].sort((a, b) => a.t - b.t);
+            ctx.beginPath();
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.moveTo(margin.left, h - margin.bottom);
+            sortedPoints.forEach(p => {
+                const px = margin.left + (p.t / MAX_TIME) * innerW;
+                const py = h - margin.bottom - (p.s / MAX_DIST) * innerH;
+                ctx.lineTo(px, py);
+            });
+            const endX = margin.left + innerW;
+            const endY = h - margin.bottom - innerH;
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
+        recordedPoints.forEach(p => {
+            const px = margin.left + (p.t / MAX_TIME) * innerW;
+            const py = h - margin.bottom - (p.s / MAX_DIST) * innerH;
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#27ae60';
+            ctx.fill();
+            ctx.fillStyle = '#27ae60';
+            ctx.font = '12px Arial';
+            ctx.fillText(`(${p.t}, ${p.s})`, px + 35, py - 10);
+        });
+
+        const t = parseInt(slider.value);
+        const s = t * SPEED;
+        const cx = margin.left + (t / MAX_TIME) * innerW;
+        const cy = h - margin.bottom - (s / MAX_DIST) * innerH;
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)';
+        ctx.moveTo(cx, h - margin.bottom);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(margin.left, cy);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#e74c3c';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function updateRecordTable() {
+        if (recordedPoints.length === 0) {
+            recordTableBody.innerHTML = '<tr><td colspan="4" style="color:#999; font-style:italic;">暂无记录，请点击“记录当前坐标点”</td></tr>';
+            return;
+        }
+        recordTableBody.innerHTML = '';
+        recordedPoints.forEach((p, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${p.t}</td>
+                <td>${p.s}</td>
+                <td>${p.t === 0 ? '-' : (p.s / p.t)}</td>
+            `;
+            recordTableBody.appendChild(row);
+        });
+    }
+
+    // 发送数据到API（包含学生信息、实验数据、发现）
+    async function sendExperimentDataToServer(discoveryText, studentName, studentId) {
+        try {
+            const dataToSend = {
+                student: {
+                    name: studentName,
+                    id: studentId
+                },
+                discovery: discoveryText,
+                speed: SPEED,
+                recordedPoints: recordedPoints.map(p => ({ time: p.t, distance: p.s })),
+                totalPoints: recordedPoints.length,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: document.referrer || window.location.href
+            };
+            const response = await fetch('https://qf.kjxs.site/api/8TlY4Lvx9JX', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataToSend)
+            });
+            if (response.ok) {
+                console.log('[数据上报] 实验数据提交成功');
+                return true;
+            } else {
+                console.warn('[数据上报] 服务器响应异常:', response.status);
+                return false;
+            }
+        } catch (err) {
+            console.error('[数据上报] 发送失败:', err);
+            return false;
+        }
+    }
+
+    // 验证学生信息
+    function validateStudentInfo() {
+        const name = studentNameInput.value.trim();
+        const sid = studentIdInput.value.trim();
+        if (name === "") {
+            feedbackArea.style.display = 'block';
+            feedbackArea.className = 'feedback-warning';
+            feedbackArea.innerHTML = '⚠️ 请填写学生姓名（必填项）！';
+            studentNameInput.focus();
+            return false;
+        }
+        if (sid === "") {
+            feedbackArea.style.display = 'block';
+            feedbackArea.className = 'feedback-warning';
+            feedbackArea.innerHTML = '⚠️ 请填写学号（必填项）！';
+            studentIdInput.focus();
+            return false;
+        }
+        return true;
+    }
+
+    recordBtn.onclick = () => {
+        const t = parseInt(slider.value);
+        const s = t * SPEED;
+        if (!recordedPoints.find(p => p.t === t)) {
+            recordedPoints.push({t, s});
+            recordedPoints.sort((a, b) => a.t - b.t);
+            drawGraph();
+            updateRecordTable();
+        }
+    };
+
+    connectBtn.onclick = () => {
+        if (recordedPoints.length < 1) {
+            alert("请先记录至少一个坐标点再尝试连线哦！");
+            return;
+        }
+        isConnected = !isConnected;
+        connectBtn.innerText = isConnected ? "🔓 取消连线" : "📏 将“所描的点连线”";
+        drawGraph();
+    };
+
+    clearPointsBtn.onclick = () => {
+        recordedPoints = [];
+        isConnected = false;
+        connectBtn.innerText = "📏 将“所描的点连线”";
+        drawGraph();
+        updateRecordTable();
+    };
+
+    // 提交发现：先验证学生信息必填，再验证发现内容，最后发送数据
+    submitDiscovery.onclick = async () => {
+        // 1. 验证学生姓名和学号
+        if (!validateStudentInfo()) {
+            return;
+        }
+        
+        const val = discoveryInput.value.trim();
+        if (!val) {
+            feedbackArea.style.display = 'block';
+            feedbackArea.className = 'feedback-warning';
+            feedbackArea.innerHTML = '📝 请在“我的发现”框中输入你的观察结论！';
+            discoveryInput.focus();
+            return;
+        }
+
+        // 获取学生信息
+        const studentName = studentNameInput.value.trim();
+        const studentId = studentIdInput.value.trim();
+
+        // 2. 显示反馈 (学习内容判断)
+        const keywords = ['直线', '正比例', '不变', '比值', '90', '固定', '增加', '一样'];
+        const isCorrect = keywords.some(k => val.includes(k));
+        
+        feedbackArea.style.display = 'block';
+        if (isCorrect) {
+            feedbackArea.className = 'feedback-success';
+            feedbackArea.innerHTML = `<b>🌟 太棒了！</b> 你观察得很仔细。路程和时间的比值（速度）确实是固定不变的（都是90），而且它们在图像上连成了一条经过原点的直线。这就是典型的<b>正比例关系</b>！`;
+        } else {
+            feedbackArea.className = 'feedback-error';
+            feedbackArea.innerHTML = `<b>🤔 再思考一下：</b> 试着观察一下实验记录表中“比值”那一列的结果是多少？图像连起来后是什么形状？<br><br><b>解析：</b> 在这个情境中，路程 ÷ 时间 = 90（速度），比值保持不变。当两个相关联的量比值一定时，它们就成正比例关系，图像是一条经过原点的直线。`;
+        }
+        
+        // 3. 将数据（包含学生信息和实验记录）发送到指定API
+        await sendExperimentDataToServer(val, studentName, studentId);
+        
+        // 可选：提交成功后给予额外提示（但不用覆盖学习反馈，仅在控制台记录或小提示）
+        // 为了友好，可短暂在反馈区追加一个小提示（不覆盖）
+        const originalMsg = feedbackArea.innerHTML;
+        setTimeout(() => {
+            if (feedbackArea.innerHTML === originalMsg) {
+                // 保持原样，不做额外覆盖，但数据已发送
+            }
+        }, 100);
+    };
+
+    window.addEventListener('resize', initCanvas);
+    slider.addEventListener('input', update);
+
+    setTimeout(() => {
+        initCanvas();
+        update();
+    }, 100);
+</script>
+</body>
+</html>

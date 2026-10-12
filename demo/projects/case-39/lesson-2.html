@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":39,"key":"case-39","title":"防溺水智能警报卫士","category":"simulation","description":"安全算法任务图：围绕活动、得分、得分开展交互学习，在数据大屏中回看记录。","headline":"安全算法任务图","view":"flow","fields":[{"key":"活动","label":"活动"},{"key":"score","label":"得分"},{"key":"得分","label":"得分"},{"key":"answers","label":"代码答案"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"活动一"},{"file":"lesson-2.html","title":"活动二·任务1"},{"file":"lesson-3.html","title":"活动二·任务2"}],"tasks":{"records":"weioUf36OBW"},"mapping":{"1up27hd4qv":"weioUf36OBW"},"accent":"#3c697b","capture":false,"lesson":"活动二·任务1"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>防溺水智能警报卫士 · 活动二 | 人脸识别精准警报代码补全</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+  background: #1a5276;
+  min-height: 100vh;
+  background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,.08) 2px, transparent 2px),
+                    radial-gradient(circle at 80% 70%, rgba(255,255,255,.08) 2px, transparent 2px);
+  background-size: 50px 50px;
+}
+
+.workbench {
+  width: 100%;
+  min-height: 100vh;
+  background: #e8f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部 */
+.title-main {
+  background: linear-gradient(145deg, #1565C0, #0D47A1);
+  padding: 14px 30px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.3);
+  border-bottom: 3px solid #0D47A1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.title-main small {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #B3E5FC;
+}
+.activity-header {
+  background: linear-gradient(145deg, #42A5F5, #1E88E5);
+  padding: 12px 30px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 3px solid #1565C0;
+  flex-wrap: wrap;
+}
+.activity-header span {
+  background: rgba(255,255,255,.2);
+  color: #E3F2FD;
+  font-size: 1.1rem;
+  padding: 5px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+/* 主面板 */
+.main-panel {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #d6eaf8;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+/* 左侧选项库 */
+.parts-store {
+  width: 290px;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, #5dade2, #2e86c1);
+  border-radius: 24px;
+  padding: 18px 12px;
+  border: 2px solid #2874a6;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.15), 0 5px 10px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.parts-store h3 {
+  font-size: 1.6rem;
+  color: #fff;
+  margin-bottom: 14px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.25);
+}
+.parts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  margin: auto 0;
+}
+.part {
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 12px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: #1a237e;
+  cursor: grab;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all .15s ease;
+  background: #E3F2FD;
+  box-shadow: 0 5px 0 #1565C0, 0 0 0 3px #1976D2, 0 4px 12px rgba(0,0,0,.2);
+  border-radius: 10px;
+  word-break: break-word;
+  line-height: 1.35;
+}
+.part:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #1565C0, 0 0 0 3px #1976D2, 0 8px 18px rgba(0,0,0,.25);
+}
+.part:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #1565C0, 0 0 0 3px #1976D2;
+  cursor: grabbing;
+}
+.part.used {
+  opacity: .4;
+  pointer-events: none;
+  filter: grayscale(.6);
+  box-shadow: 0 2px 0 #0b3b5e;
+}
+.part .badge {
+  display: inline-block;
+  background: #1565C0;
+  color: #fff;
+  font-size: .8rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-right: 10px;
+  font-weight: 700;
+}
+.hint-text {
+  color: #E3F2FD;
+  margin-top: 14px;
+  text-align: center;
+  font-weight: 500;
+  font-size: .85rem;
+}
+
+/* 右侧评分栏 */
+.score-panel {
+  background: linear-gradient(145deg, #0D47A1, #0a3470);
+  border-radius: 24px;
+  padding: 18px;
+  border: 3px solid #1565C0;
+  color: #E3F2FD;
+  box-shadow: inset 0 0 0 3px rgba(66,165,245,.3), 0 5px 10px rgba(0,0,0,.25);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 270px;
+  flex-shrink: 0;
+}
+.score-panel h3 {
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  color: #90CAF9;
+}
+.score-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+.score-value {
+  font-size: 4rem;
+  font-weight: 800;
+  background: #0a2a52;
+  padding: 10px 30px;
+  border-radius: 60px;
+  border: 2px solid #42A5F5;
+  line-height: 1.2;
+  color: #E3F2FD;
+}
+.score-label {
+  font-size: 1rem;
+  color: #90CAF9;
+}
+.feedback-area {
+  width: 100%;
+  min-height: 120px;
+  background: #1565C0;
+  border-radius: 16px;
+  padding: 14px;
+  text-align: center;
+  border: 2px solid #42A5F5;
+  font-size: 0.9rem;
+  color: #E3F2FD;
+  line-height: 1.45;
+  overflow-y: auto;
+  white-space: pre-line;
+}
+.reset-btn {
+  background: linear-gradient(145deg, #43A047, #2E7D32);
+  border: 2px solid #66BB6A;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  padding: 12px 40px;
+  border-radius: 80px;
+  box-shadow: 0 8px 0 #1B5E20;
+  cursor: pointer;
+  transition: all .06s linear;
+}
+.reset-btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 #1B5E20;
+}
+.group-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.group-section label {
+  font-size: .95rem;
+  color: #90CAF9;
+  font-weight: 600;
+}
+.group-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 2px solid #42A5F5;
+  background: #0a2a52;
+  color: #E3F2FD;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.current-player {
+  background: #1565C0;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  border: 2px solid #42A5F5;
+  font-size: 1rem;
+  width: 100%;
+}
+.current-player .player-name {
+  font-size: 1.2rem;
+  color: #BBDEFB;
+}
+
+/* 图片区: 背景图完全充满 + 自适应填满背景框 */
+.image-area {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 14px 20px 20px;
+  border: 2px solid #64b5f6;
+  box-shadow: inset 0 0 0 4px rgba(227,242,253,.6), 0 5px 10px rgba(0,0,0,.15);
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+}
+.image-area h3 {
+  font-size: 1.5rem;
+  color: #0D47A1;
+  margin-bottom: 10px;
+  background: #E3F2FD;
+  padding: 6px 24px;
+  border-radius: 60px;
+  border: 2px solid #42A5F5;
+  text-align: center;
+}
+
+/* 图片容器：弹性撑满剩余空间，保证背景图片完全填充区域 */
+.image-container {
+  position: relative;
+  flex: 1;             /* 占据父容器剩余所有高度 */
+  min-height: 0;       /* flex限制溢出的关键 */
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;    /* 确保圆角裁切，但不影响绝对定位显示 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 背景图片完全填满父容器，无空白，拉伸填充保证无缝隙 */
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;    /* 完全填充区域，不留白边，会导致图片略微拉伸，但虚线框相对位置线性对应，不影响功能 */
+  display: block;
+  border-radius: 12px;
+  border: 2px solid #90CAF9;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  background: #fefefe;
+  cursor: pointer;
+}
+
+/* 虚线框样式：窄长风格，文本清晰，位置基于容器百分比，随图片拉伸同步适应 */
+.drop-zone {
+  position: absolute;
+  border: 3px dashed #FF6F00;
+  background: rgba(255, 243, 224, 0.92);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+  color: #BF360C;
+  font-size: 0.7rem;
+  transition: all 0.1s;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 4px 3px;
+  word-break: break-word;
+  white-space: normal;
+  overflow-y: auto;
+  line-height: 1.3;
+}
+.drop-zone.drag-over {
+  background: rgba(255, 224, 130, 0.95);
+  border-color: #E65100;
+  box-shadow: 0 0 12px rgba(255,111,0,.6);
+}
+.drop-zone .badge {
+  display: inline-block;
+  background: #1565C0;
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-right: 6px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.drop-zone.filled {
+  background: rgba(227, 242, 253, 0.98);
+  border-color: #1565C0;
+  border-style: solid;
+  color: #1a237e;
+  cursor: grab;
+  font-size: 0.7rem;
+  font-weight: 500;
+  gap: 4px;
+}
+.drop-zone.correct {
+  background: #c8e6c9 !important;
+  border-color: #388e3c !important;
+}
+.drop-zone.wrong {
+  background: #ffcdd2 !important;
+  border-color: #d32f2f !important;
+}
+.drop-zone .placeholder {
+  font-size: 1.1rem;
+  font-weight: bold;
+  opacity: 0.85;
+}
+
+/* 全屏预览 */
+.fullscreen-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+.fullscreen-preview.show {
+  opacity: 1;
+  visibility: visible;
+}
+.fullscreen-preview img {
+  max-width: 95%;
+  max-height: 95%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+@media (max-width: 780px) {
+  .main-panel { flex-direction: column; }
+  .parts-store, .score-panel { width: 100%; }
+  .drop-zone { font-size: 0.6rem; padding: 3px 2px; }
+  .image-area h3 { font-size: 1.2rem; }
+}
+</style>
+</head>
+<body>
+<div class="workbench">
+  <div class="title-main">
+    <span>🏊 防溺水智能警报卫士 · 活动二</span>
+    <small>任务1：2.0版 人脸识别精准警报代码补全</small>
+  </div>
+  <div class="activity-header">
+    📝 任务1：2.0版 人脸识别精准警报代码补全 <span>将A B C D拖拽至红框内 · 每题5分</span>
+  </div>
+  <div class="main-panel">
+    
+    <div class="parts-store">
+      <h3>📌 可拖拽卡片</h3>
+      <div class="parts-grid" id="partsGrid"></div>
+      <p class="hint-text">✨ 将卡片拖到图中红框位置<br>可拖拽调整 / 拖回左侧回收</p>
+    </div>
+
+    
+    <div class="image-area">
+      <h3>📊 流程图 & 核心代码空缺区</h3>
+      <div class="image-container" id="imageContainer">
+        <img src="algorithm-bg.svg" alt="防溺水AI系统流程图" id="bgImage" draggable="false">
+        
+      </div>
+      <p style="margin-top: 10px; font-size: 0.7rem; color: #2c3e50;">💡 红框对应填空逻辑：模型切换 / ID1判断 / ID2判断 / 全局人脸检测 (按流程图正确拖拽)</p>
+    </div>
+
+    
+    <div class="score-panel">
+      <h3>👥 小组选择</h3>
+      <div class="score-panel-inner">
+        <div class="group-section">
+          <label>🏆 小组名称</label>
+          <select class="group-select" id="groupSelect">
+            <option value="">-- 请选择 --</option>
+            <option value="0">第一组</option>
+            <option value="1">第二组</option>
+            <option value="2">第三组</option>
+            <option value="3">第四组</option>
+            <option value="4">第五组</option>
+            <option value="5">第六组</option>
+          </select>
+        </div>
+        <div class="current-player" id="currentPlayer">⚡ 请先选择小组</div>
+        <div class="score-label">🎯 本次得分 (每题5分)</div>
+        <div class="score-value" id="scoreVal">--</div>
+        <div class="score-label">🏅 满分 20 分</div>
+        <div class="feedback-area" id="feedback">✅ 选择小组后，将左侧卡片拖拽到图片红框内补全人脸识别精准警报代码</div>
+        <button class="reset-btn" id="submitBtn">📥 提交答案</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="fullscreen-preview" id="fullscreenPreview">
+  <img src="" alt="全屏预览">
+</div>
+
+<script>
+// ----------------------------- 配置 ---------------------------------
+// 选项卡片数据 (根据要求: A变为“检测到人脸？”，B变为“ID1的人脸存在？”，C变为“ID2的人脸存在？”，D保持不变)
+const OPTIONS = [
+  { id: 'A', label: '检测到人脸？' },
+  { id: 'B', label: 'ID1的人脸存在？' },
+  { id: 'C', label: 'ID2的人脸存在？' },
+  { id: 'D', label: 'HUSKYLENS 2 切换内置模型为人脸识别' }
+];
+
+// 四个空缺槽位及正确答案 (适配新选项逻辑)
+// switchSlot: 模型切换初始化 -> 正确 D
+// id1Slot: 判断ID1人脸存在 -> 正确答案 B (ID1的人脸存在？)
+// id2Slot: 判断ID2人脸存在 -> 正确答案 C (ID2的人脸存在？)
+// id3Slot: 原为ID3判断，现改为整体人脸检测或触发环节，适配选项A(检测到人脸？) 保证所有槽位正确映射
+const SLOT_CONFIG = {
+  switchSlot: { name: '🔧 模型切换/初始化', answer: 'D' },
+  id1Slot:    { name: '🧑 判断ID1人脸存在？', answer: 'B' },
+  id2Slot:    { name: '👤 判断ID2人脸存在？', answer: 'C' },
+  id3Slot:    { name: '🎭 全局人脸检测 (触发逻辑)', answer: 'A' }
+};
+
+// 虚线框坐标及尺寸 (基于图片背景精确微调，图片填充后相对定位依然保持对准)
+const ZONES = {
+  switchSlot: { left: 42, top: 16.5, width: 25, height: 6 },    // 模型切换区
+  id1Slot:    { left: 46.5, top: 33.7, width: 18, height: 5 },      // ID1判断区
+  id2Slot:    { left: 48, top: 50.6, width: 18, height: 5 },      // ID2判断区
+  id3Slot:    { left: 48, top: 67.6, width: 18, height: 5 }         // 全局人脸检测区
+};
+
+// 存储当前放置映射 { slotId: optId }
+let placed = {};
+let submitted = false;
+let currentGroup = -1;   // 0~5对应第一组~第六组
+
+// 组别数组
+const GROUP_NAMES = ['第一组', '第二组', '第三组', '第四组', '第五组', '第六组'];
+
+// API上报地址
+const API_URL = "https://qf.kjxs.site/api/weioUf36OBW";
+
+// DOM 元素
+const groupSelect = document.getElementById('groupSelect');
+const currentPlayerEl = document.getElementById('currentPlayer');
+const partsGrid = document.getElementById('partsGrid');
+const bgImage = document.getElementById('bgImage');
+const fullscreenPreview = document.getElementById('fullscreenPreview');
+const fullscreenImg = fullscreenPreview.querySelector('img');
+const scoreValSpan = document.getElementById('scoreVal');
+const feedbackDiv = document.getElementById('feedback');
+
+// 拖拽全局辅助变量
+let dragSource = null;      // 'part' 或 'slot'
+let dragOptId = null;
+let dragFromSlot = null;
+
+// 每题分值: 5分
+const SCORE_PER_ITEM = 5;
+const TOTAL_ITEMS = Object.keys(ZONES).length; // 4
+const MAX_SCORE = TOTAL_ITEMS * SCORE_PER_ITEM; // 20
+
+// ----------------------------- 辅助函数 ---------------------------------
+function canPlay() {
+  return currentGroup >= 0 && !submitted;
+}
+
+function updatePlayerDisplay() {
+  if (currentGroup >= 0) {
+    currentPlayerEl.innerHTML = `<div class="player-name">🏅 ${GROUP_NAMES[currentGroup]}</div>`;
+  } else {
+    currentPlayerEl.innerHTML = '⚠️ 请先选择小组';
+  }
+}
+
+function showFeedback(msg, isSuccessFlag = null) {
+  feedbackDiv.textContent = msg;
+  if (isSuccessFlag === true) feedbackDiv.style.color = '#C8E6C9';
+  else if (isSuccessFlag === false) feedbackDiv.style.color = '#FFCDD2';
+  else feedbackDiv.style.color = '#E3F2FD';
+  setTimeout(() => {
+    if (feedbackDiv.textContent === msg) feedbackDiv.style.color = '#E3F2FD';
+  }, 2400);
+}
+
+// 填充虚线框内容
+function fillZone(zone, opt) {
+  zone.innerHTML = `<span class="badge">${opt.id}</span>${opt.label}`;
+  zone.classList.add('filled');
+  zone.draggable = true;
+  zone.dataset.filledOpt = opt.id;
+  zone.style.whiteSpace = 'normal';
+  zone.style.wordBreak = 'break-word';
+  zone.addEventListener('dragstart', onZoneDragStart);
+}
+
+function clearZone(zone) {
+  zone.innerHTML = '<span class="placeholder">❓</span>';
+  zone.classList.remove('filled', 'correct', 'wrong');
+  zone.draggable = false;
+  delete zone.dataset.filledOpt;
+}
+
+// 构建所有虚线框
+function buildDropZones() {
+  const container = document.getElementById('imageContainer');
+  container.querySelectorAll('.drop-zone').forEach(z => z.remove());
+  
+  for (const [slotId, pos] of Object.entries(ZONES)) {
+    const zone = document.createElement('div');
+    zone.className = 'drop-zone';
+    zone.dataset.slot = slotId;
+    zone.style.left = pos.left + '%';
+    zone.style.top = pos.top + '%';
+    zone.style.width = pos.width + '%';
+    zone.style.height = pos.height + '%';
+    zone.innerHTML = '<span class="placeholder">❓</span>';
+    
+    zone.addEventListener('dragover', onZoneDragOver);
+    zone.addEventListener('dragleave', onZoneDragLeave);
+    zone.addEventListener('drop', onZoneDrop);
+    
+    container.appendChild(zone);
+    
+    if (placed[slotId]) {
+      const opt = OPTIONS.find(o => o.id === placed[slotId]);
+      if (opt) fillZone(zone, opt);
+    }
+  }
+}
+
+// 左侧卡片列表 动态刷新 (互斥禁用)
+function buildParts() {
+  partsGrid.innerHTML = '';
+  OPTIONS.forEach(opt => {
+    const partDiv = document.createElement('div');
+    partDiv.className = 'part';
+    partDiv.draggable = true;
+    partDiv.dataset.optId = opt.id;
+    partDiv.innerHTML = `<span class="badge">${opt.id}</span>${opt.label}`;
+    const isUsed = Object.values(placed).includes(opt.id);
+    if (isUsed) partDiv.classList.add('used');
+    partDiv.addEventListener('dragstart', onPartDragStart);
+    partsGrid.appendChild(partDiv);
+  });
+}
+
+// ---------- 拖拽事件 -------------
+function onPartDragStart(e) {
+  if (submitted || !canPlay()) {
+    e.preventDefault();
+    return false;
+  }
+  dragSource = 'part';
+  dragOptId = e.target.closest('.part').dataset.optId;
+  dragFromSlot = null;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragOptId);
+}
+
+function onZoneDragStart(e) {
+  if (submitted || !canPlay()) {
+    e.preventDefault();
+    return;
+  }
+  const zone = e.target.closest('.drop-zone');
+  if (!zone || !zone.dataset.filledOpt) {
+    e.preventDefault();
+    return;
+  }
+  dragSource = 'slot';
+  dragOptId = zone.dataset.filledOpt;
+  dragFromSlot = zone.dataset.slot;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragOptId);
+}
+
+function onZoneDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onZoneDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onZoneDrop(e) {
+  e.preventDefault();
+  const zone = e.currentTarget;
+  zone.classList.remove('drag-over');
+  if (submitted) {
+    showFeedback('❌ 已经提交，无法修改。刷新页面可重新挑战', false);
+    return;
+  }
+  if (!canPlay()) {
+    showFeedback('👥 请先选择小组再进行拖拽填空', false);
+    return;
+  }
+  
+  const optId = e.dataTransfer.getData('text/plain') || dragOptId;
+  if (!optId) return;
+  const slotId = zone.dataset.slot;
+  
+  if (placed[slotId] === optId) return;
+  
+  if (placed[slotId]) {
+    delete placed[slotId];
+    clearZone(zone);
+  }
+  
+  if (dragSource === 'slot' && dragFromSlot && dragFromSlot !== slotId) {
+    const srcZone = document.querySelector(`[data-slot="${dragFromSlot}"]`);
+    if (srcZone && placed[dragFromSlot]) {
+      delete placed[dragFromSlot];
+      clearZone(srcZone);
+    }
+  }
+  
+  // 互斥逻辑
+  for (const [sid, oid] of Object.entries(placed)) {
+    if (oid === optId && sid !== slotId) {
+      const otherZone = document.querySelector(`[data-slot="${sid}"]`);
+      if (otherZone) clearZone(otherZone);
+      delete placed[sid];
+      break;
+    }
+  }
+  
+  placed[slotId] = optId;
+  const opt = OPTIONS.find(o => o.id === optId);
+  if (opt) fillZone(zone, opt);
+  
+  buildParts();
+  const slotLabel = SLOT_CONFIG[slotId]?.name || slotId;
+  showFeedback(`✅ 已将 ${optId} 填入 “${slotLabel}”，可继续拖拽调整`, null);
+  
+  dragSource = null;
+  dragOptId = null;
+  dragFromSlot = null;
+}
+
+// 拖拽回左侧回收区
+const partsStoreDiv = document.querySelector('.parts-store');
+partsStoreDiv.addEventListener('dragover', (e) => {
+  if (dragSource === 'slot' && !submitted && canPlay()) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+});
+partsStoreDiv.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (submitted) {
+    showFeedback('提交后不可移回选项', false);
+    return;
+  }
+  if (dragSource === 'slot' && dragFromSlot && !submitted && canPlay()) {
+    const srcZone = document.querySelector(`[data-slot="${dragFromSlot}"]`);
+    if (srcZone && placed[dragFromSlot]) {
+      delete placed[dragFromSlot];
+      clearZone(srcZone);
+      buildParts();
+      const slotName = SLOT_CONFIG[dragFromSlot]?.name || dragFromSlot;
+      showFeedback(`↩️ 已将选项从 ${slotName} 移回卡片区`, null);
+    }
+  }
+  dragSource = null;
+  dragOptId = null;
+  dragFromSlot = null;
+});
+
+// ---------- 提交 评分&上报 (每题5分，满分20) ----------
+document.getElementById('submitBtn').addEventListener('click', () => {
+  if (submitted) {
+    showFeedback('📌 本组已提交，如要重新作答请刷新页面', false);
+    return;
+  }
+  if (!canPlay()) {
+    showFeedback('⚠️ 请先选择你所在的小组！', false);
+    return;
+  }
+  
+  const totalSlots = TOTAL_ITEMS;
+  const filledCount = Object.keys(placed).length;
+  if (filledCount < totalSlots) {
+    showFeedback(`📢 还有 ${totalSlots - filledCount} 个红框未填写！请将全部4张卡片拖入对应位置`, false);
+    return;
+  }
+  
+  submitted = true;
+  let correctCount = 0;
+  let resultMsg = '';
+  let errorDetails = '';
+  const answerDetail = {};
+  
+  // 逐槽位判断正确性 (依据新版SLOT_CONFIG)
+  for (const [slotId, expected] of Object.entries(SLOT_CONFIG)) {
+    const studentOpt = placed[slotId];
+    const isCorrect = (expected.answer === studentOpt);
+    if (isCorrect) correctCount++;
+    const zoneElem = document.querySelector(`[data-slot="${slotId}"]`);
+    if (zoneElem) {
+      if (isCorrect) zoneElem.classList.add('correct');
+      else zoneElem.classList.add('wrong');
+    }
+    const slotName = expected.name;
+    answerDetail[slotId] = {
+      题目: slotName,
+      学生答案: studentOpt || '未填',
+      正确答案: expected.answer
+    };
+    if (isCorrect) {
+      resultMsg += `✓ ${slotName} ：正确 (${studentOpt}) +${SCORE_PER_ITEM}分\n`;
+    } else {
+      resultMsg += `✗ ${slotName} ：错误 (你的答案:${studentOpt || '无'}，正确:${expected.answer})\n`;
+      errorDetails += `  ${slotName} 你的答案：${studentOpt} ，正确答案：${expected.answer}\n`;
+    }
+  }
+  
+  const totalScore = correctCount * SCORE_PER_ITEM;  // 每题5分
+  scoreValSpan.textContent = totalScore;
+  
+  let finalFeedback = '';
+  if (correctCount === totalSlots) {
+    finalFeedback = `🎉 完美！ 满分 ${totalScore}/${MAX_SCORE} 分！\n${resultMsg}`;
+    showFeedback(finalFeedback, true);
+  } else {
+    finalFeedback = `📊 得分：${totalScore}/${MAX_SCORE}\n${resultMsg}\n📝 错误分析：\n${errorDetails}`;
+    showFeedback(finalFeedback, false);
+  }
+  
+  // 数据上报
+  const submitData = {
+    活动名称: "防溺水智能警报卫士 · 活动二 | 人脸识别精准警报代码补全",
+    小组ID: currentGroup,
+    小组名称: GROUP_NAMES[currentGroup],
+    本次得分: totalScore,
+    满分: MAX_SCORE,
+    答对题数: correctCount,
+    总题目数: totalSlots,
+    每题分值: SCORE_PER_ITEM,
+    作答详情: JSON.stringify(answerDetail),
+    提交时间: new Date().toLocaleString()
+  };
+  
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(submitData)
+  }).catch(err => console.log("上报异常(不影响本地):", err));
+  
+  // 禁止后续修改
+  document.querySelectorAll('.part').forEach(p => { p.draggable = false; p.style.cursor = 'default'; });
+  document.querySelectorAll('.drop-zone').forEach(z => { z.draggable = false; });
+});
+
+// 小组选择变更
+groupSelect.addEventListener('change', function() {
+  const val = parseInt(this.value);
+  if (isNaN(val)) {
+    currentGroup = -1;
+    updatePlayerDisplay();
+    showFeedback('请选择小组后开始挑战~', null);
+  } else {
+    currentGroup = val;
+    updatePlayerDisplay();
+    showFeedback(`👋 欢迎 ${GROUP_NAMES[currentGroup]}，将卡片拖进红框完成任务1 (每题5分，满分20) 【正确答案提示: 模型切换→D, ID1→B, ID2→C, 全局人脸检测→A】`, true);
+  }
+});
+
+// 图片全屏预览
+bgImage.addEventListener('click', () => {
+  fullscreenImg.src = bgImage.src;
+  fullscreenPreview.classList.add('show');
+});
+fullscreenPreview.addEventListener('click', () => {
+  fullscreenPreview.classList.remove('show');
+});
+
+// 初始化所有
+function init() {
+  placed = {};
+  submitted = false;
+  scoreValSpan.textContent = '--';
+  buildDropZones();
+  buildParts();
+  // 确保界面无残留高亮
+  for (const slotId of Object.keys(ZONES)) {
+    const zone = document.querySelector(`[data-slot="${slotId}"]`);
+    if (zone) clearZone(zone);
+  }
+}
+
+if (bgImage.complete) {
+  init();
+} else {
+  bgImage.addEventListener('load', init);
+}
+window.addEventListener('load', () => {
+  if (!document.querySelector('.drop-zone')) init();
+});
+</script>
+</body>
+</html>

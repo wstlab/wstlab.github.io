@@ -1,0 +1,12 @@
+{
+  "id": "case-10",
+  "title": "数字星球探险 · 三类数",
+  "category": "exploration",
+  "description": "数字分类观测站：围绕得分、总分、数字类型开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 10,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

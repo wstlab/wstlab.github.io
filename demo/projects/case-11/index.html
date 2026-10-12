@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":11,"key":"case-11","title":"远距离输电 · 电力特工队","category":"simulation","description":"电力行动报告：围绕总分、第一阶段、第二阶段开展交互学习，在数据大屏中回看记录。","headline":"电力行动报告","view":"diagnostic","fields":[{"key":"totalScore","label":"总分"},{"key":"stage1","label":"第一阶段"},{"key":"stage2","label":"第二阶段"},{"key":"stage3","label":"第三阶段"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开剧本杀"}],"tasks":{"records":"GTMmaR1EBLL"},"mapping":{"0t5u0rr7ij":"GTMmaR1EBLL"},"accent":"#3c697b","capture":false,"lesson":"打开剧本杀"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>亿兴电力特工队 · 光明突围战 | 高压输电解密</title>
+    
+    <script src="/projects/shared/vendor/db43a3a48e4777e7.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #0b1a2e 0%, #0a111f 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            color: #eef4ff;
+        }
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(10, 20, 35, 0.75);
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0, 242, 255, 0.2);
+        }
+        /* 头部 */
+        .hero {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #00f2ff;
+            padding-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #FFD966, #00f2ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        .hero p {
+            color: #9bb5e0;
+            font-size: 0.9rem;
+        }
+        /* 小组信息栏 */
+        .team-bar {
+            background: #07122a;
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid #2a4c7c;
+        }
+        .team-info-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .team-info-group label {
+            font-weight: bold;
+            color: #b8d0ff;
+        }
+        select, input {
+            background: #0f1b2f;
+            border: 1px solid #2f5a8c;
+            padding: 6px 12px;
+            border-radius: 2rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .member-tag {
+            background: #1e3a5f;
+            padding: 4px 12px;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+        }
+        /* 四阶导航 */
+        .stages-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stage-btn {
+            background: #0f1a2c;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            color: #9bb5e0;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 3px solid #2f5a8c;
+        }
+        .stage-btn.active {
+            background: #00a3b8;
+            color: white;
+            box-shadow: 0 0 12px #00f2ff;
+            border-left-color: #ffd966;
+        }
+        .stage-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.2);
+        }
+        /* 阶段内容卡片 */
+        .stage-panel {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        .stage-panel.active-panel {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .card {
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #2e577a;
+        }
+        .evidence-area {
+            background: #071c2c;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .btn-primary {
+            background: #00b4d8;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 2rem;
+            font-weight: bold;
+            color: #0a1120;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { background: #00e0ff; transform: scale(1.02);}
+        .btn-secondary { background: #3a6b92; }
+        .radio-group, .choice-group { display: flex; gap: 20px; flex-wrap: wrap; margin: 12px 0; }
+        .score-badge { background: #ffc107; color: #0a0a0a; padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+        iframe { width: 100%; border-radius: 1rem; border: 1px solid #2a628f; background: #000; margin: 10px 0; }
+        .iframe-placeholder { min-height: 320px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        /* 雷达图容器 */
+        .radar-box { max-width: 450px; margin: 20px auto; background: #071a2a; padding: 1rem; border-radius: 2rem; }
+        canvas#radarChart { width: 100%; height: auto; background: #f8fafc; border-radius: 1rem; }
+        /* 互评区域 */
+        .peer-review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 1rem; margin-top: 1rem; }
+        .review-card { background: #0e2740; padding: 1rem; border-radius: 1rem; }
+        .review-card select { width: 100%; margin-top: 6px; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        footer { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #6c8bb0; }
+        @media (max-width: 780px) {
+            .game-container { padding: 1rem; }
+            .stage-btn { padding: 0.5rem 1rem; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app">
+    <div class="hero">
+        <h1>⚡ 亿兴电力特工队 · 光明突围战 ⚡</h1>
+        <p>鲁科版·选择性必修二 | 高压输电解密 · 四阶循证闯关</p>
+    </div>
+    
+    <div class="team-bar">
+        <div class="team-info-group">
+            <label>班级：</label>
+            <select id="classSelect">
+                <option value="">请选择</option>
+                <option>8班</option><option>9班</option><option>10班</option>
+            </select>
+            <label>小组名：</label>
+            <input type="text" id="teamName" placeholder="例如：闪电特工队" style="width:130px">
+        </div>
+        <div class="team-info-group" id="membersArea">
+            <span>👥 队员：</span>
+            <input type="text" id="member1" placeholder="队员1" size="8">
+            <input type="text" id="member2" placeholder="队员2" size="8">
+            <input type="text" id="member3" placeholder="队员3" size="8">
+            <input type="text" id="member4" placeholder="队员4" size="8">
+        </div>
+        <div><span id="starScoreDisplay" class="score-badge">⭐ 当前积分:0</span></div>
+    </div>
+    
+    <div class="stages-nav" id="stageNav">
+        <button class="stage-btn" data-stage="1">🔎 一阶·格物 (育心)</button>
+        <button class="stage-btn" data-stage="2">⚙️ 二阶·悟物 (跨界)</button>
+        <button class="stage-btn" data-stage="3">🧠 三阶·智物 (智元)</button>
+        <button class="stage-btn" data-stage="4">🌟 四阶·理物 (悟理)</button>
+        <button class="stage-btn" data-stage="5">📊 素养雷达 & 互评提交</button>
+    </div>
+
+    
+    <div id="stage1" class="stage-panel">
+        <div class="card">
+            <h2>🔎 第一阶段：锁定“能量黑洞”</h2>
+            <p>【剧情】闽西风电入榕工程效率危机！特工们，利用实验发现能量损失元凶——电流热效应。</p>
+            <div class="evidence-area">
+                <p><strong>📌 任务1：热效应观察 (证据·选择题)</strong></p>
+                <div class="choice-group">
+                    <label><input type="radio" name="heatReason" value="电阻发热"> 电阻发热导致电能→内能</label>
+                    <label><input type="radio" name="heatReason" value="磁场辐射"> 磁场辐射损耗</label>
+                    <label><input type="radio" name="heatReason" value="电压过高"> 电压过高击穿</label>
+                </div>
+                <p><strong>📌 任务2：动机前测 (自主性/胜任感)</strong> 你觉得远距离输电最大的挑战是什么？</p>
+                <textarea id="motivationText" rows="2" style="width:100%; background:#0f1f30; color:white; border-radius:12px; padding:8px;" placeholder="写下你的看法..."></textarea>
+                <button id="submitStage1" class="btn-primary">✅ 提交一阶证据 & 解锁二阶</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="stage2" class="stage-panel">
+        <div class="card">
+            <h2>⚙️ 第二阶段：决策博弈——换线还是升压？</h2>
+            <p>指挥部提供两个方案：增大导线横截面积 (减小R) 或 提高电压 (减小I)。分析可行性。</p>
+            <div class="evidence-area">
+                <p><strong>📌 方案推导 (拖拽排序/选择题)</strong> 根据电阻定律，若将电阻降为1/100，导线截面积需扩大多少倍？</p>
+                <div class="choice-group">
+                    <label><input type="radio" name="areaFactor" value="10倍"> 10倍</label>
+                    <label><input type="radio" name="areaFactor" value="50倍"> 50倍</label>
+                    <label><input type="radio" name="areaFactor" value="100倍"> 100倍</label>
+                    <label><input type="radio" name="areaFactor" value="200倍"> 200倍</label>
+                </div>
+                <p><strong>📌 计算验证：</strong> 输送功率 P=2000kW，R线=20Ω，若U=10kV，求P损？ (填数字 kW)</p>
+                <input type="number" id="lossCalc" placeholder="功率损耗(kW)" style="width:180px;">
+                <p class="note" style="font-size:0.8rem;">⚡ 根据 ΔP=I²R, I=P/U</p>
+                <button id="submitStage2" class="btn-primary">📎 提交二阶证据 & 解锁三阶</button>
+            </div>
+            
+            <div style="margin-top:20px;">
+                <p>🎬 动态模拟：高压 vs 低压损耗对比</p>
+                <iframe src="index.html" style="width:100%; height:380px;" title="电能输送模拟" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="stage3" class="stage-panel">
+        <div class="card">
+            <h2>🧠 第三阶段：解码“光明路线图”</h2>
+            <p>观察升压→输电→降压全过程，分析电压/匝数关系，并完成思维轨迹。</p>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div><iframe src="index.html" style="width:100%; height:300px;"></iframe><p class="note">🔁 变压器匝数比实验</p></div>
+                <div><iframe src="index.html" style="width:100%; height:300px;"></iframe><p class="note">⚠️ 无变压器损耗对比</p></div>
+            </div>
+            <div class="evidence-area">
+                <p><strong>📌 元认知记录卡：</strong> 已知升压变压器原线圈匝数n1=200，副线圈n2=2000，输入电压U1=220V，则U2=？</p>
+                <input type="number" id="voltageCalc" placeholder="U2 (V)" style="width:150px;">
+                <p><strong>📌 策略调节：</strong> 如果想让用户端电压稳定在220V，降压变压器匝数比 n3:n4 应如何选择？(简答)</p>
+                <textarea id="strategyText" rows="2" style="width:100%;" placeholder="根据U3/U4 = n3/n4，U3 = U2 - I·R线..."></textarea>
+                <button id="submitStage3" class="btn-primary">🧩 提交三阶证据 & 解锁四阶</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="stage4" class="stage-panel">
+        <div class="card">
+            <h2>🌟 第四阶段：特高压黑科技——直流 vs 交流</h2>
+            <p>探究高压直流输电(HVDC)优势，完成价值反思。</p>
+            <div><iframe src="index.html" style="width:100%; height:320px;" title="AC to DC 动画"></iframe></div>
+            <div class="evidence-area">
+                <p><strong>📌 直流交流对比 (选择题)</strong> 跨海电缆为什么更青睐直流输电？</p>
+                <div class="choice-group">
+                    <label><input type="radio" name="hvdcReason" value="无感抗容抗"> 无感抗容抗损耗，节省电缆</label>
+                    <label><input type="radio" name="hvdcReason" value="变压容易"> 变压容易实现</label>
+                    <label><input type="radio" name="hvdcReason" value="成本低"> 换流站成本低</label>
+                </div>
+                <p><strong>📌 价值践行：</strong> 结合福建亿兴集团智慧运维，谈谈你对“电力高速公路”的感想。</p>
+                <textarea id="valueText" rows="3" style="width:100%;" placeholder="科技强国，绿色电力..."></textarea>
+                <button id="submitStage4" class="btn-primary">🏆 完成四阶，开启互评与雷达图</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="stage5" class="stage-panel">
+        <div class="card">
+            <h2>📈 科学素养六维评估 & 组间互评</h2>
+            <div class="radar-box">
+                <canvas id="radarChart" width="400" height="400"></canvas>
+            </div>
+            <div class="flex-between"><h3>🤝 小组互评 (组间展示后打分)</h3><span>每个维度1-5分</span></div>
+            <div class="peer-review-grid" id="peerReviewGrid">
+                
+            </div>
+            <div class="evidence-area">
+                <h3>✍️ 自评 (小组内部)</h3>
+                <div id="selfReviewContainer" style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;"></div>
+                <button id="submitFinalData" class="btn-primary" style="margin-top:20px;">📡 提交最终报告 & 生成JSON</button>
+            </div>
+        </div>
+    </div>
+    <footer>⚡ 亿兴电力特工队 · 光明突围战 | 数据将加密上传至总指挥部</footer>
+</div>
+
+<script>
+    // 全局状态
+    let currentUnlockedStage = 1;   // 已解锁最大阶段
+    let stagesCompleted = {1:false,2:false,3:false,4:false};
+    let stageScores = {1:0,2:0,3:0,4:0};  // 每阶段得分 (用于自动映射素养)
+    // 证据文本存储
+    let evidenceData = {
+        motivation: "", heatChoice: "", areaFactor: "", lossCalcNum: null,
+        voltageCalc: "", strategyText: "", hvdcReason: "", valueText: ""
+    };
+    // 六维素养最终值 (自动+自评互评融合)
+    let dimensions = {
+        scientificKnowledge: 0,   // 科学知识掌握
+        teamwork: 0,              // 团队协作能力
+        problemSolving: 0,       // 问题解决能力
+        innovativeThinking: 0,   // 创新思维能力
+        communication: 0,        // 沟通表达能力
+        responsibility: 0        // 科学态度与责任
+    };
+    let peerReviews = [];   // 存储互评数据 (模拟组间评分，演示版简化: 每组评价自己，但按照设计可给其他组打分，为了展示，让学生填写对其他组评分，本设计采用模拟: 自行给本组互评打分(组间互评环节)，但为了完整功能，提供一个评分界面)
+    let selfScores = { scientificKnowledge:3, teamwork:3, problemSolving:3, innovativeThinking:3, communication:3, responsibility:3 };
+    let radarChart = null;
+
+    // 辅助函数
+    function updateStarsDisplay() {
+        let total = (stageScores[1]+stageScores[2]+stageScores[3]+stageScores[4]);
+        document.getElementById('starScoreDisplay').innerHTML = `⭐ 当前积分:${total}`;
+    }
+    // 自动评分规则 (基于证据正确率)
+    function autoScoreStage1() {
+        let score = 0;
+        const heatRadio = document.querySelector('input[name="heatReason"]:checked');
+        if(heatRadio && heatRadio.value === "电阻发热") score += 15;
+        if(document.getElementById('motivationText').value.trim().length > 5) score += 5;
+        stageScores[1] = Math.min(20, score);
+        evidenceData.heatChoice = heatRadio ? heatRadio.value : "";
+        evidenceData.motivation = document.getElementById('motivationText').value;
+        return stageScores[1];
+    }
+    function autoScoreStage2() {
+        let score = 0;
+        const area = document.querySelector('input[name="areaFactor"]:checked');
+        if(area && area.value === "100倍") score += 10;
+        const lossVal = parseFloat(document.getElementById('lossCalc').value);
+        if(!isNaN(lossVal) && Math.abs(lossVal - 800) < 50) { score += 10; evidenceData.lossCalcNum = lossVal; }
+        else if(!isNaN(lossVal)) evidenceData.lossCalcNum = lossVal;
+        stageScores[2] = Math.min(20, score);
+        if(area) evidenceData.areaFactor = area.value;
+        return stageScores[2];
+    }
+    function autoScoreStage3() {
+        let score = 0;
+        const u2 = parseFloat(document.getElementById('voltageCalc').value);
+        if(!isNaN(u2) && Math.abs(u2 - 2200) < 50) { score += 12; evidenceData.voltageCalc = u2; }
+        const strategy = document.getElementById('strategyText').value.trim();
+        if(strategy.length > 10) { score += 8; evidenceData.strategyText = strategy; }
+        stageScores[3] = Math.min(20, score);
+        return stageScores[3];
+    }
+    function autoScoreStage4() {
+        let score = 0;
+        const hvdc = document.querySelector('input[name="hvdcReason"]:checked');
+        if(hvdc && hvdc.value === "无感抗容抗") score += 10;
+        const value = document.getElementById('valueText').value.trim();
+        if(value.length > 8) score += 10;
+        stageScores[4] = Math.min(20, score);
+        if(hvdc) evidenceData.hvdcReason = hvdc.value;
+        evidenceData.valueText = value;
+        return stageScores[4];
+    }
+    // 根据各阶段自动得分映射六维素养初始分 (自动部分)
+    function mapAutoToDimensions() {
+        // 科学知识掌握：阶段1+阶段2正确率 + 阶段3计算正确性
+        let knowledge = (stageScores[1]/20)*2 + (stageScores[2]/20)*2 + (stageScores[3]/20)*2;
+        dimensions.scientificKnowledge = Math.min(5, Math.round((knowledge + 0.5) * 10)/10);
+        // 问题解决能力：阶段2计算 + 阶段3策略
+        let problem = (stageScores[2]/20)*2.5 + (stageScores[3]/20)*2.5;
+        dimensions.problemSolving = Math.min(5, Math.round((problem + 0.8) * 10)/10);
+        // 创新思维: 阶段4直流交流理解
+        dimensions.innovativeThinking = Math.min(5, Math.round((stageScores[4]/20)*4 + 0.8));
+        // 科学态度与责任: 阶段4价值反思 + 动机文本
+        let resp = (stageScores[4]/20)*3 + (evidenceData.motivation.length>10?1:0);
+        dimensions.responsibility = Math.min(5, Math.round(resp*10)/10);
+        // 团队协作与沟通表达能力 先设为中等，后续结合自评互评调整
+        dimensions.teamwork = 3;
+        dimensions.communication = 3;
+        return dimensions;
+    }
+    // 融合自评互评分数 (最终计算)
+    function mergePeerSelf() {
+        // 自评取平均值，互评取各组平均值（演示版: 互评来自界面填写的分数）
+        let peerCount = peerReviews.length;
+        let avgPeer = { scientificKnowledge:0, teamwork:0, problemSolving:0, innovativeThinking:0, communication:0, responsibility:0 };
+        if(peerCount>0){
+            for(let p of peerReviews){
+                avgPeer.scientificKnowledge += p.scientificKnowledge || 3;
+                avgPeer.teamwork += p.teamwork || 3;
+                avgPeer.problemSolving += p.problemSolving || 3;
+                avgPeer.innovativeThinking += p.innovativeThinking || 3;
+                avgPeer.communication += p.communication || 3;
+                avgPeer.responsibility += p.responsibility || 3;
+            }
+            avgPeer.scientificKnowledge /= peerCount;
+            avgPeer.teamwork /= peerCount;
+            avgPeer.problemSolving /= peerCount;
+            avgPeer.innovativeThinking /= peerCount;
+            avgPeer.communication /= peerCount;
+            avgPeer.responsibility /= peerCount;
+        } else {
+            avgPeer = { scientificKnowledge:3, teamwork:3, problemSolving:3, innovativeThinking:3, communication:3, responsibility:3 };
+        }
+        // 最终素养 = 自动分(60%) + 自评(20%) + 互评(20%)
+        dimensions.scientificKnowledge = Math.min(5, dimensions.scientificKnowledge*0.6 + (selfScores.scientificKnowledge||3)*0.2 + avgPeer.scientificKnowledge*0.2);
+        dimensions.teamwork = Math.min(5, dimensions.teamwork*0.6 + (selfScores.teamwork||3)*0.2 + avgPeer.teamwork*0.2);
+        dimensions.problemSolving = Math.min(5, dimensions.problemSolving*0.6 + (selfScores.problemSolving||3)*0.2 + avgPeer.problemSolving*0.2);
+        dimensions.innovativeThinking = Math.min(5, dimensions.innovativeThinking*0.6 + (selfScores.innovativeThinking||3)*0.2 + avgPeer.innovativeThinking*0.2);
+        dimensions.communication = Math.min(5, dimensions.communication*0.6 + (selfScores.communication||3)*0.2 + avgPeer.communication*0.2);
+        dimensions.responsibility = Math.min(5, dimensions.responsibility*0.6 + (selfScores.responsibility||3)*0.2 + avgPeer.responsibility*0.2);
+        updateRadar();
+    }
+    function updateRadar() {
+        if(radarChart){
+            radarChart.data.datasets[0].data = [
+                dimensions.scientificKnowledge, dimensions.teamwork, dimensions.problemSolving,
+                dimensions.innovativeThinking, dimensions.communication, dimensions.responsibility
+            ];
+            radarChart.update();
+        }
+    }
+    function initRadar() {
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['科学知识掌握', '团队协作能力', '问题解决能力', '创新思维能力', '沟通表达能力', '科学态度与责任'],
+                datasets: [{ label: '特工队素养', data: [3,3,3,3,3,3], backgroundColor: 'rgba(0, 242, 255, 0.2)', borderColor: '#00f2ff', borderWidth: 2 }]
+            },
+            options: { scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } } }
+        });
+    }
+    function renderSelfReview() {
+        const container = document.getElementById('selfReviewContainer');
+        const dims = ['scientificKnowledge','teamwork','problemSolving','innovativeThinking','communication','responsibility'];
+        const names = ['科学知识掌握','团队协作能力','问题解决能力','创新思维能力','沟通表达能力','科学态度与责任'];
+        container.innerHTML = '';
+        dims.forEach((d,idx) => {
+            let div = document.createElement('div');
+            div.innerHTML = `<label>${names[idx]} (1-5)</label><select id="self_${d}" style="width:100%">${[1,2,3,4,5].map(v=>`<option ${selfScores[d]==v?'selected':''} value="${v}">${v}分</option>`).join('')}</select>`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('[id^="self_"]').forEach(sel => {
+            sel.addEventListener('change', (e) => {
+                let key = sel.id.replace('self_','');
+                selfScores[key] = parseInt(sel.value);
+                mergePeerSelf();
+            });
+        });
+    }
+    function renderPeerReview() {
+        const container = document.getElementById('peerReviewGrid');
+        const groups = ['评价小组A (示例)','评价小组B (示例)']; // 实际可让学生填写其他组名, 简化但保留互评功能
+        container.innerHTML = '';
+        groups.forEach((g, idx) => {
+            let card = document.createElement('div');
+            card.className = 'review-card';
+            card.innerHTML = `<h4>🎭 对${g}互评</h4>
+                <label>科学知识: <select class="peer-knowledge" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                <label>团队协作: <select class="peer-teamwork" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                <label>问题解决: <select class="peer-problem" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                <label>创新思维: <select class="peer-innovation" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                <label>沟通表达: <select class="peer-comm" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+                <label>责任担当: <select class="peer-resp" data-group="${idx}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+            `;
+            container.appendChild(card);
+        });
+        // 监听互评变化
+        const updatePeer = () => {
+            let reviews = [];
+            document.querySelectorAll('.review-card').forEach((card, idx) => {
+                let rev = {
+                    groupName: idx===0?'小组A':'小组B',
+                    scientificKnowledge: parseInt(card.querySelector('.peer-knowledge').value),
+                    teamwork: parseInt(card.querySelector('.peer-teamwork').value),
+                    problemSolving: parseInt(card.querySelector('.peer-problem').value),
+                    innovativeThinking: parseInt(card.querySelector('.peer-innovation').value),
+                    communication: parseInt(card.querySelector('.peer-comm').value),
+                    responsibility: parseInt(card.querySelector('.peer-resp').value),
+                };
+                reviews.push(rev);
+            });
+            peerReviews = reviews;
+            mergePeerSelf();
+        };
+        container.addEventListener('change', updatePeer);
+        updatePeer();
+    }
+    // 解锁和阶段切换逻辑
+    function unlockStage(stage) {
+        if(stage > currentUnlockedStage) currentUnlockedStage = stage;
+        renderStageButtons();
+    }
+    function renderStageButtons() {
+        for(let i=1;i<=4;i++){
+            let btn = document.querySelector(`.stage-btn[data-stage="${i}"]`);
+            if(i > currentUnlockedStage && !stagesCompleted[i-1]) btn.classList.add('locked');
+            else btn.classList.remove('locked');
+        }
+    }
+    function goToStage(stageId) {
+        if(stageId > currentUnlockedStage && stageId !== 5 && !stagesCompleted[stageId-1]) { alert('请先完成前一阶段！'); return false; }
+        document.querySelectorAll('.stage-panel').forEach(panel => panel.classList.remove('active-panel'));
+        document.getElementById(`stage${stageId}`).classList.add('active-panel');
+        document.querySelectorAll('.stage-btn').forEach(btn => btn.classList.remove('active'));
+        let activeBtn = document.querySelector(`.stage-btn[data-stage="${stageId}"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        if(stageId===5){
+            mapAutoToDimensions();
+            renderSelfReview();
+            renderPeerReview();
+            mergePeerSelf();
+        }
+        return true;
+    }
+    // 提交各阶段
+    document.getElementById('submitStage1')?.addEventListener('click',()=>{
+        autoScoreStage1();
+        stagesCompleted[1]=true;
+        unlockStage(2);
+        alert(`一阶完成！获得 ${stageScores[1]} 积分，解锁二阶。`);
+        updateStarsDisplay();
+        goToStage(2);
+    });
+    document.getElementById('submitStage2')?.addEventListener('click',()=>{
+        autoScoreStage2();
+        stagesCompleted[2]=true;
+        unlockStage(3);
+        alert(`二阶完成！获得 ${stageScores[2]} 积分，解锁三阶。`);
+        updateStarsDisplay();
+        goToStage(3);
+    });
+    document.getElementById('submitStage3')?.addEventListener('click',()=>{
+        autoScoreStage3();
+        stagesCompleted[3]=true;
+        unlockStage(4);
+        alert(`三阶完成！获得 ${stageScores[3]} 积分，解锁四阶。`);
+        updateStarsDisplay();
+        goToStage(4);
+    });
+    document.getElementById('submitStage4')?.addEventListener('click',()=>{
+        autoScoreStage4();
+        stagesCompleted[4]=true;
+        unlockStage(5);
+        alert(`四阶完成！获得 ${stageScores[4]} 积分，可进入素养评估与互评。`);
+        updateStarsDisplay();
+        goToStage(5);
+    });
+    // 最终提交 JSON
+    document.getElementById('submitFinalData')?.addEventListener('click', async ()=>{
+        const className = document.getElementById('classSelect').value;
+        const teamName = document.getElementById('teamName').value.trim();
+        const members = [document.getElementById('member1').value, document.getElementById('member2').value, document.getElementById('member3').value, document.getElementById('member4').value].filter(m=>m.trim()!=="");
+        if(!className || !teamName || members.length===0){
+            alert("请完整填写班级、小组名和至少一名队员！");
+            return;
+        }
+        mapAutoToDimensions();
+        mergePeerSelf(); // 最终素养
+        const finalSix = [dimensions.scientificKnowledge, dimensions.teamwork, dimensions.problemSolving, dimensions.innovativeThinking, dimensions.communication, dimensions.responsibility];
+        const payload = {
+            class: className,
+            teamName: teamName,
+            members: members,
+            stageCompletion: stagesCompleted,
+            stageScores: stageScores,
+            sixDimensionScores: {
+                scientificKnowledge: dimensions.scientificKnowledge,
+                teamwork: dimensions.teamwork,
+                problemSolving: dimensions.problemSolving,
+                innovativeThinking: dimensions.innovativeThinking,
+                communication: dimensions.communication,
+                responsibility: dimensions.responsibility
+            },
+            selfEvaluation: selfScores,
+            peerEvaluation: peerReviews,
+            evidenceDetails: evidenceData,
+            timestamp: new Date().toISOString()
+        };
+        console.log("提交JSON:", payload);
+        try {
+            const response = await fetch('https://qf.kjxs.site/api/GTMmaR1EBLL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if(response.ok) alert("数据提交成功！总指挥部已收到光明突围战报！");
+            else alert("提交失败，请检查网络或稍后重试");
+        } catch(e) { alert("提交出错："+e.message); }
+    });
+    // 导航监听
+    document.querySelectorAll('.stage-btn').forEach(btn => {
+        btn.addEventListener('click', (e)=>{
+            let stage = parseInt(btn.getAttribute('data-stage'));
+            if(stage <= currentUnlockedStage || stage===5) goToStage(stage);
+            else alert("尚未解锁该阶段，请完成前置任务！");
+        });
+    });
+    // 初始化雷达图
+    initRadar();
+    // 默认开启第一阶段
+    goToStage(1);
+    updateStarsDisplay();
+    renderStageButtons();
+    // 预加载嵌入动画若文件不存在会有提示，但设计上信任同目录
+</script>
+</body>
+</html>

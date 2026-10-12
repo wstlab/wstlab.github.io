@@ -1,0 +1,12 @@
+{
+  "id": "case-21",
+  "title": "校园比赛抽签",
+  "category": "activities",
+  "description": "选择演示场次，体验抽签与顺序记录，在大屏中核对抽签结果。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 21,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

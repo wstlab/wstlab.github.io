@@ -1,0 +1,47 @@
+[
+  {
+    "id": "assessment",
+    "name": "测评与学情诊断",
+    "icon": "测"
+  },
+  {
+    "id": "exploration",
+    "name": "探究与推理",
+    "icon": "探"
+  },
+  {
+    "id": "simulation",
+    "name": "实验与工程实践",
+    "icon": "实"
+  },
+  {
+    "id": "creation",
+    "name": "表达、创作与互评",
+    "icon": "创"
+  },
+  {
+    "id": "practice",
+    "name": "闯关与技能训练",
+    "icon": "练"
+  },
+  {
+    "id": "programming",
+    "name": "编码与算法",
+    "icon": "码"
+  },
+  {
+    "id": "observation",
+    "name": "感知与数据观察",
+    "icon": "感"
+  },
+  {
+    "id": "design",
+    "name": "教师备课工具",
+    "icon": "备"
+  },
+  {
+    "id": "activities",
+    "name": "活动与课堂协作",
+    "icon": "协"
+  }
+]

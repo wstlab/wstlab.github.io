@@ -1,0 +1,12 @@
+{
+  "id": "case-30",
+  "title": "地理 · 地形图标记",
+  "category": "creation",
+  "description": "地形标注画廊：围绕说明、标记、创作者开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "地理"
+  ],
+  "order": 30,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

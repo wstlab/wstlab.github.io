@@ -1,0 +1,13 @@
+{
+  "id": "case-39",
+  "title": "防溺水智能警报卫士",
+  "category": "simulation",
+  "description": "安全算法任务图：围绕活动、得分、得分开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技",
+    "安全教育"
+  ],
+  "order": 39,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

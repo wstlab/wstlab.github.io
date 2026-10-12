@@ -1,0 +1,12 @@
+{
+  "id": "area",
+  "title": "平行四边形的面积 · 课前小测",
+  "category": "assessment",
+  "description": "从原有的三道选择题与一道开放题出发，观察图形转化，在大屏中看见理解与思考。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 2,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

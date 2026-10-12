@@ -1,0 +1,12 @@
+{
+  "id": "case-20",
+  "title": "浙江地图打卡",
+  "category": "activities",
+  "description": "浙江足迹地图：围绕城市、地点、见闻开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 20,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

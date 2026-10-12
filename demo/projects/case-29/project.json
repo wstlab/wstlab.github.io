@@ -1,0 +1,12 @@
+{
+  "id": "case-29",
+  "title": "吸管塔台 · 过程性数据工坊",
+  "category": "simulation",
+  "description": "塔台迭代工坊：围绕高度、吸管数量、承重开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "工程实践"
+  ],
+  "order": 29,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

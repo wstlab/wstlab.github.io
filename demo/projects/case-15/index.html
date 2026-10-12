@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":15,"key":"case-15","title":"智能植物生长器 · 向日葵数据大屏","category":"observation","description":"向日葵环境观测：围绕温度、湿度、光照开展交互学习，在数据大屏中回看记录。","headline":"向日葵环境观测","view":"trend","fields":[{"key":"temperature","label":"温度"},{"key":"humidity","label":"湿度"},{"key":"light","label":"光照"},{"key":"soil_moisture","label":"土壤湿度"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开大屏"}],"tasks":{"records":"KfkNTfsbROM"},"mapping":{"tcseuwedel":"KfkNTfsbROM"},"accent":"#527b43","capture":false,"lesson":"打开大屏"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>向日葵智慧生长数据大屏 | 环境数据分析中心</title>
+    
+    <script src="/projects/shared/vendor/db43a3a48e4777e7.js"></script>
+    <style>
+        /* ============================================================
+           设计契约（向日葵智慧生长数据大屏）
+           本页优化严格保留以下原始视觉基因，不作换皮：
+             底    linear-gradient(135deg, #eef5e6, #d9e6c3) 叶片浅绿渐变
+             主色  #f5b042 / #ffa826 向日葵金（按钮、聚焦描边、徽章）
+             辅色  #e25822 橙红（强调）· #4c9f70 叶绿（图表数据线）
+             卡    rgba(255,255,245,.92) 奶油白 + blur + 2rem 大圆角
+                   边框 #f3e2b0 · 投影 rgba(40,60,20,.25)
+             文字  #2d3e2b 深绿墨 / #366e3a 标签绿 / #5f7a48 次级
+             形态  3rem 胶囊按钮 · 2rem 胶囊输入框 · 1.5rem 圆角统计卡
+             字体  'Segoe UI','Poppins','Roboto',system-ui + 图表 Chart.js 4.4.0
+           ============================================================ */
+        :root {
+            --s-bg-1:   #eef5e6;
+            --s-bg-2:   #d9e6c3;
+            --s-gold:   #f5b042;
+            --s-gold-2: #ffa826;
+            --s-orange: #e25822;
+            --s-leaf:   #4c9f70;
+            --s-card:   rgba(255, 255, 245, .92);
+            --s-line:   #f3e2b0;
+            --s-line-2: #cddfb8;
+            --s-ink:    #2d3e2b;
+            --s-ink-2:  #366e3a;
+            --s-ink-3:  #5f7a48;
+            --s-ok:     #2f7d3f;
+            --s-warn:   #b45309;
+            --s-err:    #b3261e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e6 0%, #d9e6c3 100%);
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, sans-serif;
+            padding: 1.5rem 2rem;
+            color: #2d3e2b;
+        }
+
+        /* 主容器 */
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 标题区 */
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(120deg, #2c6e2f, #f6b342);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+            letter-spacing: -0.5px;
+        }
+        .hero p {
+            color: #4a6b3a;
+            font-weight: 500;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: rgba(255, 255, 245, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(40, 60, 20, 0.25);
+            padding: 1.5rem 1.8rem;
+            border: 1px solid #f3e2b0;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* 网格布局 */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #366e3a;
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 2rem;
+            border: 1.5px solid #cddfb8;
+            background: #fffdf5;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            outline: none;
+        }
+        input:focus {
+            border-color: #f5b042;
+            box-shadow: 0 0 0 3px rgba(245,176,66,0.2);
+        }
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        button {
+            background: #f5b042;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2d4b1e;
+            font-family: inherit;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        button:hover {
+            background: #ffa826;
+            transform: scale(0.98);
+        }
+
+        /* 向日葵展示面板 */
+        .sunflower-panel {
+            text-align: center;
+            background: #fffdf0;
+        }
+        .sunflower-art {
+            font-size: 6rem;
+            line-height: 1.2;
+            filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.2));
+            margin: 0.5rem 0;
+        }
+        .status-text {
+            background: #fef3db;
+            border-radius: 2rem;
+            padding: 0.6rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+        .water-metrics {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .metric-badge {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 0.5rem;
+            flex: 1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #dd8822;
+        }
+        .alert-note {
+            background: #fff0e0;
+            border-left: 5px solid #e25822;
+            padding: 0.6rem;
+            border-radius: 1.2rem;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* 数据分析大屏模块 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #ffffffcc;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2a6b2f;
+        }
+        .chart-container {
+            background: #ffffffcc;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        canvas {
+            max-height: 280px;
+            width: 100%;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 1.5rem;
+            background: #fefef5;
+            padding: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        th, td {
+            padding: 0.7rem 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid #dde6cf;
+        }
+        th {
+            background: #e9f0df;
+            color: #2b5727;
+        }
+        .badge {
+            background: #f3b33d30;
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            font-weight: bold;
+        }
+        .refresh-note {
+            font-size: 0.7rem;
+            text-align: right;
+            margin-top: 0.5rem;
+            color: #7f976b;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 860px) {
+            body { padding: 1rem; }
+            .grid-2col { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ============================================================
+           补强（不动配色）
+             ① 键盘可达性：原文件只有 input:focus，全站无 :focus-visible
+             ② 提交反馈可视化：原来只是 0.8rem 一行小字，学生看不出成功/失败
+             ③ 无障碍语义：原文件 aria-* 为 0
+           ============================================================ */
+
+        /* ① 统一焦点环（向日葵金，与既有 input:focus 一致） */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        [tabindex]:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(245, 176, 66, .45);
+        }
+
+        /* ② 提交反馈：三态色块（等待 / 成功 / 失败），投影下也看得清 */
+        #apiFeedback {
+            margin-top: 1rem;
+            font-size: .92rem;
+            text-align: center;
+            color: var(--s-ink-3);
+            border-radius: 1.2rem;
+            padding: .7rem 1rem;
+            border: 1.5px solid var(--s-line-2);
+            background: #fdf7e8;
+            font-weight: 600;
+            transition: background .2s, color .2s, border-color .2s;
+        }
+        /* 空态：没有文案时不占位、不显示边框 */
+        #apiFeedback:empty {
+            background: transparent;
+            border-color: transparent;
+            padding: 0;
+            margin-top: 0;
+        }
+        #apiFeedback.is-busy {
+            background: #fff6e2;
+            border-color: var(--s-line);
+            color: var(--s-warn);
+        }
+        #apiFeedback.is-ok {
+            background: #eaf6ec;
+            border-color: #9ed3a8;
+            color: var(--s-ok);
+        }
+        #apiFeedback.is-err {
+            background: #fdecea;
+            border-color: #f2b8b5;
+            color: var(--s-err);
+        }
+
+        /* ③ 表单可读性：必填标记与输入提示更明确 */
+        .form-group label { display: flex; align-items: center; gap: .35rem; }
+        input::placeholder { color: #9aab8b; }
+        input:invalid:not(:placeholder-shown) {
+            border-color: #f2b8b5;
+        }
+
+        /* 提交按钮：按压反馈 + 提交中禁用态 */
+        button:active:not(:disabled) { transform: scale(.97); }
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card, button, #apiFeedback { transition: none; }
+            button:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="hero">
+        <h1>🌻 向日葵智慧生长数据大屏 🌞</h1>
+        <p>实时录入环境数据 | AI分析生长状态 | 浇水策略建议 | 班级科研数据集</p>
+    </div>
+
+    
+    <div class="grid-2col">
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1rem;">📝 数据采集终端</h2>
+            <form id="dataForm">
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>📚 班级</label>
+                        <input type="text" id="className" placeholder="例：六年级三班" aria-label="班级" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🆔 学号</label>
+                        <input type="text" id="studentId" placeholder="例：2024001" aria-label="学号" required>
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>💧 空气湿度 (%)</label>
+                        <input type="number" id="humidity" step="1" min="0" max="100" placeholder="30~80" required>
+                    </div>
+                    <div class="form-group">
+                        <label>☀️ 光照强度 (Lux)</label>
+                        <input type="number" id="light" step="100" min="0" max="100000" placeholder="500~8000" required>
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>🌡️ 温度 (℃)</label>
+                        <input type="number" id="temperature" step="0.5" min="-10" max="50" placeholder="18~28" required>
+                    </div>
+                    <div class="form-group">
+                        <label>💦 土壤湿度 (%)</label>
+                        <input type="number" id="soilMoisture" step="1" min="0" max="100" placeholder="40~70" required>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn">✨ 记录数据 & 自动发送至云端 ✨</button>
+            </form>
+            <div id="apiFeedback" role="status" aria-live="polite"></div>
+        </div>
+
+        
+        <div class="card sunflower-panel">
+            <h2>🌱 实时向日葵健康诊断</h2>
+            <div class="sunflower-art" id="sunflowerEmoji">🌱</div>
+            <div class="status-text" id="growthStatusText">等待第一次数据录入……</div>
+            <div class="water-metrics">
+                <div class="metric-badge">💧 今日建议浇水次数<br><span id="waterTimes" class="metric-value">--</span></div>
+                <div class="metric-badge">⏰ 下次浇水倒计时<br><span id="nextWaterHour" class="metric-value">--</span></div>
+                <div class="metric-badge">📈 健康指数<br><span id="healthScore" class="metric-value">--</span></div>
+            </div>
+            <div id="extraAlert" class="alert-note" style="display: none;"></div>
+            <div class="refresh-note">💡 根据土壤湿度+光照+温度+空气湿度动态评估</div>
+        </div>
+    </div>
+
+    
+    <div class="stats-grid" id="statsSummary">
+        <div class="stat-card"><span>📊 总提交记录</span><br><span id="totalCount" class="stat-number">0</span></div>
+        <div class="stat-card"><span>🌿 平均健康指数</span><br><span id="avgHealth" class="stat-number">0</span></div>
+        <div class="stat-card"><span>💧 平均建议浇水/日</span><br><span id="avgWater" class="stat-number">0</span></div>
+    </div>
+
+    <div class="chart-container">
+        <h3>📈 历史健康指数 & 土壤湿度趋势 (最近10条)</h3>
+        <canvas id="trendChart" width="400" height="200" style="max-height: 280px; width: 100%;"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>📋 班级科研数据全记录 (来自云端API + 本地提交融合)</h3>
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr><th>班级</th><th>学号</th><th>提交时间</th><th>空气湿度%</th><th>光照(Lux)</th><th>温度℃</th><th>土壤湿度%</th><th>健康分</th><th>浇水次数/日</th></tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="9">加载历史数据中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 0.8rem;">
+            <button id="refreshDataBtn" style="width: auto; padding: 0.4rem 1.2rem; background: #94b082;">🔄 刷新全部数据</button>
+        </div>
+    </div>
+    <footer>🌞 智能植物生长器 | 数据同步至科研API · 动态大屏助力农业STEAM教育</footer>
+</div>
+
+<script>
+    // ---------- 🌻 向日葵生长核心分析引擎 ----------
+    function analyzeSunflower(airHumidity, lightLux, temperature, soilMoisture) {
+        // 土壤评分 (最佳45-70)
+        let soilScore = 0;
+        if (soilMoisture >= 45 && soilMoisture <= 70) soilScore = 100;
+        else if (soilMoisture < 20) soilScore = 20;
+        else if (soilMoisture > 85) soilScore = 45;
+        else if (soilMoisture < 45) soilScore = 40 + (soilMoisture - 20) * 1.5;
+        else soilScore = 100 - (soilMoisture - 70) * 2.2;
+        soilScore = Math.min(100, Math.max(0, soilScore));
+        // 光照评分 理想2500~9000
+        let lightScore = 0;
+        if (lightLux >= 2500 && lightLux <= 9000) lightScore = 100;
+        else if (lightLux < 500) lightScore = 20;
+        else if (lightLux > 15000) lightScore = 55;
+        else if (lightLux < 2500) lightScore = 30 + (lightLux / 2500) * 70;
+        else lightScore = 100 - ((lightLux - 9000) / 6000) * 50;
+        lightScore = Math.min(100, Math.max(0, lightScore));
+        // 空气湿度评分 最佳45~75
+        let airScore = 0;
+        if (airHumidity >= 45 && airHumidity <= 75) airScore = 100;
+        else if (airHumidity < 30) airScore = 25;
+        else if (airHumidity > 85) airScore = 50;
+        else if (airHumidity < 45) airScore = 35 + (airHumidity - 30) * 3;
+        else airScore = 100 - (airHumidity - 75) * 2;
+        airScore = Math.min(100, Math.max(0, airScore));
+        // 温度评分 最佳18~30
+        let tempScore = 0;
+        if (temperature >= 18 && temperature <= 30) tempScore = 100;
+        else if (temperature < 5) tempScore = 10;
+        else if (temperature > 38) tempScore = 20;
+        else if (temperature < 18) tempScore = 30 + (temperature - 5) * 5;
+        else tempScore = 100 - (temperature - 30) * 3;
+        tempScore = Math.min(100, Math.max(0, tempScore));
+        let health = Math.round(soilScore * 0.4 + lightScore * 0.3 + airScore * 0.15 + tempScore * 0.15);
+        
+        let stage = "", emoji = "";
+        if (health >= 85) { stage = "🌼 盛开 · 璀璨向日葵"; emoji = "🌻✨"; }
+        else if (health >= 65) { stage = "🌻 茁壮成长 · 花苞绽放"; emoji = "🌻🌿"; }
+        else if (health >= 40) { stage = "🌱 勉强维持 · 需要关注环境"; emoji = "🌱😟"; }
+        else { stage = "🍂 萎靡不振 · 立即改善环境"; emoji = "🥀⚠️"; }
+        
+        // 浇水逻辑
+        let waterTimesPerDay = 0, nextWaterHours = 0;
+        if (soilMoisture <= 25) { waterTimesPerDay = 3; nextWaterHours = 2; }
+        else if (soilMoisture <= 40) { waterTimesPerDay = 2; nextWaterHours = 5; }
+        else if (soilMoisture <= 55) { waterTimesPerDay = 1; nextWaterHours = 10; }
+        else if (soilMoisture <= 70) { waterTimesPerDay = 1; nextWaterHours = 14; }
+        else if (soilMoisture <= 85) { waterTimesPerDay = 0; nextWaterHours = 20; }
+        else { waterTimesPerDay = 0; nextWaterHours = 28; }
+        if (temperature > 30 && soilMoisture < 55 && waterTimesPerDay < 2) { waterTimesPerDay += 1; nextWaterHours = Math.max(3, nextWaterHours - 2); }
+        if (airHumidity < 35 && soilMoisture < 60 && waterTimesPerDay <= 2) { waterTimesPerDay = Math.min(3, waterTimesPerDay + 1); nextWaterHours = Math.max(2, nextWaterHours - 1); }
+        waterTimesPerDay = Math.min(3, Math.max(0, waterTimesPerDay));
+        nextWaterHours = Math.min(30, Math.max(1, nextWaterHours));
+        
+        return { growthStage: stage, emoji, healthScore: health, waterTimesPerDay, nextWaterHours };
+    }
+    
+    // 更新右侧UI
+    function updateSunflowerUI(data) {
+        const { airHumidity, light, temperature, soilMoisture } = data;
+        const analysis = analyzeSunflower(airHumidity, light, temperature, soilMoisture);
+        document.getElementById('sunflowerEmoji').innerHTML = analysis.emoji;
+        document.getElementById('growthStatusText').innerHTML = `${analysis.growthStage}  |  健康分: ${analysis.healthScore}`;
+        document.getElementById('waterTimes').innerText = analysis.waterTimesPerDay;
+        document.getElementById('nextWaterHour').innerText = analysis.nextWaterHours + " 小时后";
+        document.getElementById('healthScore').innerText = analysis.healthScore;
+        let alertMsg = "";
+        if (soilMoisture < 25) alertMsg += "⚠️ 土壤严重缺水！立即补水。 ";
+        else if (soilMoisture > 85) alertMsg += "💧 土壤过湿，注意通风排水。 ";
+        if (temperature > 34) alertMsg += "🔥 高温预警，适当遮阳。 ";
+        else if (temperature < 8) alertMsg += "❄️ 低温，注意保暖。 ";
+        if (light < 800) alertMsg += "🌑 光照不足，移至明亮处。 ";
+        else if (light > 12000) alertMsg += "☀️ 光照过强，可能会晒伤。 ";
+        const alertDiv = document.getElementById('extraAlert');
+        if (alertMsg) { alertDiv.style.display = "block"; alertDiv.innerHTML = "🌿 养护提示: " + alertMsg; } 
+        else { alertDiv.style.display = "none"; }
+        return analysis;
+    }
+    
+    // 发送至API (POST)
+    async function postToAPI(payload) {
+        try {
+            const response = await fetch("https://qf.kjxs.site/api/KfkNTfsbROM", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (response.ok) return { success: true, data: await response.json().catch(()=>({})) };
+            else return { success: false, error: `HTTP ${response.status}` };
+        } catch(e) { return { success: false, error: e.message }; }
+    }
+    
+    // 获取所有提交历史 (GET /all 端点)
+    async function fetchAllSubmissions() {
+        try {
+            const response = await fetch("https://qf.kjxs.site/api/KfkNTfsbROM/all");
+            if (!response.ok) throw new Error("无法获取全部记录");
+            const data = await response.json();
+            // 返回结构可能是数组或者包含submissions字段？文档显示full list返回完整数组? 根据API note: 返回完整列表。实际测试为数组。
+            if (Array.isArray(data)) return data;
+            else if (data.submissions && Array.isArray(data.submissions)) return data.submissions;
+            else return [];
+        } catch(err) {
+            console.warn("获取历史数据失败", err);
+            return [];
+        }
+    }
+    
+    // 全局存储当前展示的所有记录 (融合本地提交+远端)
+    let allRecords = [];
+    let trendChart = null;
+    
+    // 渲染表格 & 统计 & 图表
+    function renderDashboard() {
+        if (!allRecords.length) {
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">暂无数据，请添加第一条记录或刷新云端数据</td></tr>';
+            document.getElementById('totalCount').innerText = '0';
+            document.getElementById('avgHealth').innerText = '-';
+            document.getElementById('avgWater').innerText = '-';
+            if(trendChart) { trendChart.data.datasets[0].data = []; trendChart.update(); }
+            return;
+        }
+        // 按时间倒序展示
+        const sorted = [...allRecords].sort((a,b)=> new Date(b.submitted_at) - new Date(a.submitted_at));
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        for(let rec of sorted) {
+            const row = tbody.insertRow();
+            const subTime = rec.submitted_at ? new Date(rec.submitted_at).toLocaleString() : "未知";
+            row.insertCell(0).innerText = rec.class_name || rec.className || '—';
+            row.insertCell(1).innerText = rec.student_number || rec.studentId || '—';
+            row.insertCell(2).innerText = subTime;
+            const env = rec.environment || {};
+            row.insertCell(3).innerText = env.air_humidity ?? rec.airHumidity ?? '—';
+            row.insertCell(4).innerText = env.light_lux ?? rec.lightIntensity ?? '—';
+            row.insertCell(5).innerText = env.temperature_celsius ?? rec.temperature ?? '—';
+            row.insertCell(6).innerText = env.soil_moisture_percent ?? rec.soilMoisture ?? '—';
+            const analysis = rec.sunflower_analysis || {};
+            row.insertCell(7).innerText = analysis.health_score ?? '—';
+            row.insertCell(8).innerText = analysis.suggested_water_times_per_day ?? '—';
+        }
+        // 统计指标
+        const total = allRecords.length;
+        const avgHealthRaw = allRecords.reduce((sum, r) => sum + (r.sunflower_analysis?.health_score || 0), 0) / total;
+        const avgWaterRaw = allRecords.reduce((sum, r) => sum + (r.sunflower_analysis?.suggested_water_times_per_day || 0), 0) / total;
+        document.getElementById('totalCount').innerText = total;
+        document.getElementById('avgHealth').innerText = avgHealthRaw.toFixed(1);
+        document.getElementById('avgWater').innerText = avgWaterRaw.toFixed(1);
+        
+        // 准备图表数据 (最近10条按时间升序)
+        const chartRecords = [...allRecords].sort((a,b)=> new Date(a.submitted_at) - new Date(b.submitted_at)).slice(-10);
+        const labels = chartRecords.map((_,idx)=> `#${idx+1}`);
+        const healthData = chartRecords.map(r => r.sunflower_analysis?.health_score || 0);
+        const soilData = chartRecords.map(r => r.environment?.soil_moisture_percent ?? r.soilMoisture ?? 0);
+        if(trendChart) {
+            trendChart.data.labels = labels;
+            trendChart.data.datasets[0].data = healthData;
+            trendChart.data.datasets[1].data = soilData;
+            trendChart.update();
+        } else {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: [
+                    { label: '健康指数 (0-100)', data: healthData, borderColor: '#f5a623', backgroundColor: '#f5a62320', tension: 0.2, fill: true },
+                    { label: '土壤湿度 (%)', data: soilData, borderColor: '#4c9f70', backgroundColor: '#4c9f7020', tension: 0.2, fill: true }
+                ]},
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+    }
+    
+    // 加载云端全部记录并合并已有的本地记录？为了避免重复，按提交时间+学生+班级做去重，简单根据 submitted_at 字符串去重（保留最新）
+    async function loadRemoteDataAndMerge(localNewRecord = null) {
+        const remoteList = await fetchAllSubmissions();
+        let merged = [...remoteList];
+        // 如果有本地刚提交的记录尚未包含在remote中（因为API可能延迟），我们合并进去并去重（依据submitted_at + 部分字段）
+        if (localNewRecord) {
+            merged.push(localNewRecord);
+        }
+        // 简单去重：使用 submitted_at + class_name + student_number 作为key，保留较新？但API数据可靠，合并时避免重复
+        const uniqueMap = new Map();
+        for(let rec of merged) {
+            const key = `${rec.submitted_at || rec.timestamp}_${rec.class_name || rec.className}_${rec.student_number || rec.studentId}`;
+            if(!uniqueMap.has(key)) uniqueMap.set(key, rec);
+        }
+        allRecords = Array.from(uniqueMap.values());
+        renderDashboard();
+    }
+    
+    // 提交表单逻辑
+    async function onSubmit(event) {
+        event.preventDefault();
+        const className = document.getElementById('className').value.trim();
+        const studentId = document.getElementById('studentId').value.trim();
+        let humidity = parseFloat(document.getElementById('humidity').value);
+        let light = parseFloat(document.getElementById('light').value);
+        let temperature = parseFloat(document.getElementById('temperature').value);
+        let soilMoisture = parseFloat(document.getElementById('soilMoisture').value);
+        if (!className || !studentId) { alert("请填写班级和学号"); return; }
+        if (isNaN(humidity) || isNaN(light) || isNaN(temperature) || isNaN(soilMoisture)) { alert("请完整填写环境数据"); return; }
+        humidity = Math.min(100, Math.max(0, humidity));
+        light = Math.min(100000, Math.max(0, light));
+        temperature = Math.min(50, Math.max(-10, temperature));
+        soilMoisture = Math.min(100, Math.max(0, soilMoisture));
+        
+        // 实时分析
+        const analysis = updateSunflowerUI({ airHumidity: humidity, light: light, temperature: temperature, soilMoisture: soilMoisture });
+        
+        const nowISO = new Date().toISOString().slice(0,19).replace('T',' ');
+        const payload = {
+            class_name: className,
+            student_number: studentId,
+            environment: { air_humidity: humidity, light_lux: light, temperature_celsius: temperature, soil_moisture_percent: soilMoisture },
+            sunflower_analysis: {
+                health_score: analysis.healthScore,
+                suggested_water_times_per_day: analysis.waterTimesPerDay,
+                next_water_hours: analysis.nextWaterHours,
+                growth_stage_text: analysis.growthStage
+            },
+            submitted_at: nowISO
+        };
+        
+        const feedbackDiv = document.getElementById('apiFeedback');
+        feedbackDiv.className = "is-busy"; feedbackDiv.innerHTML = "⏳ 正在向云端科研平台提交数据...";
+        const result = await postToAPI(payload);
+        if (result.success) {
+            feedbackDiv.className = "is-ok"; feedbackDiv.innerHTML = "✅ 数据已成功发送至智能植物生长器数据库！大屏同步更新 ✅";
+            // 本地合并新记录
+            const localRecord = { ...payload, submitted_at: nowISO, className: className, studentId: studentId };
+            await loadRemoteDataAndMerge(localRecord);
+        } else {
+            feedbackDiv.className = "is-err"; feedbackDiv.innerHTML = `⚠️ 发送失败: ${result.error}，但本地向日葵状态已更新。可稍后刷新重试。`;
+            // 即使API失败，也将本次记录暂存于前端大屏展示，让学生看到分析成果
+            const fallbackRecord = { ...payload, submitted_at: nowISO };
+            allRecords.unshift(fallbackRecord);
+            renderDashboard();
+        }
+        // 清空部分提醒稍后恢复
+        setTimeout(() => { if(feedbackDiv.innerHTML.includes("成功")) setTimeout(()=>{ feedbackDiv.innerHTML=""; feedbackDiv.className=""; }, 6000); }, 2500);
+    }
+    
+    // 手动刷新按钮
+    async function manualRefresh() {
+        const feedbackDiv = document.getElementById('apiFeedback');
+        feedbackDiv.className = "is-busy"; feedbackDiv.innerHTML = "🔄 正在从云端拉取最新数据...";
+        await loadRemoteDataAndMerge();
+        feedbackDiv.className = "is-ok"; feedbackDiv.innerHTML = "✅ 数据已刷新，共 "+allRecords.length+" 条记录";
+        setTimeout(()=>{ if(feedbackDiv.innerHTML.includes("刷新")) feedbackDiv.innerHTML=""; }, 2500);
+    }
+    
+    // 初始化: 加载远程数据并显示默认向日葵示例
+    window.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('dataForm').addEventListener('submit', onSubmit);
+        document.getElementById('refreshDataBtn').addEventListener('click', manualRefresh);
+        // 默认展示一组演示数据表单(引导)，但不覆盖提交，先展示健康向日葵模拟
+        const demoData = { airHumidity: 62, light: 5200, temperature: 24, soilMoisture: 58 };
+        updateSunflowerUI(demoData);
+        // 填入demo值便于新用户体验
+        if(!document.getElementById('humidity').value) document.getElementById('humidity').value = 62;
+        if(!document.getElementById('light').value) document.getElementById('light').value = 5200;
+        if(!document.getElementById('temperature').value) document.getElementById('temperature').value = 24;
+        if(!document.getElementById('soilMoisture').value) document.getElementById('soilMoisture').value = 58;
+        await loadRemoteDataAndMerge();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":13,"key":"case-13","title":"正方形拼接周长探索工具","category":"exploration","description":"拼摆与周长实验册：围绕正方形数、重合边、周长开展交互学习，在数据大屏中回看记录。","headline":"拼摆与周长实验册","view":"scatter","fields":[{"key":"squareCount","label":"正方形数"},{"key":"overlapEdges","label":"重合边"},{"key":"perimeter","label":"周长"},{"key":"grid","label":"拼摆结构"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开工具"}],"tasks":{"records":"SOGJjLESjHP"},"mapping":{},"accent":"#327a72","capture":true,"lesson":"打开工具"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正方形拼接周长探索工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            /* 新增左右布局 */
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+        h1 {
+            width: 100%;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        /* 左侧侧边栏 */
+        .left-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+        }
+        /* 右侧主内容区 */
+        .main-content {
+            flex: 1;
+            min-width: 700px;
+        }
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #34495e;
+            margin: 0;
+        }
+        .topic-select {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .topic-btn {
+            padding: 10px 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-align: left;
+        }
+        .topic-btn.active, .topic-btn:hover {
+            background: #2980b9;
+        }
+        .params {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+            margin-bottom: 15px;
+        }
+        .param-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .param-item input {
+            width: 120px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #27ae60;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d35400;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .canvas-area {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+        #grid-container {
+            position: relative;
+        }
+        #grid {
+            background: white;
+            border: 2px solid #ddd;
+            display: grid;
+            grid-template-columns: repeat(20, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 1px;
+            background: #eee;
+        }
+        .grid-cell {
+            width: 40px;
+            height: 40px;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .grid-cell.filled {
+            background: #3498db;
+            /* 小正方形自带1px边框 */
+            border: 1px solid #1a5276;
+        }
+        /* 重合边高亮样式 默认隐藏 */
+        .show-overlap .grid-cell.filled.edge-right::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: #c0392b;
+            z-index: 2;
+        }
+        .show-overlap .grid-cell.filled.edge-bottom::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #c0392b;
+            z-index: 2;
+        }
+        .info-panel {
+            flex: 1;
+            min-width: 280px;
+        }
+        .info-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .info-label {
+            font-weight: bold;
+            color: #34495e;
+            margin-right: 10px;
+        }
+        .overlap-info, .edge-legend {
+            display: none;
+        }
+        .show-overlap .overlap-info, .show-overlap .edge-legend {
+            display: block;
+        }
+        .relation-tip {
+            color: #e67e22;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .edge-legend {
+            margin-top: 10px;
+            align-items: center;
+            gap: 10px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            background: #c0392b;
+            display: inline-block;
+        }
+        /* 方案表格样式 */
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+        .plan-table th, .plan-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .plan-table th {
+            background: #3498db;
+            color: white;
+        }
+        .plan-input {
+            width: 70px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-align: center;
+        }
+        .unit-text {
+            margin-left: 3px;
+            color: #666;
+            font-size: 14px;
+        }
+        .conclusion-area {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        /* 缩略图样式 修复间隙不均匀问题 */
+        .mini-grid {
+            display: inline-grid;
+            gap: 0;
+            background: #eee;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .mini-grid:hover {
+            transform: scale(1.2);
+        }
+        .mini-cell {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 0.5px solid #eee;
+        }
+        .mini-cell.filled {
+            background: #3498db;
+            border: 0.5px solid #1a5276;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .tip-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        /* 响应式适配 */
+        @media (max-width: 1100px) {
+            .left-sidebar {
+                width: 100%;
+            }
+            .main-content {
+                min-width: 100%;
+            }
+            .topic-select {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .params {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>正方形拼接周长探索工具</h1>
+
+        
+        <aside class="left-sidebar">
+            
+            <div class="section">
+                <div class="section-title">选择题目</div>
+                <div class="topic-select">
+                    <button class="topic-btn active" data-topic="0">16张正方形拼图形</button>
+                    <button class="topic-btn" data-topic="1">6个正方形拼长方形</button>
+                    <button class="topic-btn" data-topic="2">18幅绘画园地</button>
+                    <button class="topic-btn" data-topic="3">36张正方形拓展题</button>
+                    <button class="topic-btn" data-topic="4">自定义场景</button>
+                    <button class="btn btn-warning" id="toggle-overlap">显示/隐藏重合边提示</button>
+                </div>
+                <div id="topic-desc" class="info-item">
+                    用16张边长是1分米的正方形纸拼长方形或正方形，怎样拼才能使拼成的图形周长最短？
+                </div>
+            </div>
+
+            
+            <div class="section">
+                <div class="section-title">参数设置</div>
+                <div class="params">
+                    <div class="param-item">
+                        <label>小正方形数量：</label>
+                        <input type="number" id="square-count" min="1" value="16">
+                    </div>
+                    <div class="param-item">
+                        <label>小正方形边长：</label>
+                        <input type="number" id="square-length" min="0.1" step="0.1" value="1">
+                    </div>
+                    <div class="param-item">
+                        <label>单位：</label>
+                        <input type="text" id="unit" value="分米">
+                    </div>
+                    <button class="btn btn-primary" id="apply-param">应用参数</button>
+                    <button class="btn btn-danger" id="clear">清空画布</button>
+                </div>
+            </div>
+        </aside>
+
+        
+        <main class="main-content">
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">拼接操作区</div>
+                    <button class="btn btn-primary" id="add-plan">记录当前摆法</button>
+                </div>
+                <div class="edge-legend">
+                    <span class="legend-color"></span>
+                    <span>深红色线段为两个正方形重合的「藏起来的边」，数量越多周长越短</span>
+                </div>
+                <div class="canvas-area" style="margin-top: 15px;">
+                    <div id="grid-container">
+                        <div id="grid"></div>
+                    </div>
+                    <div class="info-panel">
+                        <div class="info-item">
+                            <span class="info-label">已放置正方形数量：</span>
+                            <span id="placed-count">0</span> / <span id="total-count">16</span>
+                        </div>
+                        <div class="info-item overlap-info">
+                            <span class="info-label">当前重合（藏起）的边总数：</span>
+                            <span id="overlap-edge-count" style="color: #c0392b; font-weight: bold;">0</span> 条
+                            <div class="relation-tip" id="relation-tip"></div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">当前图形是否为长方形/正方形：</span>
+                            <span id="is-rect" style="color: #e74c3c;">否</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="section">
+                <div class="section-title">方案记录表</div>
+                <div class="tip-text">💡 点击摆法示意图可将该方案还原到画布上重新编辑</div>
+                <table class="plan-table" id="plan-table">
+                    <thead>
+                        <tr>
+                            <th>方案序号</th>
+                            <th>摆法示意图</th>
+                            <th>长</th>
+                            <th>宽</th>
+                            <th>周长</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plan-body">
+                    </tbody>
+                </table>
+
+                <div class="conclusion-area">
+                    <label class="info-label">我的结论：</label>
+                    <span>我发现，方案</span>
+                    <input type="number" id="conclusion-plan" class="plan-input" style="width: 50px; margin: 0 5px;" min="1">
+                    <span>的周长最短</span>
+                    <button class="btn btn-primary" style="margin-left: 20px;" id="check-conclusion">验证结论</button>
+                    <div id="conclusion-feedback" class="feedback" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 题目配置
+        const topics = [
+            {
+                count: 16,
+                length: 1,
+                unit: '分米',
+                desc: '用16张边长是1分米的正方形纸拼长方形或正方形，怎样拼才能使拼成的图形周长最短？',
+                answerShape: '正方形',
+                answerPerimeter: 16
+            },
+            {
+                count: 6,
+                length: 2,
+                unit: '厘米',
+                desc: '用6个边长2厘米的小正方形拼成一个新长方形，怎样拼长方形的周长最小？如果要拼成一个正方形，至少再添上几个小正方形？',
+                answerShape: '长方形',
+                answerPerimeter: 20
+            },
+            {
+                count: 18,
+                length: 2,
+                unit: '分米',
+                desc: '把18幅绘画作品贴在一起，做一个长方形"绘画园地"，每幅作品是边长2分米的正方形，怎样设计才能使贴的花边最少？',
+                answerShape: '长方形',
+                answerPerimeter: 36
+            },
+            {
+                count: 36,
+                length: 1,
+                unit: '分米',
+                desc: '用36张边长是1分米的正方形纸拼长方形或正方形，怎样拼才能使拼成的图形周长最短？',
+                answerShape: '正方形',
+                answerPerimeter: 24
+            },
+            {
+                count: 10,
+                length: 1,
+                unit: '分米',
+                desc: '自定义拼接场景，自由设置参数探索规律',
+                answerShape: '',
+                answerPerimeter: null
+            }
+        ];
+
+        let currentTopic = 0;
+        let grid = [];
+        let gridRows = 10;
+        let gridCols = 20;
+        let cellSize = 40;
+        let showOverlap = false;
+        let planIndex = 1; // 当前方案序号
+
+        // 刷新所有方案序号 修复删除后序号错误问题
+        function updatePlanIndexes() {
+            const rows = document.querySelectorAll('#plan-body tr');
+            rows.forEach((row, idx) => {
+                row.cells[0].textContent = idx + 1;
+            });
+            planIndex = rows.length + 1;
+            // 同步更新结论输入框的最大值
+            document.getElementById('conclusion-plan').max = rows.length;
+        }
+
+        // 切换重合边显示
+        function toggleOverlap() {
+            showOverlap = !showOverlap;
+            if (showOverlap) {
+                document.body.classList.add('show-overlap');
+            } else {
+                document.body.classList.remove('show-overlap');
+            }
+        }
+
+        // 初始化网格
+        function initGrid() {
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+            grid = Array(gridRows).fill().map(() => Array(gridCols).fill(false));
+            
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', toggleCell);
+                    gridEl.appendChild(cell);
+                }
+            }
+            updateInfo();
+        }
+
+        // 切换单元格状态
+        function toggleCell(e) {
+            const row = parseInt(e.target.dataset.row);
+            const col = parseInt(e.target.dataset.col);
+            const count = getPlacedCount();
+            const maxCount = parseInt(document.getElementById('square-count').value);
+
+            if (grid[row][col]) {
+                grid[row][col] = false;
+                e.target.classList.remove('filled');
+            } else {
+                if (count >= maxCount) {
+                    alert(`最多只能放置${maxCount}个正方形`);
+                    return;
+                }
+                grid[row][col] = true;
+                e.target.classList.add('filled');
+            }
+            updateOverlapEdges();
+            updateInfo();
+        }
+
+        // 还原摆法到画布
+        function restoreShape(shapeData) {
+            clearGrid();
+            const points = shapeData.split(';').map(p => p.split(',').map(Number));
+            points.forEach(([i,j]) => {
+                grid[i][j] = true;
+                const cell = document.querySelector(`.grid-cell[data-row="${i}"][data-col="${j}"]`);
+                cell.classList.add('filled');
+            });
+            updateOverlapEdges();
+            updateInfo();
+        }
+
+        // 更新重合边高亮
+        function updateOverlapEdges() {
+            document.querySelectorAll('.grid-cell').forEach(cell => {
+                cell.classList.remove('edge-right', 'edge-bottom');
+            });
+
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    if (grid[i][j]) {
+                        // 右边是否有相邻正方形
+                        if (j < gridCols -1 && grid[i][j+1]) {
+                            const cell = document.querySelector(`.grid-cell[data-row="${i}"][data-col="${j}"]`);
+                            cell.classList.add('edge-right');
+                        }
+                        // 下边是否有相邻正方形
+                        if (i < gridRows -1 && grid[i+1][j]) {
+                            const cell = document.querySelector(`.grid-cell[data-row="${i}"][data-col="${j}"]`);
+                            cell.classList.add('edge-bottom');
+                        }
+                    }
+                }
+            }
+        }
+
+        // 生成摆法缩略图
+        function generateMiniGrid(filledPoints) {
+            const filled = filledPoints.map(p => p.split(',').map(Number));
+            const minRow = Math.min(...filled.map(p => p[0]));
+            const maxRow = Math.max(...filled.map(p => p[0]));
+            const minCol = Math.min(...filled.map(p => p[1]));
+            const maxCol = Math.max(...filled.map(p => p[1]));
+            const height = maxRow - minRow + 1;
+            const width = maxCol - minCol + 1;
+
+            const miniGrid = document.createElement('div');
+            miniGrid.className = 'mini-grid';
+            miniGrid.style.gridTemplateColumns = `repeat(${width}, 12px)`;
+            miniGrid.style.gridTemplateRows = `repeat(${height}, 12px)`;
+
+            for (let i = minRow; i <= maxRow; i++) {
+                for (let j = minCol; j <= maxCol; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'mini-cell';
+                    if (filled.some(p => p[0] === i && p[1] === j)) cell.classList.add('filled');
+                    miniGrid.appendChild(cell);
+                }
+            }
+            return miniGrid;
+        }
+
+        // 计算重合边总数
+        function getOverlapEdgeCount() {
+            let count = 0;
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    if (grid[i][j]) {
+                        if (j < gridCols -1 && grid[i][j+1]) count++;
+                        if (i < gridRows -1 && grid[i+1][j]) count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        // 获取已放置数量
+        function getPlacedCount() {
+            return grid.flat().filter(v => v).length;
+        }
+
+        // 判断是否为长方形/正方形
+        function getRectInfo() {
+            const filled = [];
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    if (grid[i][j]) filled.push([i,j]);
+                }
+            }
+            if (filled.length === 0) return {isRect: false};
+
+            const minRow = Math.min(...filled.map(p => p[0]));
+            const maxRow = Math.max(...filled.map(p => p[0]));
+            const minCol = Math.min(...filled.map(p => p[1]));
+            const maxCol = Math.max(...filled.map(p => p[1]));
+
+            const height = maxRow - minRow + 1;
+            const width = maxCol - minCol + 1;
+            const expectedCount = height * width;
+
+            return {isRect: expectedCount === filled.length};
+        }
+
+        // 更新信息面板
+        window.captureLesson=()=>({squareCount:getPlacedCount(),overlapEdges:getOverlapEdgeCount(),perimeter:(4*getPlacedCount()-2*getOverlapEdgeCount())*Number(document.getElementById('square-length').value),grid});
+function updateInfo() {
+            const count = getPlacedCount();
+            const maxCount = parseInt(document.getElementById('square-count').value);
+            const unit = document.getElementById('unit').value;
+            const sideLength = parseFloat(document.getElementById('square-length').value);
+            const rectInfo = getRectInfo();
+            const overlapCount = getOverlapEdgeCount();
+
+            document.getElementById('placed-count').textContent = count;
+            document.getElementById('total-count').textContent = maxCount;
+            document.getElementById('overlap-edge-count').textContent = overlapCount;
+
+            // 关联提示
+            const reduceLength = overlapCount * 2 * sideLength;
+            document.getElementById('relation-tip').textContent = `→ 相比所有正方形单独摆放，总周长减少了 ${reduceLength} ${unit}`;
+
+            if (rectInfo.isRect) {
+                document.getElementById('is-rect').textContent = '是';
+                document.getElementById('is-rect').style.color = '#27ae60';
+            } else {
+                document.getElementById('is-rect').textContent = '否';
+                document.getElementById('is-rect').style.color = '#e74c3c';
+            }
+        }
+
+        // 新增方案
+        function addPlan() {
+            const placedCount = getPlacedCount();
+            const totalCount = parseInt(document.getElementById('square-count').value);
+            // 新增校验：必须拼完所有正方形
+            if (placedCount !== totalCount) {
+                alert(`请拼完所有${totalCount}个小正方形后再记录方案`);
+                return;
+            }
+            const rectInfo = getRectInfo();
+            if (!rectInfo.isRect) {
+                alert('当前图形不是规则的长方形/正方形，请调整后再记录');
+                return;
+            }
+            const unit = document.getElementById('unit').value;
+            const tbody = document.getElementById('plan-body');
+            const tr = document.createElement('tr');
+            
+            // 存储当前摆法的坐标数据
+            const filledPoints = [];
+            for (let i = 0; i < gridRows; i++) {
+                for (let j = 0; j < gridCols; j++) {
+                    if (grid[i][j]) filledPoints.push(`${i},${j}`);
+                }
+            }
+            const shapeData = filledPoints.join(';');
+            tr.dataset.shape = shapeData;
+
+            const miniGrid = generateMiniGrid(filledPoints);
+            // 点击缩略图还原摆法
+            miniGrid.addEventListener('click', () => restoreShape(shapeData));
+
+            tr.innerHTML = `
+                <td>${planIndex}</td>
+                <td class="mini-grid-cell"></td>
+                <td><input type="number" class="plan-input"> <span class="unit-text">${unit}</span></td>
+                <td><input type="number" class="plan-input"> <span class="unit-text">${unit}</span></td>
+                <td><input type="number" class="plan-input"> <span class="unit-text">${unit}</span></td>
+                <td><button class="btn btn-danger" onclick="this.parentElement.parentElement.remove();updatePlanIndexes();">删除</button></td>
+            `;
+            tr.querySelector('.mini-grid-cell').appendChild(miniGrid);
+            tbody.appendChild(tr);
+            planIndex++;
+            // 同步更新结论输入框最大值
+            document.getElementById('conclusion-plan').max = planIndex -1;
+            // 自动清空画布
+            clearGrid();
+            alert(`方案${planIndex-1}已记录，可继续拼接下一个摆法`);
+        }
+
+        // 更新所有方案的单位
+        function updatePlanUnit() {
+            const unit = document.getElementById('unit').value;
+            document.querySelectorAll('.unit-text').forEach(el => {
+                el.textContent = unit;
+            });
+        }
+
+        // 验证结论
+        function checkConclusion() {
+            const inputPlan = parseInt(document.getElementById('conclusion-plan').value);
+            const feedback = document.getElementById('conclusion-feedback');
+            const rows = document.querySelectorAll('#plan-body tr');
+            
+            if (isNaN(inputPlan) || inputPlan < 1 || inputPlan > rows.length) {
+                feedback.textContent = `请输入1到${rows.length}之间的有效方案序号`;
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            // 提取所有方案的周长
+            const perimeters = [];
+            rows.forEach(row => {
+                const p = parseFloat(row.cells[4].querySelector('input').value);
+                perimeters.push(isNaN(p) ? Infinity : p);
+            });
+
+            const minP = Math.min(...perimeters);
+            const minIndexes = perimeters.map((p, idx) => p === minP ? idx+1 : null).filter(v => v !== null);
+
+            if (minIndexes.includes(inputPlan)) {
+                feedback.textContent = '回答正确！你找到了周长最短的方案，很棒！';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = `回答错误，周长最短的是方案${minIndexes.join('、')}，再对比下各方案的周长数值哦`;
+                feedback.className = 'feedback wrong';
+            }
+        }
+
+        // 应用参数
+        function applyParams() {
+            updateInfo();
+            updatePlanUnit();
+            clearGrid();
+        }
+
+        // 清空画布
+        function clearGrid() {
+            grid.forEach(row => row.fill(false));
+            document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('filled', 'edge-right', 'edge-bottom'));
+            updateInfo();
+        }
+
+        // 切换题目
+        function switchTopic(topicId) {
+            currentTopic = topicId;
+            const topic = topics[topicId];
+            document.getElementById('square-count').value = topic.count;
+            document.getElementById('square-length').value = topic.length;
+            document.getElementById('unit').value = topic.unit;
+            document.getElementById('topic-desc').textContent = topic.desc;
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.topic-btn[data-topic="${topicId}"]`).classList.add('active');
+            
+            // 切换题目清空方案表和结论
+            document.getElementById('plan-body').innerHTML = '';
+            document.getElementById('conclusion-plan').value = '';
+            document.getElementById('conclusion-feedback').style.display = 'none';
+            planIndex = 1;
+            document.getElementById('conclusion-plan').max = 0;
+            updatePlanUnit();
+            applyParams();
+        }
+
+        // 限制结论输入框只能输入正整数
+        document.getElementById('conclusion-plan').addEventListener('input', function(e) {
+            let val = parseInt(e.target.value);
+            if (isNaN(val) || val < 1) {
+                e.target.value = '';
+            }
+            const max = parseInt(e.target.max);
+            if (val > max) e.target.value = max;
+        });
+
+        // 事件绑定
+        document.getElementById('apply-param').addEventListener('click', applyParams);
+        document.getElementById('clear').addEventListener('click', clearGrid);
+        document.getElementById('toggle-overlap').addEventListener('click', toggleOverlap);
+        document.getElementById('add-plan').addEventListener('click', addPlan);
+        document.getElementById('check-conclusion').addEventListener('click', checkConclusion);
+        document.querySelectorAll('.topic-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTopic(parseInt(btn.dataset.topic)));
+        });
+
+        // 初始化
+        initGrid();
+    </script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

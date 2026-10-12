@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":49,"key":"case-49","title":"六下单词默写大赛","category":"practice","description":"单词默写档案：围绕单元、得分、正确率开展交互学习，在数据大屏中回看记录。","headline":"单词默写档案","view":"diagnostic","fields":[{"key":"unit","label":"单元"},{"key":"score","label":"得分"},{"key":"accuracy","label":"正确率"},{"key":"wrongWords","label":"易错词"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"ekqS83aaEAV"},"mapping":{"7diw8q09wh":"ekqS83aaEAV"},"accent":"#4468ab","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>单词默写大赛 · 六年级下册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', 'Comic Neue', 'Microsoft YaHei', cursive, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #b3e5fc 0%, #ffe0b5 50%, #f8bbd0 100%);
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 透明气泡背景 */
+        .bubble {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            z-index: 0;
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+        }
+        .b1 { width: 180px; height: 180px; top: 5%; left: 2%; background: #ffccbc; opacity: 0.5; }
+        .b2 { width: 250px; height: 250px; bottom: 5%; right: 3%; background: #c8e6ff; opacity: 0.5; }
+        .b3 { width: 150px; height: 150px; top: 30%; right: 10%; background: #fff9c4; opacity: 0.6; }
+        .b4 { width: 200px; height: 200px; bottom: 20%; left: 5%; background: #e1bee7; opacity: 0.4; }
+
+        /* 主容器 - 透明玻璃效果 */
+        .glass-panel {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 30px -5px rgba(0, 150, 200, 0.3), inset 0 0 20px rgba(255,255,255,0.5);
+            padding: 30px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* 开始面板 */
+        .start-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 35px 30px;
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 15px 0 #ffb6c1, 0 15px 30px #b0e0e6;
+            text-align: center;
+        }
+        .start-panel h2 {
+            font-size: 2.8rem;
+            color: #6a4c9c;
+            text-shadow: 3px 3px 0 #ffdab9;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        .input-group label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #5e3a7a;
+            text-align: left;
+        }
+        .input-group input, .input-group select {
+            font-size: 1.4rem;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 3px solid white;
+            background: rgba(255, 255, 255, 0.8);
+            outline: none;
+            box-shadow: inset 0 4px 6px #d4a5c0;
+        }
+        .btn-start {
+            background: #ffb7c5;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 60px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4a2e5a;
+            box-shadow: 0 8px 0 #e68a9e, 0 8px 20px #ffc0cb;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: 0.07s;
+            display: inline-block;
+        }
+        .btn-start:active { transform: translateY(6px); box-shadow: 0 2px 0 #d97788; }
+
+        /* 默写主界面 (初始隐藏) */
+        .game-main {
+            display: none;
+        }
+
+        /* 顶部栏 */
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 60px;
+            padding: 15px 25px;
+            border: 2px solid white;
+        }
+        .unit-badge {
+            background: #ffefb0;
+            border-radius: 40px;
+            padding: 8px 25px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #4f3b6b;
+            box-shadow: 0 5px 0 #f7c55e;
+        }
+        .timer-box {
+            background: #c1e5ff;
+            border-radius: 40px;
+            padding: 8px 25px;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #28597a;
+            box-shadow: 0 5px 0 #8fc5f0;
+        }
+        .progress-box {
+            background: #d3ffc9;
+            border-radius: 40px;
+            padding: 8px 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d6e46;
+            box-shadow: 0 5px 0 #a0d88c;
+        }
+
+        /* 单词卡片网格 */
+        .words-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        /* 单词卡片 - 透明气泡风 */
+        .word-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 35px;
+            padding: 25px 18px;
+            box-shadow: 0 12px 0 #f5a9b8, 0 15px 25px rgba(255, 200, 220, 0.5);
+            border: 3px solid white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .word-card.correct {
+            background: rgba(200, 255, 200, 0.6);
+            box-shadow: 0 8px 0 #9fd99f;
+        }
+        .chinese {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #572e7a;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 #ffe0f0;
+        }
+        .hint {
+            font-size: 1.5rem;
+            color: #3e4a7a;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 18px;
+            border-radius: 40px;
+            margin: 10px 0;
+            border: 2px dashed white;
+        }
+        .input-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .word-input {
+            width: 90%;
+            padding: 12px 18px;
+            font-size: 1.4rem;
+            border-radius: 40px;
+            border: 3px solid white;
+            background: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            outline: none;
+            box-shadow: inset 0 3px 8px #c3a5d0;
+        }
+        .word-input:disabled {
+            background: #e0ffe0;
+            color: #2c6b2c;
+            border-color: #9fd99f;
+        }
+        .check-btn {
+            background: #ffd966;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4a3b1a;
+            box-shadow: 0 4px 0 #e6b857;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: 0.05s;
+        }
+        .check-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #e6b857; }
+        .check-btn:disabled {
+            background: #cccccc;
+            box-shadow: 0 4px 0 #aaaaaa;
+            cursor: not-allowed;
+        }
+
+        /* 底部按钮组 */
+        .footer-btns {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #ffb7b7;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #412d4d;
+            box-shadow: 0 8px 0 #e68f8f, 0 8px 20px #fbb6c6;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: 0.07s;
+        }
+        .btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #d47777; }
+        .btn.submit-btn { background: #a7e0b5; box-shadow: 0 8px 0 #79b389; }
+        .btn.reset-btn { background: #b7d5ff; box-shadow: 0 8px 0 #7fa3d0; }
+
+        /* 消息提示 */
+        .toast-message {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            padding: 15px 35px;
+            border-radius: 60px;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #572e7a;
+            box-shadow: 0 10px 0 #ff9eb5, 0 10px 30px #ffc0d0;
+            border: 3px solid white;
+            z-index: 200;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn {
+            from { top: -50px; opacity: 0; }
+            to { top: 30px; opacity: 1; }
+        }
+
+        /* ========== 响应式设计增强 ========== */
+
+        /* 中等屏幕（平板）: 768px - 1024px */
+        @media (min-width: 700px) and (max-width: 1000px) {
+            .words-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .start-panel h2 {
+                font-size: 2.4rem;
+            }
+            .input-group label {
+                font-size: 1.3rem;
+            }
+            .input-group input, .input-group select {
+                font-size: 1.2rem;
+                padding: 10px 16px;
+            }
+            .btn-start {
+                font-size: 1.8rem;
+                padding: 14px 35px;
+            }
+            .game-header {
+                padding: 12px 20px;
+            }
+            .unit-badge, .timer-box, .progress-box {
+                font-size: 1.4rem;
+                padding: 6px 18px;
+            }
+            .chinese {
+                font-size: 2rem;
+            }
+            .hint {
+                font-size: 1.3rem;
+            }
+            .word-input {
+                font-size: 1.2rem;
+                padding: 10px 15px;
+            }
+            .check-btn {
+                font-size: 1rem;
+                padding: 6px 18px;
+            }
+            .btn {
+                font-size: 1.5rem;
+                padding: 12px 30px;
+            }
+        }
+
+        /* 手机屏幕: 最大宽度 700px (原媒体查询优化) */
+        @media (max-width: 700px) {
+            .words-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .start-panel h2 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            .input-group {
+                gap: 15px;
+            }
+            .input-group label {
+                font-size: 1.2rem;
+            }
+            .input-group input, .input-group select {
+                font-size: 1.1rem;
+                padding: 10px 15px;
+            }
+            .btn-start {
+                font-size: 1.6rem;
+                padding: 12px 30px;
+            }
+            .game-header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px 15px;
+            }
+            .unit-badge, .timer-box, .progress-box {
+                width: 100%;
+                text-align: center;
+                font-size: 1.3rem;
+                padding: 8px 12px;
+            }
+            .chinese {
+                font-size: 1.8rem;
+            }
+            .hint {
+                font-size: 1.2rem;
+                padding: 6px 12px;
+            }
+            .word-input {
+                font-size: 1.1rem;
+                padding: 10px 12px;
+            }
+            .check-btn {
+                font-size: 1rem;
+                padding: 6px 16px;
+            }
+            .footer-btns {
+                gap: 15px;
+            }
+            .btn {
+                font-size: 1.3rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* 小手机屏幕: 最大宽度 480px */
+        @media (max-width: 480px) {
+            .glass-panel {
+                padding: 20px 15px;
+            }
+            .start-panel {
+                padding: 25px 20px;
+            }
+            .start-panel h2 {
+                font-size: 1.8rem;
+            }
+            .input-group label {
+                font-size: 1rem;
+            }
+            .input-group input, .input-group select {
+                font-size: 1rem;
+                padding: 8px 12px;
+            }
+            .btn-start {
+                font-size: 1.4rem;
+                padding: 10px 25px;
+            }
+            .unit-badge, .timer-box, .progress-box {
+                font-size: 1.1rem;
+                padding: 6px 10px;
+            }
+            .chinese {
+                font-size: 1.5rem;
+            }
+            .hint {
+                font-size: 1rem;
+                padding: 5px 10px;
+            }
+            .word-input {
+                font-size: 1rem;
+                padding: 8px 10px;
+            }
+            .check-btn {
+                font-size: 0.9rem;
+                padding: 5px 14px;
+            }
+            .btn {
+                font-size: 1.1rem;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+    <div class="bubble b4"></div>
+
+    <div class="glass-panel">
+        
+        <div id="startPanel" class="start-panel">
+            <h2>✨ 单词默写大赛 ✨</h2>
+            <div class="input-group">
+                <label>你的名字</label>
+                <input type="text" id="playerName" placeholder="输入名字" value="小勇士">
+                <label>选择班级</label>
+                <select id="classSelect">
+                    <option value="六年级1班">六年级1班</option>
+                    <option value="六年级2班">六年级2班</option>
+                </select>
+                <label>选择单元</label>
+                <select id="unitSelect">
+                    <option value="unit1">Unit 1 How tall are you?</option>
+                    <option value="unit2">Unit 2 Last weekend</option>
+                    <option value="unit3">Unit 3 Where did you go?</option>
+                    <option value="unit4">Unit 4 Then and now</option>
+                </select>
+            </div>
+            <button class="btn-start" id="startGameBtn">🚀 开始默写</button>
+        </div>
+
+        
+        <div id="gameMain" class="game-main">
+            <div class="game-header">
+                <div class="unit-badge" id="currentUnitDisplay">Unit 1</div>
+                <div class="timer-box" id="timerDisplay">⏱️ 00:00</div>
+                <div class="progress-box" id="progressDisplay">✅ 0 / 0</div>
+            </div>
+
+            
+            <div id="wordsContainer" class="words-grid"></div>
+
+            
+            <div class="footer-btns">
+                <button class="btn reset-btn" id="resetGameBtn">🔄 重新默写</button>
+                <button class="btn submit-btn" id="submitGameBtn" disabled>📬 提交成绩</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 单词库（从上传文档整理，完整保留）----------
+            const UNIT_WORDS = {
+                unit1: [
+                    { en: 'younger', zh: '更年轻的' },
+                    { en: 'older', zh: '更年长的' },
+                    { en: 'taller', zh: '更高的' },
+                    { en: 'shorter', zh: '更矮的' },
+                    { en: 'longer', zh: '更长的' },
+                    { en: 'thinner', zh: '更瘦的' },
+                    { en: 'heavier', zh: '更重的' },
+                    { en: 'bigger', zh: '更大的' },
+                    { en: 'smaller', zh: '更小的' },
+                    { en: 'stronger', zh: '更强壮的' },
+                    { en: 'dinosaur', zh: '恐龙' },
+                    { en: 'hall', zh: '大厅' },
+                    { en: 'metre', zh: '米' },
+                    { en: 'than', zh: '比' },
+                    { en: 'both', zh: '两个都' },
+                    { en: 'kilogram', zh: '千克' },
+                    { en: 'countryside', zh: '乡村' },
+                    { en: 'lower', zh: '更低的' },
+                    { en: 'shadow', zh: '阴影' },
+                    { en: 'smarter', zh: '更聪明的' },
+                    { en: 'become', zh: '变成' }
+                ],
+                unit2: [
+                    { en: 'cleaned', zh: '打扫' },
+                    { en: 'stayed', zh: '停留' },
+                    { en: 'washed', zh: '洗' },
+                    { en: 'watched', zh: '看' },
+                    { en: 'had', zh: '患病' },
+                    { en: 'had a cold', zh: '感冒' },
+                    { en: 'slept', zh: '睡觉' },
+                    { en: 'read', zh: '读' },
+                    { en: 'saw', zh: '看见' },
+                    { en: 'last', zh: '最近的' },
+                    { en: 'yesterday', zh: '昨天' },
+                    { en: 'before', zh: '在...之前' },
+                    { en: 'drank', zh: '喝' },
+                    { en: 'show', zh: '演出' },
+                    { en: 'magazine', zh: '杂志' },
+                    { en: 'better', zh: '更好的' },
+                    { en: 'faster', zh: '更快的' },
+                    { en: 'hotel', zh: '旅馆' },
+                    { en: 'fixed', zh: '修理' },
+                    { en: 'broken', zh: '破损的' },
+                    { en: 'lamp', zh: '台灯' },
+                    { en: 'loud', zh: '喧闹的' },
+                    { en: 'enjoy', zh: '享受' },
+                    { en: 'stay', zh: '逗留' }
+                ],
+                unit3: [
+                    { en: 'went', zh: '去' },
+                    { en: 'camp', zh: '野营' },
+                    { en: 'went camping', zh: '野营' },
+                    { en: 'fish', zh: '钓鱼' },
+                    { en: 'went fishing', zh: '去钓鱼' },
+                    { en: 'rode', zh: '骑' },
+                    { en: 'hurt', zh: '受伤' },
+                    { en: 'ate', zh: '吃' },
+                    { en: 'took', zh: '吃' },
+                    { en: 'took pictures', zh: '照相' },
+                    { en: 'bought', zh: '买' },
+                    { en: 'gift', zh: '礼物' },
+                    { en: 'fell', zh: '摔倒' },
+                    { en: 'off', zh: '落下' },
+                    { en: 'Labour Day', zh: '劳动节' },
+                    { en: 'mule', zh: '骡子' },
+                    { en: 'Turpan', zh: '吐鲁番' },
+                    { en: 'could', zh: '能' },
+                    { en: 'till', zh: '直到' },
+                    { en: 'beach', zh: '海滩' },
+                    { en: 'basket', zh: '篮' },
+                    { en: 'part', zh: '角色' },
+                    { en: 'licked', zh: '舔' },
+                    { en: 'laughed', zh: '笑' }
+                ],
+                unit4: [
+                    { en: 'dining hall', zh: '饭厅' },
+                    { en: 'grass', zh: '草坪' },
+                    { en: 'gym', zh: '体育馆' },
+                    { en: 'ago', zh: '以前' },
+                    { en: 'cycling', zh: '骑自行车' },
+                    { en: 'go cycling', zh: '去骑自行车' },
+                    { en: 'ice-skate', zh: '滑冰' },
+                    { en: 'badminton', zh: '羽毛球' },
+                    { en: 'star', zh: '星' },
+                    { en: 'easy', zh: '容易的' },
+                    { en: 'look up', zh: '查阅' },
+                    { en: 'Internet', zh: '互联网' },
+                    { en: 'different', zh: '不同的' },
+                    { en: 'active', zh: '活跃的' },
+                    { en: 'race', zh: '赛跑' },
+                    { en: 'nothing', zh: '没有什么' },
+                    { en: 'thought', zh: '想' },
+                    { en: 'felt', zh: '感觉' },
+                    { en: 'cheetah', zh: '猎豹' },
+                    { en: 'trip', zh: '绊倒' },
+                    { en: 'woke', zh: '醒' },
+                    { en: 'dream', zh: '梦' }
+                ]
+            };
+
+            // ---------- 游戏状态 ----------
+            let currentUnit = 'unit1';
+            let currentWords = [];
+            let wordStatus = []; // 每个单词是否正确
+            let timerInterval = null;
+            let startTime = null;
+            let timerRunning = false;
+            let playerName = '';
+            let playerClass = '';
+
+            // DOM 元素
+            const startPanel = document.getElementById('startPanel');
+            const gameMain = document.getElementById('gameMain');
+            const playerNameInput = document.getElementById('playerName');
+            const classSelect = document.getElementById('classSelect');
+            const unitSelect = document.getElementById('unitSelect');
+            const startBtn = document.getElementById('startGameBtn');
+            const currentUnitDisplay = document.getElementById('currentUnitDisplay');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const progressDisplay = document.getElementById('progressDisplay');
+            const wordsContainer = document.getElementById('wordsContainer');
+            const resetGameBtn = document.getElementById('resetGameBtn');
+            const submitGameBtn = document.getElementById('submitGameBtn');
+
+            // ---------- 辅助函数 ----------
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                return `${mins}:${secs}`;
+            }
+
+            function updateTimer() {
+                if (!startTime) return;
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                timerDisplay.textContent = `⏱️ ${formatTime(elapsed)}`;
+            }
+
+            function startTimer() {
+                if (timerRunning) return;
+                startTime = Date.now();
+                timerRunning = true;
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            function stopTimer() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                }
+            }
+
+            function resetTimer() {
+                stopTimer();
+                timerDisplay.textContent = '⏱️ 00:00';
+                startTime = null;
+            }
+
+            // 更新进度显示
+            function updateProgress() {
+                const correct = wordStatus.filter(v => v).length;
+                const total = wordStatus.length;
+                progressDisplay.textContent = `✅ ${correct} / ${total}`;
+                if (correct === total && total > 0) {
+                    submitGameBtn.disabled = false;
+                } else {
+                    submitGameBtn.disabled = true;
+                }
+            }
+
+            // 显示临时提示
+            function showToast(msg, isError = false) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-message';
+                toast.textContent = msg;
+                toast.style.background = isError ? '#ffdddd' : '#ffffff';
+                toast.style.color = isError ? '#b00020' : '#572e7a';
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    if (document.body.contains(toast)) document.body.removeChild(toast);
+                }, 2000);
+            }
+
+            // 生成下划线提示文本 (例如：单词长度 6，第一个字母 y → "y _____")
+            function getHintText(word) {
+                if (!word) return '';
+                const first = word[0];
+                const restLen = word.length - 1;
+                return first + ' ' + '_'.repeat(restLen).split('').join(' ');
+            }
+
+            // 渲染单词卡片
+            function renderWords() {
+                wordsContainer.innerHTML = '';
+                wordStatus = new Array(currentWords.length).fill(false);
+
+                currentWords.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'word-card';
+                    card.dataset.index = index;
+
+                    const chineseDiv = document.createElement('div');
+                    chineseDiv.className = 'chinese';
+                    chineseDiv.textContent = item.zh;
+
+                    const hintDiv = document.createElement('div');
+                    hintDiv.className = 'hint';
+                    hintDiv.textContent = getHintText(item.en);
+
+                    const inputArea = document.createElement('div');
+                    inputArea.className = 'input-area';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'word-input';
+                    input.placeholder = '输入完整单词';
+                    input.dataset.index = index;
+
+                    const checkBtn = document.createElement('button');
+                    checkBtn.className = 'check-btn';
+                    checkBtn.textContent = '✓ 检查';
+                    checkBtn.dataset.index = index;
+
+                    inputArea.appendChild(input);
+                    inputArea.appendChild(checkBtn);
+
+                    card.appendChild(chineseDiv);
+                    card.appendChild(hintDiv);
+                    card.appendChild(inputArea);
+                    wordsContainer.appendChild(card);
+
+                    // 检查按钮事件
+                    checkBtn.addEventListener('click', () => {
+                        const idx = parseInt(checkBtn.dataset.index);
+                        if (wordStatus[idx]) {
+                            showToast('这个词已经正确啦！', false);
+                            return;
+                        }
+                        const userAnswer = input.value.trim().toLowerCase();
+                        const correct = currentWords[idx].en.toLowerCase();
+                        // 忽略首尾空格，比较
+                        if (userAnswer === correct) {
+                            wordStatus[idx] = true;
+                            card.classList.add('correct');
+                            input.disabled = true;
+                            checkBtn.disabled = true;
+                            showToast('✅ 正确！', false);
+                            updateProgress();
+                        } else {
+                            showToast('❌ 拼写错误，再试试', true);
+                            input.classList.add('error');
+                            setTimeout(() => input.classList.remove('error'), 500);
+                        }
+                    });
+
+                    // 输入框回车也可以触发检查
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            checkBtn.click();
+                        }
+                    });
+                });
+
+                updateProgress();
+            }
+
+            // 加载单元
+            function loadUnit(unit) {
+                currentUnit = unit;
+                currentWords = UNIT_WORDS[unit] || [];
+                // 更新标题
+                const unitNames = {
+                    unit1: 'Unit 1 How tall are you?',
+                    unit2: 'Unit 2 Last weekend',
+                    unit3: 'Unit 3 Where did you go?',
+                    unit4: 'Unit 4 Then and now'
+                };
+                currentUnitDisplay.textContent = unitNames[unit] || unit;
+                renderWords();
+                resetTimer();
+            }
+
+            // 重置游戏（重新开始当前单元）
+            function resetGame() {
+                loadUnit(currentUnit);
+                startTimer(); // 重新开始计时
+            }
+
+            // 提交成绩
+            async function submitScore() {
+                // 检查是否所有单词正确
+                if (wordStatus.includes(false)) {
+                    showToast('请先完成所有单词的默写！', true);
+                    return;
+                }
+
+                const name = playerName || '未命名';
+                const className = playerClass || '未分班';
+                const total = wordStatus.length;
+                const correct = wordStatus.filter(v => v).length;
+                const accuracy = total > 0 ? Math.round((correct / total) * 100) + '%' : '0%';
+                
+                // 获取用时（秒）
+                const timeElapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+                const timeStr = formatTime(timeElapsed);
+
+                const payload = {
+                    name: name,
+                    class: className,
+                    unit: currentUnit,
+                    unitName: currentUnitDisplay.textContent,
+                    completedWords: correct,
+                    totalWords: total,
+                    accuracy: accuracy,
+                    time: timeStr,
+                    timestamp: new Date().toISOString()
+                };
+
+                const submitUrl = 'https://qf.kjxs.site/api/ekqS83aaEAV';
+
+                try {
+                    const response = await fetch(submitUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        showToast('🎉 成绩提交成功！', false);
+                        submitGameBtn.disabled = true; // 防止重复提交
+                    } else {
+                        showToast('❌ 提交失败，请重试', true);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('⚠️ 网络错误', true);
+                }
+            }
+
+            // 开始游戏
+            function startGame() {
+                playerName = playerNameInput.value.trim() || '小勇士';
+                playerClass = classSelect.value;
+                currentUnit = unitSelect.value;
+
+                startPanel.style.display = 'none';
+                gameMain.style.display = 'block';
+
+                loadUnit(currentUnit);
+                startTimer();
+            }
+
+            // 事件绑定
+            startBtn.addEventListener('click', startGame);
+
+            resetGameBtn.addEventListener('click', () => {
+                resetGame();
+            });
+
+            submitGameBtn.addEventListener('click', submitScore);
+
+            // 初始化时只显示开始面板
+            startPanel.style.display = 'block';
+            gameMain.style.display = 'none';
+        })();
+    </script>
+</body>
+</html>

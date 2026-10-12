@@ -1,0 +1,13 @@
+{
+  "id": "case-58",
+  "title": "班级分贝森林",
+  "category": "observation",
+  "description": "用麦克风观察相对音量与森林变化，只保存数值摘要和时长，不上传录音。",
+  "subjects": [
+    "科学",
+    "音乐"
+  ],
+  "order": 58,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

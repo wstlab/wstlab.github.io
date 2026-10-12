@@ -1,0 +1,50 @@
+#case-nav,#case-lessons,#case-connection,.case-evidence{font-family:Inter,"Microsoft YaHei",sans-serif!important;box-sizing:border-box;letter-spacing:normal;font-size:14px;line-height:1.65}
+#case-nav{position:relative;z-index:9999;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:18px 28px;margin:0 0 24px;background:#fff;color:#193745;border:1px solid #dfebef;border-radius:16px;box-shadow:0 8px 28px #19374508;flex-wrap:wrap;width:100%}
+#case-nav a,#case-lessons a{color:#193745;text-decoration:none;white-space:nowrap}
+#case-nav>a{font-weight:800;font-size:16px}
+#case-nav nav,#case-lessons{display:flex;gap:20px;flex-wrap:wrap}
+#case-lessons{padding:12px 24px;border-bottom:1px solid #dce5ec;margin-bottom:24px}
+#case-lessons a{padding:6px 12px;border-radius:8px;background:#f1f6f8}
+#case-connection{position:relative;clear:both;margin:24px auto 0;padding:18px 24px;display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;background:#f2f7f9;color:#46616d;border-radius:14px;max-width:1440px}
+#case-connection strong{color:#23745e;font-size:13px;overflow-wrap:anywhere}
+#case-connection .error{color:#ac3429}
+.case-evidence{clear:both;max-width:1100px;margin:28px auto;padding:26px;background:#fff;border:1px solid #d9e5e9;border-radius:20px;color:#203f4b;box-shadow:0 10px 35px #1d3d4907}
+.case-evidence h2{font-size:22px;margin:0 0 8px;color:#203f4b}
+.case-evidence p{font-size:14px;color:#687d85}
+.case-evidence textarea,.case-evidence input,.case-evidence select{background:white;color:#203f4b;border:1px solid #cbdbe1;padding:10px 12px;border-radius:9px;max-width:100%;font-size:15px}
+.case-evidence textarea{display:block;width:100%;min-height:80px;margin:12px 0}
+.case-evidence button{border:0;border-radius:10px;padding:12px 20px;background:var(--case-accent,#236d84);color:white;font-weight:700;cursor:pointer}
+.case-evidence button:disabled{opacity:.5;cursor:wait}
+.case-evidence pre{max-height:280px;overflow:auto;white-space:pre-wrap;background:#f3f7f8;padding:16px;border-radius:12px;font-size:13px}
+html{scroll-behavior:smooth}body{min-width:0!important}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #43a2bb;outline-offset:3px}
+img,video{max-width:100%}
+@media(max-width:640px){#case-nav{padding:14px;gap:10px}#case-nav nav{gap:12px;font-size:12px}#case-connection{padding:14px;font-size:12px}.case-evidence{padding:18px;margin:18px 0}#case-lessons{padding:8px;gap:8px}}
+@media(max-width:640px){
+ body{box-sizing:border-box!important;max-width:100%!important;width:100%!important}
+ #case-nav,#case-connection,.case-evidence{max-width:100%!important;min-width:0!important;overflow-wrap:anywhere}
+ .container,.main-container,.app-container,.game-container,.card,.panel,.header,.toolbar,.controls,.input-group,.form-group{box-sizing:border-box;max-width:100%;min-width:0}
+ input,select,textarea{box-sizing:border-box;max-width:100%}
+ .toolbar,.controls,.header,.button-group,.buttons{flex-wrap:wrap}
+ .network图{max-width:100%;overflow:auto}
+ #grid-container,#canvasWrap,.svg-wrap{max-width:100%;overflow:auto}
+ #grid-container #grid{max-width:none}
+ #container{box-sizing:border-box;max-width:100%;min-width:0}
+ #saveRestoreButtons,#rollName,#groups{box-sizing:border-box;max-width:100%;min-width:0}
+ #saveRestoreButtons{display:flex;flex-wrap:wrap}
+ #main-wrapper.game-wrapper{max-width:100%!important;overflow:hidden}
+ #interaction-panel{left:12px!important;right:12px!important;transform:none!important;width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;box-sizing:border-box}
+ #groups{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
+ .group{min-width:0!important}
+ .categories{display:grid!important;grid-template-columns:1fr!important;min-width:0!important;max-width:100%!important}
+ .category-card,.category-header,.drop-zone{min-width:0!important;max-width:100%!important;box-sizing:border-box}
+ .category-header{flex-wrap:wrap}
+ .svg-wrap{width:100%!important;min-width:0!important;max-width:100%!important}
+ .dropzone-panel,.source-panel,.preview-panel{min-width:0!important;width:100%!important}
+ .group>div{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+ .group button{margin:2px!important;padding:5px!important}
+ .category-header{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important}
+ .drop-zone{padding:12px!important;overflow-wrap:anywhere}
+ .empty-hint{position:static!important;transform:none!important;max-width:100%!important}
+}

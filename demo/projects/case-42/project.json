@@ -1,0 +1,12 @@
+{
+  "id": "case-42",
+  "title": "推理题（环形/四边形卡片）",
+  "category": "exploration",
+  "description": "卡片推理档案：围绕任务、得分、尝试次数开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 42,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

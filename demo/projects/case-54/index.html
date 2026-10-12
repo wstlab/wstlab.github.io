@@ -1,0 +1,1893 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":54,"key":"case-54","title":"AI课堂互动评价与自主学习平台","category":"assessment","description":"围绕分数问题开展课堂互动、自评与反馈，从记录中发现概念误区。","headline":"分数课堂观察","view":"groups","fields":[{"key":"question","label":"问题"},{"key":"answer","label":"答案"},{"key":"mastery","label":"自评"},{"key":"need","label":"帮助需求"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开平台"}],"tasks":{"records":"ZkYq8HWl2OS"},"mapping":{},"accent":"#a16a48","capture":true,"lesson":"打开平台"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI赋能小学数学课堂互动评价与自主学习平台</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #1d2433;
+      --muted: #687386;
+      --line: #dbe1ea;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #c2410c;
+      --violet: #6d28d9;
+      --shadow: 0 14px 36px rgba(29, 36, 51, .08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, .94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 16px 22px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(37, 99, 235, .96), rgba(15, 118, 110, .96)),
+        #2563eb;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, .18);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 760;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .shell {
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px 22px 30px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      min-height: 96px;
+      box-shadow: 0 8px 20px rgba(29, 36, 51, .05);
+      display: grid;
+      align-content: space-between;
+      gap: 8px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .metric em {
+      font-style: normal;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .column {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      min-height: 58px;
+      padding: 13px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .panel-title {
+      min-width: 0;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 760;
+    }
+
+    .panel-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .btn {
+      min-height: 36px;
+      border-radius: 7px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      color: var(--ink);
+      background: #eef2f7;
+      border: 1px solid transparent;
+      font-weight: 680;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: #e5ebf3;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-teal {
+      color: #fff;
+      background: var(--teal);
+    }
+
+    .btn-teal:hover {
+      background: #0f665f;
+    }
+
+    .btn-green {
+      color: #fff;
+      background: var(--green);
+    }
+
+    .btn-red {
+      color: #fff;
+      background: var(--red);
+    }
+
+    .btn-icon {
+      width: 36px;
+      padding: 0;
+    }
+
+    .btn svg,
+    .brand-mark svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+      flex: 0 0 auto;
+    }
+
+    .selector-row {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .field,
+    .select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+
+    .field:focus,
+    .select:focus,
+    textarea:focus {
+      border-color: rgba(37, 99, 235, .8);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px;
+      color: var(--ink);
+      outline: none;
+      background: #fff;
+    }
+
+    .student-display {
+      min-height: 136px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-radius: var(--radius);
+      border: 1px solid #cad4e2;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(37, 99, 235, .12), transparent 32%),
+        linear-gradient(145deg, #f8fbff, #eef6f4);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .student-display strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1.1;
+      font-weight: 850;
+    }
+
+    .student-display span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .roll-active strong {
+      animation: pop .22s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(.96); opacity: .65; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .student-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 14px;
+      max-height: 94px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .tag {
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #344054;
+      padding: 5px 9px;
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .tag.hot {
+      color: #fff;
+      background: var(--teal);
+    }
+
+    .lesson-card {
+      display: grid;
+      gap: 8px;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #f8fbff, #f1f8f6);
+      margin-bottom: 12px;
+    }
+
+    .lesson-card strong {
+      font-size: 15px;
+    }
+
+    .lesson-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .flow-list,
+    .award-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .flow-item,
+    .award {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .flow-item mark,
+    .award mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--blue);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .flow-item strong,
+    .award strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .flow-item span,
+    .award span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .group-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .group-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .group-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .group-top strong {
+      font-size: 15px;
+    }
+
+    .score {
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .bar-track {
+      height: 8px;
+      background: #edf1f6;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: var(--blue);
+      transition: width .28s ease;
+    }
+
+    .score-actions {
+      display: grid;
+      grid-template-columns: 36px 36px;
+      gap: 7px;
+    }
+
+    .quiz-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .quiz-media {
+      min-height: 120px;
+      display: grid;
+      grid-template-columns: 122px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      background:
+        linear-gradient(130deg, rgba(37, 99, 235, .10), rgba(21, 128, 61, .10)),
+        #f7fafc;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .learning-visual {
+      width: 100%;
+      aspect-ratio: 1 / .78;
+      border-radius: 7px;
+      background:
+        linear-gradient(160deg, transparent 57%, rgba(21, 128, 61, .18) 58% 62%, transparent 63%),
+        linear-gradient(30deg, transparent 45%, rgba(37, 99, 235, .16) 46% 49%, transparent 50%),
+        #fff;
+      border: 1px solid #cbd5e1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 6px;
+      padding: 10px;
+    }
+
+    .learning-visual i {
+      display: block;
+      border-radius: 5px;
+      background: #dbeafe;
+    }
+
+    .learning-visual i:nth-child(2n) {
+      background: #ccfbf1;
+    }
+
+    .learning-visual i:nth-child(3n) {
+      background: #fed7aa;
+    }
+
+    .quiz-media h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 760;
+    }
+
+    .quiz-media p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 9px;
+      padding: 12px;
+    }
+
+    .quest-progress {
+      padding: 12px 12px 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .quest-progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #edf1f6;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+      transition: width .28s ease;
+    }
+
+    .quest-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .quest-step {
+      min-height: 28px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .quest-step.done {
+      color: #fff;
+      border-color: transparent;
+      background: var(--green);
+    }
+
+    .quest-step.current {
+      color: #fff;
+      border-color: transparent;
+      background: var(--blue);
+    }
+
+    .choice {
+      min-height: 46px;
+      width: 100%;
+      text-align: left;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 620;
+    }
+
+    .choice:hover {
+      border-color: rgba(37, 99, 235, .55);
+      background: #f8fbff;
+    }
+
+    .choice mark {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eef2f7;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .choice.correct {
+      border-color: rgba(21, 128, 61, .75);
+      background: #f0fdf4;
+    }
+
+    .choice.wrong {
+      border-color: rgba(194, 65, 12, .72);
+      background: #fff7ed;
+    }
+
+    .quiz-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 0 12px 12px;
+    }
+
+    .feedback {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 19px;
+    }
+
+    .insight-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quickform-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .quickform-grid .span-2 {
+      grid-column: 1 / -1;
+    }
+
+    .quickform-frame {
+      min-height: 112px;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      background: #f8fafc;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .quickform-frame iframe {
+      width: 100%;
+      min-height: 240px;
+      border: 0;
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .feedback-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mini-stat {
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 8px;
+      background: #fff;
+      display: grid;
+      gap: 3px;
+    }
+
+    .mini-stat strong {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .insight {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .insight-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+    }
+
+    .insight h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+    }
+
+    .insight p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chart-wrap {
+      display: grid;
+      gap: 12px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 260px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+      max-height: 176px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 10px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .log strong {
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 16px;
+    }
+
+    .tab {
+      min-height: 34px;
+      border-radius: 7px;
+      padding: 7px 11px;
+      background: #eef2f7;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .compact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: #eef2f7;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .top-actions {
+        justify-content: stretch;
+      }
+
+      .top-actions .btn {
+        flex: 1 1 120px;
+      }
+
+      .shell {
+        padding: 14px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+      }
+
+      .brand p {
+        white-space: normal;
+      }
+
+      .stats,
+      .layout,
+      .selector-row,
+      .button-grid,
+      .quiz-media,
+      .quickform-grid,
+      .feedback-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .quickform-grid .span-2 {
+        grid-column: auto;
+      }
+
+      .button-grid .btn {
+        width: 100%;
+      }
+
+      .metric strong {
+        font-size: 24px;
+      }
+
+      .student-display strong {
+        font-size: 32px;
+      }
+
+      canvas {
+        height: 220px;
+      }
+    }
+
+    @media print {
+      .top-actions,
+      .btn,
+      .tabs,
+      textarea,
+      select,
+      input {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .shell {
+        padding: 10px;
+      }
+
+      .panel,
+      .metric {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+<style>@media(max-width:640px){.brand{min-width:0!important;max-width:100%!important}.brand>div{min-width:0!important}.brand h1{overflow-wrap:anywhere!important}}</style><style>@media(max-width:640px){header>div,header>div>div,.brand>div{min-width:0!important;max-width:100%!important}header h1{font-size:22px!important;overflow-wrap:anywhere}header{flex-wrap:wrap!important}}</style></head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v18"></path><path d="m6 8 6-5 6 5"></path><path d="m6 16 6 5 6-5"></path>
+            </svg>
+          </div>
+          <div>
+            <h1>AI赋能小学数学课堂互动评价与自主学习平台</h1>
+            <p>小学教师课堂互动、学情反馈、分层指导与成果提交一体化工具</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="btn" id="printBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 14h12v8H6z"></path></svg>
+            打印材料
+          </button>
+          <button class="btn" id="exportBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg>
+            导出说明
+          </button>
+          <button class="btn btn-red" id="resetBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            重置
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="stats" aria-label="课堂数据">
+        <div class="metric">
+          <span>课堂参与</span>
+          <strong id="metricParticipation">0</strong>
+          <em>已记录互动次数</em>
+        </div>
+        <div class="metric">
+          <span>闯关正确率</span>
+          <strong id="metricAccuracy">0%</strong>
+          <em>实时统计答题表现</em>
+        </div>
+        <div class="metric">
+          <span>领先小组</span>
+          <strong id="metricLeader">第一组</strong>
+          <em>按积分自动更新</em>
+        </div>
+        <div class="metric">
+          <span>学习状态</span>
+          <strong id="metricStatus">待启动</strong>
+          <em id="metricStatusNote">完成一次互动后生成</em>
+        </div>
+        <div class="metric">
+          <span>QuickForm反馈</span>
+          <strong id="metricFeedback">0</strong>
+          <em id="metricFeedbackNote">学生反馈实时汇总</em>
+        </div>
+      </section>
+
+      <section class="layout" aria-label="工作台">
+        <div class="column">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>随机点名</h2>
+                <p>关注课堂参与，形成即时互动记录</p>
+              </div>
+              <span class="status-pill"><i class="dot"></i><span id="rosterCount">0人</span></span>
+            </div>
+            <div class="panel-body">
+              <div class="selector-row">
+                <input class="field" id="studentInput" type="text" placeholder="输入学生姓名">
+                <button class="btn btn-teal" id="addStudentBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                  添加
+                </button>
+              </div>
+              <div class="student-display" id="studentDisplay">
+                <div>
+                  <strong id="selectedStudent">准备开始</strong>
+                  <span id="studentSubtext">点击随机点名后记录课堂表现</span>
+                </div>
+              </div>
+              <div class="button-grid">
+                <button class="btn btn-primary" id="rollBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"></path><path d="M4 20 21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path></svg>
+                  点名
+                </button>
+                <button class="btn btn-green" id="markGoodBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                  正确
+                </button>
+                <button class="btn" id="markFollowBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+                  跟进
+                </button>
+              </div>
+              <div class="student-tags" id="studentTags"></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>学生名单</h2>
+                <p>每行一个姓名，保存后用于点名</p>
+              </div>
+              <button class="btn btn-icon" id="saveRosterBtn" type="button" title="保存名单">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
+              </button>
+            </div>
+            <div class="panel-body">
+              <textarea id="rosterEditor"></textarea>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>小组积分</h2>
+                <p>互动、闯关、展示均可计入</p>
+              </div>
+              <select class="select" id="activeGroup"></select>
+            </div>
+            <div class="panel-body">
+              <div class="group-list" id="groupList"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="column">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>知识闯关</h2>
+                <p>选择小组后答题，系统自动统计表现</p>
+              </div>
+              <span class="status-pill"><i class="dot" style="background: var(--amber);"></i><span id="questionIndex">第1题</span></span>
+            </div>
+            <div class="panel-body">
+              <div class="quiz-card">
+                <div class="quiz-media">
+                  <div class="learning-visual" aria-hidden="true">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                  <div>
+                    <h3 id="questionText"></h3>
+                    <p id="questionMeta"></p>
+                  </div>
+                </div>
+                <div class="quest-progress">
+                  <div class="quest-progress-top">
+                    <span>闯关打卡进度</span>
+                    <span id="questProgressText">0/5</span>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" id="questProgressFill"></div></div>
+                  <div class="quest-steps" id="questSteps"></div>
+                </div>
+                <div class="choice-list" id="choiceList"></div>
+                <div class="quiz-footer">
+                  <div class="feedback" id="quizFeedback"></div>
+                  <div class="compact-row">
+                    <button class="btn" id="prevQuestionBtn" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                      上一题
+                    </button>
+                    <button class="btn btn-primary" id="nextQuestionBtn" type="button">
+                      下一题
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>学习反馈</h2>
+                <p>根据互动与答题结果实时更新</p>
+              </div>
+              <button class="btn btn-icon" id="refreshAdviceBtn" type="button" title="刷新反馈">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M3 21v-5h5"></path><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M16 8h5V3"></path></svg>
+              </button>
+            </div>
+            <div class="panel-body">
+              <div class="insight-list" id="adviceList"></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>荣誉奖励</h2>
+                <p>把过程性评价转化为课堂激励</p>
+              </div>
+              <span class="status-pill"><i class="dot" style="background: var(--amber);"></i>实时生成</span>
+            </div>
+            <div class="panel-body">
+              <div class="award-list" id="awardList"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="column">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>QuickForm反馈采集</h2>
+                <p>采集学生反馈，实时形成学习分析</p>
+              </div>
+              <span class="status-pill"><i class="dot" style="background: var(--teal);"></i><span id="feedbackCount">0条</span></span>
+            </div>
+            <div class="panel-body">
+              <div class="quickform-grid">
+                <input class="field span-2" id="quickFormUrl" type="url" placeholder="粘贴QuickForm公开链接，可嵌入真实表单">
+                <select class="select" id="feedbackStudent"></select>
+                <select class="select" id="feedbackMastery">
+                  <option value="已掌握">已掌握</option>
+                  <option value="基本理解">基本理解</option>
+                  <option value="需要讲解">需要讲解</option>
+                </select>
+                <select class="select" id="feedbackMood">
+                  <option value="有信心">有信心</option>
+                  <option value="一般">一般</option>
+                  <option value="有困难">有困难</option>
+                </select>
+                <select class="select" id="feedbackNeed">
+                  <option value="基础巩固">基础巩固</option>
+                  <option value="错题讲评">错题讲评</option>
+                  <option value="拓展挑战">拓展挑战</option>
+                </select>
+                <textarea class="span-2" id="feedbackText" placeholder="学生反馈：今天最需要帮助的分数知识点"></textarea>
+                <button class="btn btn-primary span-2" id="submitFeedbackBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg>
+                  提交QuickForm反馈
+                </button>
+              </div>
+              <div class="feedback-summary">
+                <div class="mini-stat"><strong id="feedbackTotal">0</strong><span>反馈总数</span></div>
+                <div class="mini-stat"><strong id="feedbackNeedHelp">0</strong><span>需讲解</span></div>
+                <div class="mini-stat"><strong id="feedbackTopNeed">基础巩固</strong><span>主要需求</span></div>
+              </div>
+              <div class="quickform-frame" id="quickFormFrame">粘贴QuickForm链接后，这里会显示嵌入表单；未联网时可使用上方本地反馈表完成演示。</div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h2>学情分析</h2>
+                <p>小组表现与课堂记录同步呈现</p>
+              </div>
+              <div class="compact-row">
+                <button class="tab active" data-chart="score" type="button">积分</button>
+                <button class="tab" data-chart="accuracy" type="button">正确率</button>
+                <button class="tab" data-chart="feedback" type="button">反馈</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-wrap">
+                <canvas id="chart" width="900" height="320"></canvas>
+                <div class="timeline" id="logList"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const storageKey = "ai-primary-math-classroom-platform-v2";
+
+    const defaultState = {
+      students:Array.from({length:12},(_,i)=>"探索者"+String(i+1).padStart(2,"0")),
+      selectedStudent: "",
+      participation: 0,
+      answered: 0,
+      correct: 0,
+      activeGroup: "第一组",
+      chartMode: "score",
+      currentQuestion: 0,
+      answeredQuestions: {},
+      quickFormUrl: "",
+      feedbacks:[],groups: [
+        { name: "第一组", score: 0, attempts: 0, correct: 0, color: "#2563eb" },
+        { name: "第二组", score: 0, attempts: 0, correct: 0, color: "#0f766e" },
+        { name: "第三组", score: 0, attempts: 0, correct: 0, color: "#b45309" },
+        { name: "第四组", score: 0, attempts: 0, correct: 0, color: "#6d28d9" }
+      ],
+      logs: []
+    };
+
+    const questions = [
+      {
+        subject: "小学数学",
+        level: "基础理解",
+        text: "把一个蛋糕平均分成4份，每份是这个蛋糕的几分之几？",
+        choices: ["1/2", "1/3", "1/4", "4/1"],
+        answer: 2,
+        explain: "平均分成4份，其中1份就是这个整体的1/4。"
+      },
+      {
+        subject: "小学数学",
+        level: "图形表达",
+        text: "下面哪一种说法可以表示1/2？",
+        choices: ["把整体随便分成2份，取1份", "把整体平均分成2份，取1份", "把整体平均分成3份，取2份", "把整体分得越多越大"],
+        answer: 1,
+        explain: "分数强调平均分，1/2表示平均分成2份中的1份。"
+      },
+      {
+        subject: "小学数学",
+        level: "数据分析",
+        text: "同样大小的纸条，1/3和1/5哪一个表示的长度更长？",
+        choices: ["1/3", "1/5", "一样长", "无法比较"],
+        answer: 0,
+        explain: "整体相同且分子都是1时，分母越大，每份越小。"
+      },
+      {
+        subject: "小学数学",
+        level: "生活应用",
+        text: "6名同学中有2名喜欢跳绳，可以用哪个分数表示喜欢跳绳的人数占全组人数？",
+        choices: ["2/6", "6/2", "1/6", "4/6"],
+        answer: 0,
+        explain: "喜欢跳绳的是2人，全组是6人，所以可以表示为2/6。"
+      },
+      {
+        subject: "学习反思",
+        level: "自主学习",
+        text: "如果你还不理解“分母越大，每份越小”，最适合在反馈表中选择什么？",
+        choices: ["已经完全掌握", "需要讲解或错题讲评", "不填写反馈", "只看小组积分"],
+        answer: 1,
+        explain: "真实反馈能帮助老师安排讲解和分层练习。"
+      }
+    ];
+
+    let state = loadState();
+
+    const el = {
+      metricParticipation: document.getElementById("metricParticipation"),
+      metricAccuracy: document.getElementById("metricAccuracy"),
+      metricLeader: document.getElementById("metricLeader"),
+      metricStatus: document.getElementById("metricStatus"),
+      metricStatusNote: document.getElementById("metricStatusNote"),
+      metricFeedback: document.getElementById("metricFeedback"),
+      metricFeedbackNote: document.getElementById("metricFeedbackNote"),
+      rosterCount: document.getElementById("rosterCount"),
+      studentInput: document.getElementById("studentInput"),
+      selectedStudent: document.getElementById("selectedStudent"),
+      studentSubtext: document.getElementById("studentSubtext"),
+      studentDisplay: document.getElementById("studentDisplay"),
+      studentTags: document.getElementById("studentTags"),
+      rosterEditor: document.getElementById("rosterEditor"),
+      activeGroup: document.getElementById("activeGroup"),
+      groupList: document.getElementById("groupList"),
+      awardList: document.getElementById("awardList"),
+      adviceList: document.getElementById("adviceList"),
+      questionIndex: document.getElementById("questionIndex"),
+      questionText: document.getElementById("questionText"),
+      questionMeta: document.getElementById("questionMeta"),
+      choiceList: document.getElementById("choiceList"),
+      quizFeedback: document.getElementById("quizFeedback"),
+      questProgressText: document.getElementById("questProgressText"),
+      questProgressFill: document.getElementById("questProgressFill"),
+      questSteps: document.getElementById("questSteps"),
+      feedbackCount: document.getElementById("feedbackCount"),
+      quickFormUrl: document.getElementById("quickFormUrl"),
+      feedbackStudent: document.getElementById("feedbackStudent"),
+      feedbackMastery: document.getElementById("feedbackMastery"),
+      feedbackMood: document.getElementById("feedbackMood"),
+      feedbackNeed: document.getElementById("feedbackNeed"),
+      feedbackText: document.getElementById("feedbackText"),
+      feedbackTotal: document.getElementById("feedbackTotal"),
+      feedbackNeedHelp: document.getElementById("feedbackNeedHelp"),
+      feedbackTopNeed: document.getElementById("feedbackTopNeed"),
+      quickFormFrame: document.getElementById("quickFormFrame"),
+      chart: document.getElementById("chart"),
+      logList: document.getElementById("logList")
+    };
+
+    document.getElementById("rollBtn").addEventListener("click", rollStudent);
+    document.getElementById("markGoodBtn").addEventListener("click", () => markStudent("回答正确", 1));
+    document.getElementById("markFollowBtn").addEventListener("click", () => markStudent("需要跟进", 0));
+    document.getElementById("addStudentBtn").addEventListener("click", addStudent);
+    document.getElementById("saveRosterBtn").addEventListener("click", saveRoster);
+    document.getElementById("submitFeedbackBtn").addEventListener("click", submitFeedback);
+    document.getElementById("quickFormUrl").addEventListener("change", event => {
+      state.quickFormUrl = event.target.value.trim();
+      addLog("QuickForm", state.quickFormUrl ? "已绑定外部QuickForm链接" : "已清空QuickForm链接");
+      render();
+    });
+    document.getElementById("studentInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") addStudent();
+    });
+    document.getElementById("activeGroup").addEventListener("change", event => {
+      state.activeGroup = event.target.value;
+      addLog("小组切换", `当前答题小组：${state.activeGroup}`);
+      render();
+    });
+    document.getElementById("prevQuestionBtn").addEventListener("click", () => moveQuestion(-1));
+    document.getElementById("nextQuestionBtn").addEventListener("click", () => moveQuestion(1));
+    document.getElementById("refreshAdviceBtn").addEventListener("click", () => {
+      addLog("学习反馈", "已根据当前数据刷新学习反馈");
+      render();
+    });
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+    document.getElementById("exportBtn").addEventListener("click", exportReport);
+    document.querySelectorAll("[data-chart]").forEach(button => {
+      button.addEventListener("click", () => {
+        state.chartMode = button.dataset.chart;
+        render();
+      });
+    });
+
+    render();
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (!saved) return structuredClone(defaultState);
+        const parsed = JSON.parse(saved);
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          groups: Array.isArray(parsed.groups) ? parsed.groups : structuredClone(defaultState.groups),
+          students: Array.isArray(parsed.students) ? parsed.students : structuredClone(defaultState.students),
+          feedbacks: Array.isArray(parsed.feedbacks) ? parsed.feedbacks : structuredClone(defaultState.feedbacks),
+          logs: Array.isArray(parsed.logs) ? parsed.logs : []
+        };
+      } catch {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function render() {
+      renderMetrics();
+      renderRoster();
+      renderGroups();
+      renderAwards();
+      renderFeedback();
+      renderQuiz();
+      renderAdvice();
+      renderChart();
+      renderLogs();
+      saveState();
+    }
+
+    function renderMetrics() {
+      const leader = getLeader();
+      const accuracy = state.answered ? Math.round(state.correct / state.answered * 100) : 0;
+      el.metricParticipation.textContent = state.participation;
+      el.metricAccuracy.textContent = `${accuracy}%`;
+      el.metricLeader.textContent = leader.name;
+      el.metricStatus.textContent = statusLabel(accuracy, state.answered);
+      el.metricStatusNote.textContent = state.answered ? `已完成${state.answered}次闯关记录` : "完成一次互动后生成";
+      el.metricFeedback.textContent = state.feedbacks.length;
+      el.metricFeedbackNote.textContent = state.quickFormUrl ? "已绑定QuickForm链接" : "本地表单演示中";
+    }
+
+    function renderRoster() {
+      el.rosterCount.textContent = `${state.students.length}人`;
+      el.selectedStudent.textContent = state.selectedStudent || "准备开始";
+      el.studentSubtext.textContent = state.selectedStudent ? `${state.activeGroup}正在参与课堂互动` : "点击随机点名后记录课堂表现";
+      el.rosterEditor.value = state.students.join("\n");
+      el.studentTags.innerHTML = state.students.map(name => {
+        const hot = name === state.selectedStudent ? " hot" : "";
+        return `<span class="tag${hot}">${escapeHtml(name)}</span>`;
+      }).join("");
+    }
+
+    function renderGroups() {
+      el.activeGroup.innerHTML = state.groups.map(group => {
+        const selected = group.name === state.activeGroup ? "selected" : "";
+        return `<option ${selected}>${escapeHtml(group.name)}</option>`;
+      }).join("");
+
+      const maxScore = Math.max(10, ...state.groups.map(group => group.score));
+      el.groupList.innerHTML = state.groups.map(group => {
+        const percent = Math.min(100, Math.round(group.score / maxScore * 100));
+        return `
+          <div class="group-item">
+            <div>
+              <div class="group-top">
+                <strong>${escapeHtml(group.name)}</strong>
+                <span class="score">${group.score}</span>
+              </div>
+              <div class="bar-track"><div class="bar" style="width:${percent}%; background:${group.color};"></div></div>
+            </div>
+            <div class="score-actions">
+              <button class="btn btn-icon" type="button" title="${escapeHtml(group.name)}加分" onclick="changeScore('${escapeAttr(group.name)}', 1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+              </button>
+              <button class="btn btn-icon" type="button" title="${escapeHtml(group.name)}减分" onclick="changeScore('${escapeAttr(group.name)}', -1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderAwards() {
+      const leader = getLeader();
+      const accuracy = state.answered ? Math.round(state.correct / state.answered * 100) : 0;
+      const activeLearner = state.selectedStudent || "完成点名后生成";
+      const feedbackLevel = state.feedbacks.length >= 6 ? "反馈充分" : state.feedbacks.length ? "持续采集中" : "等待反馈";
+      const awards = [
+        { icon: "合", title: "合作探究小组", target: leader.name, note: `当前积分${leader.score}分，适合承担展示讲解。` },
+        { icon: "闯", title: "闯关进步星", target: state.answered ? `${accuracy}%正确率` : "完成答题后生成", note: "依据知识闯关表现生成，鼓励学生看见进步。"},
+        { icon: "讲", title: "表达展示星", target: activeLearner, note: "由随机点名和课堂表现记录生成，扩大参与面。"},
+        { icon: "学", title: "自主学习星", target: feedbackLevel, note: "依据QuickForm反馈，提醒学生主动表达学习需求。"}
+      ];
+
+      el.awardList.innerHTML = awards.map((award, index) => `
+        <div class="award">
+          <mark style="background:${state.groups[index]?.color || "var(--blue)"}">${escapeHtml(award.icon)}</mark>
+          <div>
+            <strong>${escapeHtml(award.title)}：${escapeHtml(award.target)}</strong>
+            <span>${escapeHtml(award.note)}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderFeedback() {
+      el.feedbackCount.textContent = `${state.feedbacks.length}条`;
+      el.quickFormUrl.value = state.quickFormUrl || "";
+      el.feedbackStudent.innerHTML = state.students.map(name => {
+        const selected = name === state.selectedStudent ? "selected" : "";
+        return `<option ${selected}>${escapeHtml(name)}</option>`;
+      }).join("");
+
+      const needHelp = state.feedbacks.filter(item => item.mastery === "需要讲解" || item.mood === "有困难").length;
+      const needCounts = state.feedbacks.reduce((map, item) => {
+        map[item.need] = (map[item.need] || 0) + 1;
+        return map;
+      }, {});
+      const topNeed = Object.entries(needCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "基础巩固";
+      el.feedbackTotal.textContent = state.feedbacks.length;
+      el.feedbackNeedHelp.textContent = needHelp;
+      el.feedbackTopNeed.textContent = topNeed;
+
+      if (state.quickFormUrl) {
+        el.quickFormFrame.innerHTML = `<iframe title="QuickForm课堂反馈表" src="${escapeAttr(state.quickFormUrl)}"></iframe>`;
+      } else {
+        el.quickFormFrame.textContent = "粘贴QuickForm链接后，这里会显示嵌入表单；未联网时可使用上方本地反馈表完成演示。";
+      }
+    }
+
+    function renderQuiz() {
+      const question = questions[state.currentQuestion];
+      el.questionIndex.textContent = `第${state.currentQuestion + 1}题`;
+      el.questionText.textContent = question.text;
+      el.questionMeta.textContent = `${question.subject} · ${question.level} · 当前小组：${state.activeGroup}`;
+      const answered = state.answeredQuestions[state.currentQuestion];
+      const completed = Object.keys(state.answeredQuestions).length;
+      const progress = Math.round(completed / questions.length * 100);
+      el.questProgressText.textContent = `${completed}/${questions.length}`;
+      el.questProgressFill.style.width = `${progress}%`;
+      el.questSteps.innerHTML = questions.map((_, index) => {
+        const done = state.answeredQuestions[index] ? " done" : "";
+        const current = index === state.currentQuestion ? " current" : "";
+        return `<span class="quest-step${done}${current}">${index + 1}</span>`;
+      }).join("");
+
+      el.choiceList.innerHTML = question.choices.map((choice, index) => {
+        let statusClass = "";
+        if (answered) {
+          if (index === question.answer) statusClass = " correct";
+          if (index === answered.choice && index !== question.answer) statusClass = " wrong";
+        }
+        return `
+          <button class="choice${statusClass}" type="button" onclick="answerQuestion(${index})">
+            <mark>${String.fromCharCode(65 + index)}</mark>
+            <span>${escapeHtml(choice)}</span>
+          </button>
+        `;
+      }).join("");
+
+      el.quizFeedback.textContent = answered
+        ? (answered.correct ? `回答正确。${question.explain}` : `继续思考。${question.explain}`)
+        : "请选择答案";
+    }
+
+    function renderAdvice() {
+      const accuracy = state.answered ? state.correct / state.answered : 0;
+      const leader = getLeader();
+      const weaker = state.groups.reduce((lowest, group) => group.score < lowest.score ? group : lowest, state.groups[0]);
+      const needHelp = state.feedbacks.filter(item => item.mastery === "需要讲解" || item.mood === "有困难").length;
+      const advice = [
+        {
+          color: "var(--blue)",
+          title: "课堂互动",
+          text: state.participation
+            ? `已记录${state.participation}次互动，建议继续让更多学生用“平均分”语言解释分数含义。`
+            : "可从随机点名开始，让学生说一说生活中的分数。"
+        },
+        {
+          color: "var(--green)",
+          title: "学习反馈",
+          text: state.answered
+            ? (accuracy >= .8 ? "多数学生能理解几分之一，可增加生活情境中的分数表达和小组展示。" : "正确率仍有提升空间，建议回到实物平均分操作，再进行错题讲评。")
+            : "完成分数知识闯关后将形成即时学习反馈。"
+        },
+        {
+          color: "var(--violet)",
+          title: "QuickForm数据",
+          text: state.feedbacks.length
+            ? `已采集${state.feedbacks.length}条反馈，其中${needHelp}条需要教师继续讲解或个别辅导。重点关注“分母越大每份越小”的理解。`
+            : "建议先让学生完成QuickForm反馈表，形成学情采集证据。"
+        },
+        {
+          color: "var(--amber)",
+          title: "小组协作",
+          text: `${leader.name}当前领先，${weaker.name}可获得一次基础题讲解或学具操作展示机会。`
+        },
+        {
+          color: "var(--red)",
+          title: "分层作业",
+          text: accuracy >= .8
+            ? "推荐拓展作业：用图画或生活照片表示3个分数，并说明平均分过程。"
+            : "推荐基础作业：画一画1/2、1/3、1/4，写出每个分数表示的平均分过程。"
+        }
+      ];
+
+      el.adviceList.innerHTML = advice.map(item => `
+        <div class="insight">
+          <div class="insight-icon" style="background:${item.color};">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="m4.93 4.93 2.83 2.83"></path><path d="m16.24 16.24 2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="m4.93 19.07 2.83-2.83"></path><path d="m16.24 7.76 2.83-2.83"></path></svg>
+          </div>
+          <div>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.text)}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderChart() {
+      const ctx = el.chart.getContext("2d");
+      const width = el.chart.width;
+      const height = el.chart.height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = "#dbe1ea";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = 42 + i * 55;
+        ctx.beginPath();
+        ctx.moveTo(58, y);
+        ctx.lineTo(width - 24, y);
+        ctx.stroke();
+      }
+
+      const mode = state.chartMode;
+      document.querySelectorAll("[data-chart]").forEach(button => {
+        button.classList.toggle("active", button.dataset.chart === mode);
+      });
+
+      const values = state.groups.map(group => {
+        if (mode === "accuracy") return group.attempts ? Math.round(group.correct / group.attempts * 100) : 0;
+        if (mode === "feedback") return state.feedbacks.filter(item => item.group === group.name).length;
+        return group.score;
+      });
+      const maxValue = Math.max(mode === "accuracy" ? 100 : 10, ...values);
+      const barWidth = Math.max(52, (width - 120) / state.groups.length - 34);
+      const baseY = height - 54;
+
+      ctx.font = "600 14px Microsoft YaHei, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      state.groups.forEach((group, index) => {
+        const value = values[index];
+        const x = 76 + index * ((width - 120) / state.groups.length) + 22;
+        const barHeight = Math.round((baseY - 42) * value / maxValue);
+        const y = baseY - barHeight;
+        ctx.fillStyle = group.color;
+        roundRect(ctx, x, y, barWidth, barHeight, 7);
+        ctx.fill();
+        ctx.fillStyle = "#1d2433";
+        const unit = mode === "accuracy" ? `${value}%` : mode === "feedback" ? `${value}条` : `${value}分`;
+        ctx.fillText(unit, x + barWidth / 2, y - 16);
+        ctx.fillStyle = "#687386";
+        ctx.fillText(group.name, x + barWidth / 2, baseY + 25);
+      });
+
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#344054";
+      ctx.font = "700 16px Microsoft YaHei, sans-serif";
+      const title = mode === "accuracy" ? "小组闯关正确率" : mode === "feedback" ? "QuickForm反馈分布" : "小组课堂积分";
+      ctx.fillText(title, 24, 24);
+    }
+
+    function renderLogs() {
+      const logs = state.logs.slice(0, 8);
+      el.logList.innerHTML = logs.length ? logs.map(log => `
+        <div class="log">
+          <strong>${escapeHtml(log.time)}</strong>
+          <span>${escapeHtml(log.title)}：${escapeHtml(log.text)}</span>
+        </div>
+      `).join("") : `<div class="log"><strong>待记录</strong><span>课堂互动开始后自动生成记录</span></div>`;
+    }
+
+    function buildReport() {
+      const leader = getLeader();
+      const accuracy = state.answered ? Math.round(state.correct / state.answered * 100) : 0;
+      const needHelp = state.feedbacks.filter(item => item.mastery === "需要讲解" || item.mood === "有困难").length;
+      return [
+        "作品名称：《AI赋能小学数学课堂互动评价与自主学习平台》",
+        "设计身份：小学教师",
+        "课例主题：小学数学三年级《认识分数》",
+        "",
+        "作品简介：",
+        "本作品面向真实小学课堂教学场景，以“平均分、几分之一、简单分数表达”为学习内容，融合随机点名、小组积分、知识闯关、QuickForm反馈采集、学习反馈、荣誉奖励和数据可视化等模块，帮助教师提升课堂互动效率，及时掌握学生学习表现，并为学生提供有针对性的自主学习反馈。",
+        "",
+        "功能亮点：",
+        `1. 课堂互动：已支持${state.students.length}名学生的随机点名与表现记录。`,
+        `2. 数据评价：当前记录${state.participation}次互动，闯关正确率${accuracy}%。`,
+        `3. 小组协作：${leader.name}当前积分领先，平台可实时呈现小组表现。`,
+        `4. QuickForm集成：当前采集${state.feedbacks.length}条学生反馈，其中${needHelp}条需要继续讲解或个别辅导。`,
+        "5. 学习反馈：根据答题结果、参与情况和反馈数据生成基础巩固、错题讲评、拓展挑战三类分层反馈。",
+        "6. 荣誉奖励：根据积分、闯关、反馈和表达情况生成合作探究小组、闯关进步星、表达展示星、自主学习星。",
+        "7. 可视化设计：提供积分图表、闯关打卡进度条、实时日志和作品说明导出。",
+        "",
+        "应用价值：",
+        "该作品体现了人工智能技术与小学数学课堂评价、学生参与、QuickForm数据采集、个性化反馈的融合，可用于课堂展示、学情分析、课后辅导和教师教学成果材料提交。",
+        "",
+        "评分对照：",
+        "教学性与交互性：围绕小学数学《认识分数》设计真实任务，随机点名、闯关答题、小组积分均可现场操作。",
+        "数据集成与技术实现：作品基于HTML、CSS、JavaScript实现，使用localStorage保存数据，Canvas绘制图表；QuickForm反馈表支持本地演示，也支持粘贴真实QuickForm链接嵌入展示。",
+        "汇报表达与荣誉奖励：页面支持打印和导出作品说明，用于现场讲解和材料提交。"
+      ].join("\n");
+    }
+
+    function rollStudent() {
+      if (!state.students.length) return;
+      const previous = state.selectedStudent;
+      let pick = state.students[Math.floor(Math.random() * state.students.length)];
+      if (state.students.length > 1) {
+        while (pick === previous) pick = state.students[Math.floor(Math.random() * state.students.length)];
+      }
+      state.selectedStudent = pick;
+      state.participation += 1;
+      addLog("随机点名", `${pick}参与课堂互动`);
+      el.studentDisplay.classList.remove("roll-active");
+      void el.studentDisplay.offsetWidth;
+      el.studentDisplay.classList.add("roll-active");
+      render();
+    }
+
+    function markStudent(label, scoreDelta) {
+      if (!state.selectedStudent) {
+        rollStudent();
+        return;
+      }
+      if (scoreDelta) changeScore(state.activeGroup, scoreDelta, false);
+      addLog("课堂表现", `${state.selectedStudent}${label}，${state.activeGroup}${scoreDelta ? "加1分" : "记录跟进"}`);
+      render();
+    }
+
+    function addStudent() {
+      const name = el.studentInput.value.trim();
+      if (!name) return;
+      if (!state.students.includes(name)) {
+        state.students.push(name);
+        addLog("名单更新", `新增学生：${name}`);
+      }
+      el.studentInput.value = "";
+      render();
+    }
+
+    function saveRoster() {
+      const names = el.rosterEditor.value.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
+      state.students = Array.from(new Set(names));
+      if (!state.students.includes(state.selectedStudent)) state.selectedStudent = "";
+      addLog("名单保存", `当前名单共${state.students.length}人`);
+      render();
+    }
+
+    async function submitFeedback() {
+      const student = el.feedbackStudent.value || state.selectedStudent || state.students[0] || "学生";
+      const item = {
+        student,
+        group: state.activeGroup,
+        mastery: el.feedbackMastery.value,
+        mood: el.feedbackMood.value,
+        need: el.feedbackNeed.value,
+        text: el.feedbackText.value.trim() || "暂无补充"
+      };
+      try { await CaseFlow.send(item); } catch { return; }
+      state.feedbacks.unshift(item);
+      state.feedbacks = state.feedbacks.slice(0, 50);
+      el.feedbackText.value = "";
+      addLog("QuickForm反馈", `${student}提交：${item.mastery}，${item.need}`);
+      render();
+    }
+
+    function changeScore(groupName, delta, shouldRender = true) {
+      const group = state.groups.find(item => item.name === groupName);
+      if (!group) return;
+      group.score = Math.max(0, group.score + delta);
+      addLog("积分调整", `${group.name}${delta > 0 ? "加" : "减"}${Math.abs(delta)}分`);
+      if (shouldRender) render();
+    }
+
+    function answerQuestion(choice) {
+      const question = questions[state.currentQuestion];
+      if (state.answeredQuestions[state.currentQuestion]) return;
+      const correct = choice === question.answer;
+      state.answeredQuestions[state.currentQuestion] = { choice, correct, group: state.activeGroup };
+      state.answered += 1;
+      if (correct) state.correct += 1;
+
+      const group = state.groups.find(item => item.name === state.activeGroup);
+      if (group) {
+        group.attempts += 1;
+        if (correct) {
+          group.correct += 1;
+          group.score += 2;
+        } else {
+          group.score = Math.max(0, group.score - 1);
+        }
+      }
+
+      addLog("知识闯关", `${state.activeGroup}${correct ? "答对" : "答错"}第${state.currentQuestion + 1}题`);
+      render();
+    }
+
+    function moveQuestion(direction) {
+      const next = state.currentQuestion + direction;
+      if (next < 0 || next >= questions.length) return;
+      state.currentQuestion = next;
+      render();
+    }
+
+    function resetAll() {
+      if (!confirm("确认重置课堂数据？学生名单会保留默认设置。")) return;
+      localStorage.removeItem(storageKey);
+      state = structuredClone(defaultState);
+      addLog("系统重置", "已恢复默认演示数据");
+      render();
+    }
+
+    function exportReport() {
+      const blob = new Blob([buildReport()], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "AI课堂互动评价与自主学习平台_作品说明.txt";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      addLog("材料导出", "已生成作品说明文本");
+      render();
+    }
+
+    function addLog(title, text) {
+      const time = new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+      state.logs.unshift({ time, title, text });
+      state.logs = state.logs.slice(0, 30);
+    }
+
+    function getLeader() {
+      return state.groups.reduce((best, group) => group.score > best.score ? group : best, state.groups[0]);
+    }
+
+    function statusLabel(accuracy, answered) {
+      if (!answered) return "待启动";
+      if (accuracy >= 85) return "优秀";
+      if (accuracy >= 70) return "良好";
+      if (accuracy >= 50) return "巩固";
+      return "需辅导";
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + width, y, x + width, y + height, r);
+      ctx.arcTo(x + width, y + height, x, y + height, r);
+      ctx.arcTo(x, y + height, x, y, r);
+      ctx.arcTo(x, y, x + width, y, r);
+      ctx.closePath();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+  </script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

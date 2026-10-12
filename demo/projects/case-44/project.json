@@ -1,0 +1,12 @@
+{
+  "id": "case-44",
+  "title": "二叉查找树无限 PK",
+  "category": "programming",
+  "description": "搜索树操作图谱：围绕得分、轮次、错误开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 44,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

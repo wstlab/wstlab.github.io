@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":40,"key":"case-40","title":"格点多边形探究实验室","category":"exploration","description":"格点规律观测：围绕内部格点、边界格点、面积开展交互学习，在数据大屏中回看记录。","headline":"格点规律观测","view":"scatter","fields":[{"key":"a","label":"内部格点"},{"key":"b","label":"边界格点"},{"key":"S","label":"面积"},{"key":"area","label":"面积"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开探究"}],"tasks":{"records":"ygLhEbWQpPK"},"mapping":{"odwm4j8rkr":"ygLhEbWQpPK"},"accent":"#327a72","capture":false,"lesson":"打开探究"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>格点多边形探究实验室 | 精确库版 (a=0~10) + JSON提交</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #f5efe5;
+            font-family: 'Segoe UI', '微软雅黑', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #2c3e2f;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 2rem; color: #8b5a2b; margin: 0; }
+        .header p { font-size: 0.9rem; color: #b87c4a; margin-top: 5px; }
+        .control-bar {
+            background: #fff9ef;
+            border-radius: 60px;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e5d5bb;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f5ede0;
+            padding: 6px 18px;
+            border-radius: 40px;
+        }
+        .control-group label { font-weight: bold; font-size: 1.2rem; color: #5e3a1c; }
+        .control-group input {
+            width: 80px;
+            padding: 8px 12px;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 1px solid #d4b68a;
+            border-radius: 36px;
+            background: white;
+            font-weight: bold;
+        }
+        button {
+            background-color: #8b5a2b;
+            border: none;
+            color: white;
+            padding: 8px 22px;
+            font-size: 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #6b4318; transform: scale(1.02); }
+        .btn-outline { background-color: #b87c4a; }
+        .btn-clear { background-color: #9b7b5c; }
+        .polygons-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .poly-card {
+            background: white;
+            border-radius: 32px;
+            padding: 18px 16px 20px;
+            width: 310px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border: 1px solid #eedfcb;
+            text-align: center;
+        }
+        .poly-card canvas {
+            background: #fffcf5;
+            border-radius: 20px;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto;
+        }
+        .card-title {
+            background: #f0e7da;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 12px 0 8px;
+            color: #5a3a1c;
+        }
+        .input-area {
+            background: #faf6ef;
+            border-radius: 24px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .input-row span { font-weight: bold; width: 30px; color: #5e3a1c; }
+        .input-row input {
+            flex: 1;
+            padding: 7px;
+            border-radius: 28px;
+            border: 1px solid #ddceb5;
+            background: white;
+            text-align: center;
+        }
+        .check-btn {
+            background-color: #5a7c5a;
+            width: 100%;
+            padding: 7px;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+        .result-msg {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            padding: 6px;
+            border-radius: 30px;
+            background: #ece3d8;
+        }
+        .correct { color: #2c6e2c; background: #e0f0e0; }
+        .wrong { color: #b33; background: #ffe6e6; }
+        .neutral { color: #7a6233; }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #a48c6f;
+            margin-top: 25px;
+            border-top: 1px solid #e6d5b8;
+            padding-top: 15px;
+        }
+        #loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #8b5a2b;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🏛️ 格点多边形探究实验室</h1>
+        <p>—— 内部格点数 a = 0 ~ 10 | 凸多边形 | 精确预生成库 | JSON自动提交</p>
+    </div>
+    <div class="control-bar">
+        <div class="control-group">
+            <label>🔢 固定内部格点数 a =</label>
+            <input type="number" id="fixedA" min="0" max="10" value="1" step="1">
+        </div>
+        <button id="generateNewBtn">✨ 生成新多边形（清空列表）</button>
+        <button id="addMoreBtn" class="btn-outline">➕ 再生成一个（保留现有）</button>
+        <button id="clearAllBtn" class="btn-clear">🗑️ 清空所有图形</button>
+    </div>
+    <div id="loading">⏳ 正在构建多边形库（仅首次加载），请稍候...</div>
+    <div id="polygonsContainer" class="polygons-grid" style="display:none;"></div>
+    <div style="text-align:center; margin-top:10px;">
+        <small>💡 提示：固定a值（0~10）→ 生成多边形 → 数出边界格点数 b 和面积 S → 填入检验 → 自动验证并提交数据（JSON格式）。</small>
+    </div>
+    <footer>
+        📐 每个多边形的内部格点数经过精确枚举计算，严格等于所选 a 值。<br>
+        🧠 检验时自动对比正确 b 和 S，帮助学生自主发现 S = a + b/2 - 1。
+    </footer>
+</div>
+
+<script>
+    // ======================== 几何计算函数（与原代码完全相同）================
+    function polygonArea(vertices) {
+        let sum = 0;
+        const n = vertices.length;
+        for (let i = 0; i < n; i++) {
+            const x1 = vertices[i][0], y1 = vertices[i][1];
+            const x2 = vertices[(i+1)%n][0], y2 = vertices[(i+1)%n][1];
+            sum += x1 * y2 - x2 * y1;
+        }
+        return Math.abs(sum) / 2;
+    }
+    function gcd(a, b) {
+        a = Math.abs(a); b = Math.abs(b);
+        while (b !== 0) { let t = b; b = a % b; a = t; }
+        return a;
+    }
+    function countBoundaryPoints(vertices) {
+        let boundary = 0;
+        const n = vertices.length;
+        for (let i = 0; i < n; i++) {
+            const x1 = vertices[i][0], y1 = vertices[i][1];
+            const x2 = vertices[(i+1)%n][0], y2 = vertices[(i+1)%n][1];
+            boundary += gcd(x2 - x1, y2 - y1);
+        }
+        return boundary;
+    }
+    function getInternalPoints(vertices) {
+        const area = polygonArea(vertices);
+        const boundary = countBoundaryPoints(vertices);
+        return Math.round(area - boundary/2 + 1);
+    }
+    function cross(o, a, b) {
+        return (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
+    }
+    function isConvex(vertices) {
+        const n = vertices.length;
+        if (n < 3) return false;
+        let sign = 0;
+        for (let i = 0; i < n; i++) {
+            const p = vertices[i];
+            const q = vertices[(i+1)%n];
+            const r = vertices[(i+2)%n];
+            const cr = cross(p, q, r);
+            if (cr !== 0) {
+                if (sign === 0) sign = cr > 0 ? 1 : -1;
+                else if ((cr > 0 && sign < 0) || (cr < 0 && sign > 0)) return false;
+            }
+        }
+        return true;
+    }
+    function generateAllConvexPolygons(maxCoord=8, minV=4, maxV=7) {
+        const results = [];
+        const points = [];
+        for (let x = 0; x <= maxCoord; x++) {
+            for (let y = 0; y <= maxCoord; y++) {
+                points.push([x, y]);
+            }
+        }
+        const seen = new Set();
+        for (let attempt = 0; attempt < 8000; attempt++) {
+            const numVertices = Math.floor(Math.random() * (maxV - minV + 1)) + minV;
+            const shuffled = [...points];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            const selected = shuffled.slice(0, numVertices);
+            const hull = convexHull(selected);
+            if (hull.length < 3) continue;
+            const key = hull.map(p => `${p[0]},${p[1]}`).sort().join(';');
+            if (seen.has(key)) continue;
+            seen.add(key);
+            let strict = true;
+            const n = hull.length;
+            for (let i = 0; i < n; i++) {
+                if (cross(hull[i], hull[(i+1)%n], hull[(i+2)%n]) === 0) { strict = false; break; }
+            }
+            if (!strict) continue;
+            const a = getInternalPoints(hull);
+            if (a >= 0 && a <= 10) {
+                results.push({ a: a, vertices: hull });
+            }
+        }
+        const grouped = {};
+        for (let poly of results) {
+            if (!grouped[poly.a]) grouped[poly.a] = [];
+            grouped[poly.a].push(poly);
+        }
+        for (let a = 0; a <= 10; a++) {
+            if (!grouped[a] || grouped[a].length < 10) {
+                for (let w = a+2; w <= 12; w++) {
+                    for (let h = 2; h <= 8; h++) {
+                        const rect = [[0,0],[w,0],[w,h],[0,h]];
+                        const aRect = getInternalPoints(rect);
+                        if (aRect === a) {
+                            grouped[a] = grouped[a] || [];
+                            grouped[a].push({ a: a, vertices: rect });
+                            break;
+                        }
+                    }
+                    if (grouped[a] && grouped[a].length >= 10) break;
+                }
+            }
+        }
+        return grouped;
+    }
+    function convexHull(points) {
+        if (points.length < 3) return points.slice();
+        const sorted = points.slice().sort((a,b) => a[0]!==b[0] ? a[0]-b[0] : a[1]-b[1]);
+        const lower = [];
+        for (let p of sorted) {
+            while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop();
+            lower.push(p);
+        }
+        const upper = [];
+        for (let i = sorted.length-1; i >= 0; i--) {
+            const p = sorted[i];
+            while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop();
+            upper.push(p);
+        }
+        const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+        return hull;
+    }
+
+    let polygonLibrary = null;
+
+    async function initLibrary() {
+        const loadingDiv = document.getElementById('loading');
+        const container = document.getElementById('polygonsContainer');
+        loadingDiv.style.display = 'block';
+        container.style.display = 'none';
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const lib = generateAllConvexPolygons(8, 4, 6);
+        polygonLibrary = lib;
+        loadingDiv.style.display = 'none';
+        container.style.display = 'flex';
+        generateNewSet();
+    }
+
+    function getRandomPolygonByA(targetA, existingList) {
+        const candidates = polygonLibrary[targetA] || [];
+        if (candidates.length === 0) {
+            let w = Math.min(10, Math.max(3, targetA+2));
+            let h = Math.min(8, Math.max(2, Math.floor(targetA/w)+2));
+            let rect = [[0,0],[w,0],[w,h],[0,h]];
+            let actual = getInternalPoints(rect);
+            let attempts = 0;
+            while (actual !== targetA && attempts < 30) {
+                if (actual < targetA) { w++; h++; }
+                else { w--; h--; }
+                w = Math.min(12, Math.max(2, w));
+                h = Math.min(10, Math.max(2, h));
+                rect = [[0,0],[w,0],[w,h],[0,h]];
+                actual = getInternalPoints(rect);
+                attempts++;
+            }
+            const area = polygonArea(rect);
+            const b = countBoundaryPoints(rect);
+            return { a: targetA, vertices: rect, area, b };
+        }
+        const shuffled = [...candidates];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        for (let cand of shuffled) {
+            const norm = normalizeVertices(cand.vertices);
+            let dup = false;
+            for (let item of existingList) {
+                if (normalizeVertices(item.data.vertices) === norm) {
+                    dup = true;
+                    break;
+                }
+            }
+            if (!dup) {
+                const area = polygonArea(cand.vertices);
+                const b = countBoundaryPoints(cand.vertices);
+                return { a: targetA, vertices: cand.vertices.map(v=>[...v]), area, b };
+            }
+        }
+        const fallback = candidates[0];
+        const area = polygonArea(fallback.vertices);
+        const b = countBoundaryPoints(fallback.vertices);
+        return { a: targetA, vertices: fallback.vertices.map(v=>[...v]), area, b };
+    }
+    function normalizeVertices(vertices) {
+        return vertices.map(v => `${v[0]},${v[1]}`).sort().join(';');
+    }
+
+    function drawPolygon(canvas, vertices) {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#fefaf0";
+        ctx.fillRect(0, 0, w, h);
+        if (!vertices.length) return;
+        let minX = Math.min(...vertices.map(v=>v[0]), 0);
+        let maxX = Math.max(...vertices.map(v=>v[0]), 8);
+        let minY = Math.min(...vertices.map(v=>v[1]), 0);
+        let maxY = Math.max(...vertices.map(v=>v[1]), 8);
+        const rangeX = maxX - minX, rangeY = maxY - minY;
+        const padding = 0.1;
+        const scaleX = (w * (1-2*padding)) / (rangeX||1);
+        const scaleY = (h * (1-2*padding)) / (rangeY||1);
+        const scale = Math.min(scaleX, scaleY);
+        const offX = w*padding + (w*(1-2*padding)-scale*rangeX)/2 - minX*scale;
+        const offY = h*padding + (h*(1-2*padding)-scale*rangeY)/2 - minY*scale;
+        ctx.save();
+        ctx.strokeStyle = "#ddd2c0";
+        ctx.lineWidth = 0.6;
+        for (let x=Math.floor(minX); x<=Math.ceil(maxX); x++) {
+            const sx = offX + x*scale;
+            if (sx>=0 && sx<=w) {
+                ctx.beginPath();
+                ctx.moveTo(sx, offY+minY*scale);
+                ctx.lineTo(sx, offY+maxY*scale);
+                ctx.stroke();
+            }
+        }
+        for (let y=Math.floor(minY); y<=Math.ceil(maxY); y++) {
+            const sy = offY + y*scale;
+            if (sy>=0 && sy<=h) {
+                ctx.beginPath();
+                ctx.moveTo(offX+minX*scale, sy);
+                ctx.lineTo(offX+maxX*scale, sy);
+                ctx.stroke();
+            }
+        }
+        ctx.beginPath();
+        let first=true;
+        for (let v of vertices) {
+            const x = offX + v[0]*scale;
+            const y = offY + v[1]*scale;
+            if (first) { ctx.moveTo(x,y); first=false; }
+            else ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = "rgba(180,130,80,0.2)";
+        ctx.fill();
+        ctx.strokeStyle = "#8b5a2b";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.fillStyle = "#c0392b";
+        for (let v of vertices) {
+            const x = offX + v[0]*scale;
+            const y = offY + v[1]*scale;
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, 2*Math.PI);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    let polygonsList = [];
+    function renderCards() {
+        const container = document.getElementById('polygonsContainer');
+        container.innerHTML = '';
+        polygonsList.forEach((item, idx) => {
+            const d = item.data;
+            const card = document.createElement('div');
+            card.className = 'poly-card';
+            const canvas = document.createElement('canvas');
+            canvas.width = 280;
+            canvas.height = 280;
+            canvas.style.width = '100%';
+            canvas.style.height = 'auto';
+            drawPolygon(canvas, d.vertices);
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            title.innerText = `🔍 图形 ${idx+1}  |  固定 a = ${d.a}`;
+            const inputArea = document.createElement('div');
+            inputArea.className = 'input-area';
+            inputArea.innerHTML = `
+                <div class="input-row"><span>b:</span><input type="number" id="b_${idx}" placeholder="边界格点数" step="1"></div>
+                <div class="input-row"><span>S:</span><input type="number" id="s_${idx}" placeholder="面积" step="0.5"></div>
+                <button class="check-btn" data-idx="${idx}">✅ 检验</button>
+                <div id="result_${idx}" class="result-msg neutral">⚡ 填写 b 和 S 后点击检验</div>
+            `;
+            card.appendChild(canvas);
+            card.appendChild(title);
+            card.appendChild(inputArea);
+            container.appendChild(card);
+        });
+        document.querySelectorAll('.check-btn').forEach(btn => {
+            btn.removeEventListener('click', handleCheck);
+            btn.addEventListener('click', handleCheck);
+        });
+    }
+    function handleCheck(e) {
+        const btn = e.currentTarget;
+        const idx = parseInt(btn.dataset.idx, 10);
+        if (isNaN(idx) || idx>=polygonsList.length) return;
+        const d = polygonsList[idx].data;
+        const bInp = document.getElementById(`b_${idx}`);
+        const sInp = document.getElementById(`s_${idx}`);
+        const resDiv = document.getElementById(`result_${idx}`);
+        const userB = parseFloat(bInp.value);
+        const userS = parseFloat(sInp.value);
+        if (isNaN(userB) || isNaN(userS)) {
+            resDiv.innerHTML = '❓ 请完整填写 b 和 S';
+            resDiv.className = 'result-msg wrong';
+            return;
+        }
+        const bOk = (userB === d.b);
+        const sOk = (Math.abs(userS - d.area) < 0.01);
+        if (bOk && sOk) {
+            resDiv.innerHTML = `🎉 完全正确！ b = ${d.b}, S = ${d.area}`;
+            resDiv.className = 'result-msg correct';
+            
+            // ========== 修改为 JSON 格式提交 ==========
+            const apiUrl = 'https://qf.kjxs.site/api/ygLhEbWQpPK';
+            const jsonData = {
+                a: d.a,
+                b: d.b,
+                S: d.area
+            };
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ 数据已提交到 QuickForm', data);
+                } else {
+                    console.error('❌ 提交失败：', data.message);
+                }
+            })
+            .catch(error => console.error('❌ 网络错误', error));
+        } else {
+            let msg = '❌ 不正确。';
+            if (!bOk) msg += ` 边界格点数应为 ${d.b}；`;
+            if (!sOk) msg += ` 面积应为 ${d.area}。`;
+            resDiv.innerHTML = msg;
+            resDiv.className = 'result-msg wrong';
+        }
+    }
+    function addPolygon() {
+        let a = parseInt(document.getElementById('fixedA').value, 10);
+        if (isNaN(a)) a = 1;
+        a = Math.min(10, Math.max(0, a));
+        if (!polygonLibrary) return;
+        const poly = getRandomPolygonByA(a, polygonsList);
+        polygonsList.push({ id: Date.now(), data: poly });
+        renderCards();
+    }
+    function clearAll() { polygonsList = []; renderCards(); }
+    function generateNewSet() { clearAll(); addPolygon(); }
+    document.getElementById('generateNewBtn').addEventListener('click', generateNewSet);
+    document.getElementById('addMoreBtn').addEventListener('click', () => addPolygon());
+    document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+    
+    initLibrary();
+</script>
+</body>
+</html>

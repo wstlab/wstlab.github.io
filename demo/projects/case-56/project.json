@@ -1,0 +1,12 @@
+{
+  "id": "case-56",
+  "title": "记录身边的数据 · 在线导学单",
+  "category": "observation",
+  "description": "身边数据观察簿：围绕观察任务、数值、单位开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 56,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

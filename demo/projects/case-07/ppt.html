@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":7,"key":"case-07","title":"巧算24点","category":"practice","description":"用四则运算挑战24点，保留多次尝试与竞赛过程，比较不同解法。","headline":"24点解法研究","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"correctCount","label":"正确题数"},{"key":"totalTime","label":"用时"},{"key":"expression","label":"运算表达式"}],"upload":"","rebuilt":false,"configIds":["e4x91r8wjq"],"pages":[{"file":"ppt.html","title":"同题多解 · PPT教学版"},{"file":"ppt-dashboard.html","title":"同题多解 · 数据分析"},{"file":"index.html","title":"竞赛练习 · 进阶版"},{"file":"lesson-2.html","title":"规则讲解课件"}],"tasks":{"records":"3R1MoMlX7OB","config-e4x91r8wjq":"Dh0DyVuVtKX"},"mapping":{"e4x91r8wjq":"Dh0DyVuVtKX","xpmozn8xui":"3R1MoMlX7OB","kvn2uastxj":"3R1MoMlX7OB"},"accent":"#4468ab","capture":false,"lesson":"PPT同题多解"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24点·多解法可重复提交</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .game-container {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 48px;
+            padding: 30px 28px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        h1 {
+            color: #f0e9db;
+            font-weight: 500;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span {
+            background: #fbbf24;
+            color: #0f172a;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 6px 18px;
+            border-radius: 60px;
+            margin-left: auto;
+        }
+        .student-area {
+            background: #2d3a4e;
+            border-radius: 60px;
+            padding: 16px 24px;
+            margin: 20px 0 25px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border: 1px solid #60768f;
+        }
+        .student-area label {
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        #studentName {
+            background: #1e2a3a;
+            border: 1px solid #5f7a9a;
+            border-radius: 40px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            color: white;
+            outline: none;
+            flex: 2 1 220px;
+            transition: 0.2s;
+        }
+        #studentName:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+        }
+        .card-panel {
+            background: #1e2a3a;
+            border-radius: 40px;
+            padding: 28px 20px;
+            border: 1px solid #4a607a;
+            margin-bottom: 28px;
+        }
+        .numbers {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin: 10px 0 20px 0;
+        }
+        .num-card {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            width: 90px;
+            height: 90px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 15px 0 #b45309, 0 20px 20px -10px black;
+            transition: 0.1s ease;
+        }
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+        .expression-box {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        #expressionInput {
+            flex: 3 1 260px;
+            background: #0f1a24;
+            border: 2px solid #54789e;
+            border-radius: 60px;
+            padding: 18px 25px;
+            font-size: 1.4rem;
+            color: #f8fafc;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            letter-spacing: 1px;
+            outline: none;
+            text-align: center;
+        }
+        #expressionInput:focus {
+            border-color: #fbbf24;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 12px 0 8px;
+        }
+        button {
+            background: #334155;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 28px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 6px 0 #1e293b;
+            border: 1px solid #5f7a9a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1 0 auto;
+        }
+        button:hover {
+            background: #40566e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #1e293b;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e293b;
+        }
+        .submit-btn {
+            background: #fbbf24;
+            color: #0f172a;
+            border-color: #f59e0b;
+            box-shadow: 0 6px 0 #b45309;
+            font-size: 1.3rem;
+        }
+        .skip-btn {
+            background: #475569;
+            border-color: #94a3b8;
+        }
+        .end-btn {
+            background: #b91c1c;
+            border-color: #991b1b;
+            box-shadow: 0 6px 0 #7f1d1d;
+        }
+        .message {
+            min-height: 60px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f1a24;
+            border-radius: 40px;
+            padding: 12px 25px;
+            margin: 15px 0 5px;
+            border-left: 8px solid #fbbf24;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            color: #a5b4cb;
+            font-size: 1.1rem;
+            background: #1a2634;
+            padding: 15px 22px;
+            border-radius: 40px;
+            margin-top: 25px;
+            border: 1px solid #41546b;
+        }
+        .stats strong {
+            color: #fbbf24;
+            font-size: 1.3rem;
+            margin-left: 8px;
+        }
+        .history-note {
+            font-size: 0.9rem;
+            color: #9ca9bc;
+            text-align: right;
+        }
+        .hint-badge {
+            background: #2b3b4e;
+            color: #fbbf24;
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .feature-note {
+            background: #1e2a3a;
+            color: #a5b4cb;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 10px;
+            border: 1px dashed #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🧮 24点·多解法 <span>正确多次计数</span></h1>
+        
+        <!-- 姓名区域 -->
+        <div class="student-area">
+            <label for="studentName">👤 演示称呼</label>
+            <input type="text" id="studentName" placeholder="例如：探索者01" value="探索者01" autocomplete="off">
+        </div>
+
+        <!-- 主卡片 -->
+        <div class="card-panel">
+            <div class="feature-note">
+                ⭐ 同一题目可反复尝试，每次正确都计数 ⭐
+            </div>
+            <div class="numbers" id="numberCards">
+                <!-- 动态生成四个数字卡片 -->
+                <div class="num-card">3</div>
+                <div class="num-card">3</div>
+                <div class="num-card">8</div>
+                <div class="num-card">8</div>
+            </div>
+
+            <!-- 输入与操作 -->
+            <div class="input-area">
+                <div class="expression-box">
+                    <input type="text" id="expressionInput" placeholder="例如 (8-3)×3+8" value="">
+                </div>
+                <div class="action-buttons">
+                    <button class="submit-btn" id="submitBtn">✅ 提交</button>
+                    <button class="skip-btn" id="skipBtn">⏭️ 换一题 (跳过)</button>
+                    <button class="end-btn" id="endBtn">🏁 结束并上传</button>
+                </div>
+            </div>
+
+            <!-- 提示信息 -->
+            <div class="message" id="messageArea">✨ 输入算式，点击提交</div>
+            <div class="hint-badge" id="solvabilityBadge">✅ 本题保证有解</div>
+        </div>
+
+        <!-- 统计板 -->
+        <div class="stats">
+            <span>📋 累计正确次数: <strong id="completedCount">0</strong></span>
+            <span class="history-note">⚡ 本题尝试: <span id="attemptCounter">0</span></span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 核心状态 ----------
+            // 当前题目四个数字 (初始随机生成有解题目，不再是固定的3,3,8,8)
+            let currentNumbers = [];
+            // 累计正确次数 (同一题目可多次正确，每次都增加)
+            let totalCorrectCount = 0;
+            // 当前题目学生的提交记录 (每个条目: { expression, isCorrect, timestamp })
+            let currentSubmissionRecords = [];
+            // 学生姓名
+            let studentName = "探索者01";
+
+            // DOM 元素
+            const nameInput = document.getElementById('studentName');
+            const numberCardsDiv = document.getElementById('numberCards');
+            const expressionInput = document.getElementById('expressionInput');
+            const messageArea = document.getElementById('messageArea');
+            const completedSpan = document.getElementById('completedCount');
+            const attemptSpan = document.getElementById('attemptCounter');
+            const solvabilityBadge = document.getElementById('solvabilityBadge');
+
+            // 辅助函数: 更新UI数字卡片
+            function renderNumbers() {
+                const cards = numberCardsDiv.querySelectorAll('.num-card');
+                for (let i = 0; i < cards.length; i++) {
+                    cards[i].textContent = currentNumbers[i];
+                }
+            }
+
+            // 更新统计数据展示
+            function updateStatsDisplay() {
+                completedSpan.textContent = totalCorrectCount;
+                attemptSpan.textContent = currentSubmissionRecords.length;
+            }
+
+            // ---------- 24点可解性检查 (回溯法) ----------
+            function isSolvable(numbers) {
+                const eps = 0.0001;
+                let arr = [...numbers];
+                
+                const backtrack = (list) => {
+                    if (list.length === 1) {
+                        return Math.abs(list[0] - 24) < eps;
+                    }
+                    const n = list.length;
+                    for (let i = 0; i < n; i++) {
+                        for (let j = i + 1; j < n; j++) {
+                            const a = list[i];
+                            const b = list[j];
+                            const remaining = list.filter((_, idx) => idx !== i && idx !== j);
+                            
+                            const results = new Set();
+                            results.add(a + b);
+                            results.add(a - b);
+                            results.add(b - a);
+                            results.add(a * b);
+                            if (Math.abs(b) > eps) results.add(a / b);
+                            if (Math.abs(a) > eps) results.add(b / a);
+                            
+                            for (let val of results) {
+                                const newList = [val, ...remaining];
+                                if (backtrack(newList)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                };
+                
+                return backtrack(arr);
+            }
+
+            // 生成确保有解的四个1~13数字
+            function generateSolvablePuzzle() {
+                const maxAttempts = 500;
+                for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                    const candidate = Array.from({ length: 4 }, () => Math.floor(Math.random() * 13) + 1);
+                    if (isSolvable(candidate)) {
+                        return candidate;
+                    }
+                }
+                // 保底返回一个经典有解组合 (3,3,8,8) - 但这种情况极少发生
+                console.warn('使用保底题目 3,3,8,8');
+                return [3, 3, 8, 8];
+            }
+
+            // 切换到下一题 (保留姓名，重置当前记录，生成有解新数字)
+            function loadNextPuzzle() {
+                // 重置当前提交记录
+                currentSubmissionRecords = [];
+                // 生成确保有解的新数字
+                currentNumbers = generateSolvablePuzzle();
+                renderNumbers();
+                // 清空输入框 (设置为空白)
+                expressionInput.value = '';
+                messageArea.innerHTML = '✨ 新题目 (保证可算出24)';
+                solvabilityBadge.innerHTML = '✅ 本题保证有解';
+                updateStatsDisplay();
+            }
+
+            // 检查算式是否合法且结果等于24
+            function evaluateExpression(expr, numbers) {
+                const cleaned = expr.replace(/\s+/g, '');
+                if (cleaned === '') return { valid: false, reason: '算式为空' };
+
+                if (!/^[\d\+\-\*\/\(\)\.]+$/.test(cleaned)) {
+                    return { valid: false, reason: '包含非法字符' };
+                }
+
+                const tokens = cleaned.match(/\d+(\.\d+)?|[\+\-\*\/\(\)]/g) || [];
+                const numberTokens = tokens.filter(t => /^\d/.test(t)).map(t => parseFloat(t));
+                
+                if (numberTokens.length !== 4) {
+                    return { valid: false, reason: `需要使用4个数字 (当前${numberTokens.length}个)` };
+                }
+
+                const sortedInput = [...numberTokens].sort((a,b) => a - b);
+                const sortedCurrent = [...currentNumbers].sort((a,b) => a - b);
+                for (let i = 0; i < 4; i++) {
+                    if (Math.abs(sortedInput[i] - sortedCurrent[i]) > 0.0001) {
+                        return { valid: false, reason: '使用的数字与题目不符' };
+                    }
+                }
+
+                try {
+                    const func = new Function(`return (${cleaned})`);
+                    const result = func();
+                    const isTwentyFour = Math.abs(result - 24) < 0.000001;
+                    return { 
+                        valid: true, 
+                        result: result, 
+                        isTwentyFour: isTwentyFour,
+                        reason: isTwentyFour ? '正确' : `结果 = ${result}，不等于24`
+                    };
+                } catch (e) {
+                    return { valid: false, reason: '算式不合法 (括号或运算错误)' };
+                }
+            }
+
+            // 处理提交 (正确后不自动换题，可继续尝试)
+            function handleSubmit() {
+                studentName = nameInput.value.trim() || "匿名";
+
+                const expr = expressionInput.value.trim();
+                if (expr === '') {
+                    messageArea.innerHTML = '⚠️ 请输入算式';
+                    return;
+                }
+
+                const evalResult = evaluateExpression(expr, currentNumbers);
+                
+                const timestamp = new Date().toISOString();
+                const submissionRecord = {
+                    expression: expr,
+                    isCorrect: evalResult.valid && evalResult.isTwentyFour ? true : false,
+                    timestamp: timestamp,
+                    usedNumbers: [...currentNumbers],
+                    evaluationDetail: evalResult.reason || (evalResult.valid ? `结果: ${evalResult.result}` : '无效')
+                };
+
+                // 无论对错，推入当前提交记录
+                currentSubmissionRecords.push(submissionRecord);
+                
+                // 判断是否正确（有效且结果==24）
+                if (evalResult.valid && evalResult.isTwentyFour) {
+                    // 正确：累计正确次数+1，但题目不变，不清空记录
+                    totalCorrectCount += 1;
+                    messageArea.innerHTML = `🎉 计算正确！总正确次数 +1 (可继续尝试其他解法或跳过)`;
+                    
+                    // 记录到主日志
+                    masterHistory.push({ 
+                        type: 'submit', 
+                        ...submissionRecord, 
+                        studentName, 
+                        puzzle: [...currentNumbers],
+                        action: 'correct' 
+                    });
+
+                    // 更新显示，但不换题，不清空currentSubmissionRecords
+                    updateStatsDisplay();
+                } else {
+                    // 错误答案
+                    const reason = evalResult.valid ? `结果 = ${evalResult.result}，不等于24` : (evalResult.reason || '无效算式');
+                    messageArea.innerHTML = `❌ 计算错误: ${reason}`;
+                    
+                    // 记录到主日志
+                    masterHistory.push({ 
+                        type: 'submit', 
+                        ...submissionRecord, 
+                        studentName, 
+                        puzzle: [...currentNumbers],
+                        action: 'incorrect' 
+                    });
+                    
+                    updateStatsDisplay();
+                }
+            }
+
+            // 跳过此题 (换一题，重置当前题目记录)
+            function handleSkip() {
+                studentName = nameInput.value.trim() || "匿名";
+                
+                const timestamp = new Date().toISOString();
+                const skipRecord = {
+                    type: 'skip',
+                    expression: '【跳过】',
+                    isCorrect: false,
+                    timestamp: timestamp,
+                    usedNumbers: [...currentNumbers],
+                    evaluationDetail: '用户跳过此题',
+                    studentName: studentName,
+                    puzzle: [...currentNumbers],
+                    action: 'skip'
+                };
+                masterHistory.push(skipRecord);
+                
+                // 重置当前题目的提交记录 (换题)
+                currentSubmissionRecords = []; 
+                
+                // 加载下一题 (新数字)
+                loadNextPuzzle();  // 内部会重置 currentSubmissionRecords 并刷新
+                messageArea.innerHTML = '⏩ 已换题，开始新题目';
+                updateStatsDisplay();
+            }
+
+            // 结束并上传
+            function handleEnd() {
+                studentName = nameInput.value.trim() || "匿名";
+
+                if (!studentName || studentName === '匿名') {
+                    if (!confirm('姓名未填写，确定要继续吗？')) return;
+                }
+
+                const uploadData = {
+                    studentName: studentName,
+                    totalCorrectCount: totalCorrectCount,   // 累计正确次数
+                    submissions: masterHistory.map(rec => ({ ...rec }))
+                };
+
+                fetch('https://qf.kjxs.site/api/3R1MoMlX7OB', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(uploadData, null, 2)
+                })
+                .then(res => {
+                    if (res.ok) return res.text();
+                    else throw new Error(`服务器响应 ${res.status}`);
+                })
+                .then(data => {
+                    alert(`✅ 数据上传成功！\n累计正确次数: ${totalCorrectCount}\n总提交次数: ${masterHistory.length}`);
+                    // 重置游戏
+                    totalCorrectCount = 0;
+                    currentSubmissionRecords = [];
+                    masterHistory = [];
+                    currentNumbers = generateSolvablePuzzle();
+                    renderNumbers();
+                    expressionInput.value = '';
+                    messageArea.innerHTML = '✨ 已重置，开始新的一轮';
+                    solvabilityBadge.innerHTML = '✅ 本题保证有解';
+                    updateStatsDisplay();
+                })
+                .catch(err => {
+                    alert('❌ 上传失败: ' + err.message);
+                    console.error(err);
+                });
+            }
+
+            // ---------- 初始化全局日志 ----------
+            let masterHistory = [];
+
+            // 初始UI - 首题随机生成有解题目
+            currentNumbers = generateSolvablePuzzle();
+            renderNumbers();
+            updateStatsDisplay();
+            solvabilityBadge.innerHTML = '✅ 本题保证有解';
+            expressionInput.value = ''; // 确保初始输入框为空
+
+            // 绑定事件
+            document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+            document.getElementById('skipBtn').addEventListener('click', handleSkip);
+            document.getElementById('endBtn').addEventListener('click', handleEnd);
+
+            expressionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

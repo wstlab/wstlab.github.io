@@ -1,0 +1,12 @@
+{
+  "id": "case-43",
+  "title": "凯撒密码 · 编码实验",
+  "category": "programming",
+  "description": "移动字母表，观察明文与密文的对应关系，保存编码和解码结果。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 43,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

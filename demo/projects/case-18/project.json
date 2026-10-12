@@ -1,0 +1,12 @@
+{
+  "id": "case-18",
+  "title": "机房协作 · 教学模拟",
+  "category": "activities",
+  "description": "在模拟机位上签到、记录设备状态和清理情况，从数据看见课堂协作。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 18,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

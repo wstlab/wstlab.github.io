@@ -1,0 +1,12 @@
+{
+  "id": "case-12",
+  "title": "春之回旋 · 小小音乐侦探",
+  "category": "practice",
+  "description": "回旋曲听辨图谱：围绕正确数、片段数、听辨答案开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "音乐"
+  ],
+  "order": 12,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>学员作品中心 · AI赋能课堂数智融合工作坊</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23123A5F'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%23C8862B'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23FFFFFF' opacity='.85'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23FFFFFF' opacity='.85'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%23C8862B'/%3E%3C/svg%3E">
+</head>
+<body style="margin:0;font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#EEF2F6;color:#5A6B7B;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center">
+  <p>正在进入学员作品中心…<br><a id="fallback" href="center.html" style="color:#123A5F;font-weight:700">如果没有自动跳转，请点击这里</a></p>
+  <script>
+  /* 跳转时带一个时间戳参数。
+     页面被 CDN 边缘节点缓存后，同一 URL 可能在不同节点返回新旧两个版本；
+     带上每次访问都不同的参数，可确保每次都从源站取到最新的 center.html。
+     正文内容都在 center.html，改内容只需改那一个文件，不需要再改文件名或版本号。
+     同时把 #锚点 和 ?stage=1 原样传给 center.html，
+     这样根链接可以直接分享「作品展示 / 学习资料 / 学员留言」等具体栏目的地址。 */
+  (function () {
+    var q = location.search.replace(/^[?&]+/, '');
+    var keep = /(^|&)stage=1(&|$)/.test(q) ? 'stage=1&' : '';
+    var target = 'center.html?' + keep + 'd=' + Date.now() + location.hash;
+
+    /* 兜底链接先指向同一个带时间戳的地址，再触发跳转；
+       万一自动跳转失效，用户点到的也一定是最新版本。 */
+    var a = document.getElementById('fallback');
+    if (a) a.href = target;
+
+    location.replace(target);
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":9,"key":"case-09","title":"春 · 细读 在线批注","category":"creation","description":"春日批注墙：围绕段落、批注、批注开展交互学习，在数据大屏中回看记录。","headline":"春日批注墙","view":"wall","fields":[{"key":"paragraph","label":"段落"},{"key":"content","label":"批注"},{"key":"comment","label":"批注"},{"key":"text","label":"选段"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开双端"}],"tasks":{"records":"9JrdL0FWRCV"},"mapping":{"3be600bmbf":"9JrdL0FWRCV"},"accent":"#916749","capture":false,"lesson":"打开双端"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>春·细读 | 在线批注系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', '宋体', 'Times New Roman', 'Segoe UI', serif;
+            background: #eef3e3;  /* 早春新绿底色 */
+            min-height: 100vh;
+            color: #2c4b2a;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 登录卡片 */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #cde2c0 0%, #e2e7cf 100%);
+            position: relative;
+        }
+        .login-card {
+            background: rgba(255, 252, 240, 0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(50, 65, 30, 0.2), 0 0 0 1px rgba(170, 190, 120, 0.4);
+            padding: 2rem 2.5rem;
+            width: 380px;
+            text-align: center;
+            border: 1px solid #d4e0b2;
+        }
+        .login-card h2 {
+            font-size: 2rem;
+            letter-spacing: 4px;
+            color: #4c7a3a;
+            margin-bottom: 0.5rem;
+            font-weight: normal;
+            border-left: 4px solid #8ab87a;
+            padding-left: 20px;
+            text-align: left;
+        }
+        .login-card .sub {
+            color: #7f6e4a;
+            margin-bottom: 2rem;
+            font-style: italic;
+            font-size: 0.9rem;
+            text-align: left;
+            padding-left: 24px;
+        }
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #5f7842;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #fffff2;
+            border: 1px solid #cfdfb0;
+            border-radius: 28px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #8ab87a;
+            box-shadow: 0 0 0 2px rgba(138,184,122,0.3);
+        }
+        .login-btn {
+            background: #7ba55e;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .login-btn:hover {
+            background: #5c8642;
+        }
+
+        /* 主应用布局 */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #cfdfb5;
+        }
+        .app-header h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #4f7840;
+            letter-spacing: 3px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%237ba55e" width="28px" height="28px"><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8 s8,3.59,8,8S16.41,20,12,20z M12,6c-3.31,0-6,2.69-6,6s2.69,6,6,6s6-2.69,6-6S15.31,6,12,6z"/></svg>') no-repeat left center;
+            background-size: 28px;
+            padding-left: 38px;
+        }
+        .user-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: #eef2e0;
+            padding: 6px 16px;
+            border-radius: 40px;
+        }
+        .user-info span {
+            color: #4f6e3a;
+        }
+        .logout-btn {
+            background: none;
+            border: 1px solid #aabb88;
+            padding: 4px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            color: #6c7542;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: #dee8c6;
+        }
+
+        /* 两栏布局 */
+        .two-columns {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .article-panel {
+            flex: 2;
+            min-width: 260px;
+            background: #fffffffa;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(70, 60, 20, 0.08);
+            padding: 28px 32px;
+            border: 1px solid #e2e9ce;
+        }
+        .annotation-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: #fefef4;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 20px 24px;
+            border: 1px solid #e2e5ca;
+            height: fit-content;
+        }
+
+        .essay-title {
+            font-size: 2rem;
+            font-weight: 500;
+            text-align: center;
+            color: #5f8b46;
+            margin-bottom: 24px;
+            letter-spacing: 6px;
+        }
+        .essay-content {
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: #2e4426;
+        }
+        .essay-content p {
+            margin: 1.2em 0;
+            text-indent: 2em;
+        }
+        .annotation-marker {
+            background-color: #ecf3df;
+            border-bottom: 1px dashed #9bbf7a;
+            cursor: pointer;
+            transition: 0.1s;
+            position: relative;
+            padding: 0 2px;
+            border-radius: 6px;
+        }
+        .annotation-marker:hover {
+            background-color: #dcecc5;
+        }
+        .selected-area {
+            background: #f6f9ea;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-left: 5px solid #8ab87a;
+        }
+        .selected-text {
+            background: white;
+            padding: 12px;
+            border-radius: 16px;
+            font-style: italic;
+            color: #5f7542;
+            margin: 10px 0;
+            border: 1px solid #e1e6be;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .annotation-input {
+            width: 100%;
+            border: 1px solid #dce6b0;
+            background: white;
+            border-radius: 24px;
+            padding: 12px 16px;
+            font-family: inherit;
+            resize: vertical;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .submit-annotation {
+            background: #b1cf93;
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 16px;
+            cursor: pointer;
+            color: #2f5122;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .submit-annotation:hover {
+            background: #8ab87a;
+            color: white;
+        }
+        .annotations-list {
+            margin-top: 28px;
+        }
+        .annotations-list h3 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            border-left: 4px solid #b7cf8a;
+            padding-left: 12px;
+            margin-bottom: 16px;
+        }
+        .annotation-item {
+            background: #fffef0;
+            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 18px;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e3ecca;
+        }
+        .annotation-user {
+            font-weight: bold;
+            color: #6f8852;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .annotation-quote {
+            background: #f2f6e2;
+            padding: 6px 8px;
+            border-radius: 12px;
+            margin: 8px 0;
+            font-size: 0.8rem;
+            color: #5d7842;
+        }
+        .annotation-text {
+            margin-top: 8px;
+            color: #3f5c30;
+        }
+        .delete-annotation {
+            float: right;
+            background: none;
+            border: none;
+            color: #b08d5a;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .delete-annotation:hover {
+            color: #b34e2a;
+        }
+
+        .teacher-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fffff5;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+        .teacher-table th, .teacher-table td {
+            border-bottom: 1px solid #e1e9be;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        .teacher-table th {
+            background: #ecf2db;
+            font-weight: 500;
+        }
+        .badge {
+            background: #d2e5b6;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            background: none;
+            border: 1px solid #c2d3a2;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 780px) {
+            .two-columns { flex-direction: column; }
+            .article-panel, .annotation-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+    // ---------- 朱自清《春》全文 ----------
+    const springTextParagraphs = [
+        "盼望着，盼望着，东风来了，春天的脚步近了。",
+        "一切都像刚睡醒的样子，欣欣然张开了眼。山朗润起来了，水涨起来了，太阳的脸红起来了。",
+        "小草偷偷地从土里钻出来，嫩嫩的，绿绿的。园子里，田野里，瞧去，一大片一大片满是的。坐着，躺着，打两个滚，踢几脚球，赛几趟跑，捉几回迷藏。风轻悄悄的，草软绵绵的。",
+        "桃树、杏树、梨树，你不让我，我不让你，都开满了花赶趟儿。红的像火，粉的像霞，白的像雪。花里带着甜味儿；闭了眼，树上仿佛已经满是桃儿、杏儿、梨儿。花下成千成百的蜜蜂嗡嗡地闹着，大小的蝴蝶飞来飞去。野花遍地是：杂样儿，有名字的，没名字的，散在草丛里，像眼睛，像星星，还眨呀眨的。",
+        "“吹面不寒杨柳风”，不错的，像母亲的手抚摸着你。风里带来些新翻的泥土的气息，混着青草味儿，还有各种花的香，都在微微润湿的空气里酝酿。鸟儿将窠巢安在繁花嫩叶当中，高兴起来了，呼朋引伴地卖弄清脆的喉咙，唱出宛转的曲子，与轻风流水应和着。牛背上牧童的短笛，这时候也成天在嘹亮地响。",
+        "雨是最寻常的，一下就是三两天。可别恼。看，像牛毛，像花针，像细丝，密密地斜织着，人家屋顶上全笼着一层薄烟。树叶儿却绿得发亮，小草儿也青得逼你的眼。傍晚时候，上灯了，一点点黄晕的光，烘托出一片安静而和平的夜。乡下去，小路上，石桥边，有撑起伞慢慢走着的人；还有地里工作的农夫，披着蓑，戴着笠的。他们的草屋，稀稀疏疏的，在雨里静默着。",
+        "天上风筝渐渐多了，地上孩子也多了。城里乡下，家家户户，老老小小，他们也赶趟儿似的，一个个都出来了。舒活舒活筋骨，抖擞抖擞精神，各做各的一份事去。“一年之计在于春”，刚起头儿，有的是工夫，有的是希望。",
+        "春天像刚落地的娃娃，从头到脚都是新的，它生长着。",
+        "春天像小姑娘，花枝招展的，笑着，走着。",
+        "春天像健壮的青年，有铁一般的胳膊和腰脚，他领着我们上前去。"
+    ];
+
+    let annotations = [];
+    let currentUser = null;
+    let currentView = 'login';
+    const API_URL = "https://qf.kjxs.site/api/9JrdL0FWRCV";
+
+    function saveAnnotationsToLocal() {
+        localStorage.setItem('spring_annotations', JSON.stringify(annotations));
+    }
+
+    function loadAnnotationsFromLocal() {
+        const stored = localStorage.getItem('spring_annotations');
+        if (stored) {
+            annotations = JSON.parse(stored);
+        } else {
+            annotations = [];
+        }
+    }
+
+    async function postAnnotationToAPI(annotationData) {
+        try {
+            const payload = {
+                ...annotationData,
+                article: "朱自清《春》",
+                platform: "春·细读",
+                submittedAt: new Date().toISOString()
+            };
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (err) {
+            console.warn("API post failed:", err);
+        }
+    }
+
+    function addAnnotation(paragraphIndex, startOffset, endOffset, selectedText, commentText) {
+        if (!commentText.trim()) return false;
+        if (!selectedText || selectedText.trim() === "") return false;
+        const newId = Date.now() + Math.random() * 10000;
+        const newAnnotation = {
+            id: newId,
+            userId: currentUser.name + "_" + Date.now(),
+            userName: currentUser.name,
+            role: currentUser.role,
+            paragraphIndex: paragraphIndex,
+            startOffset: startOffset,
+            endOffset: endOffset,
+            selectedText: selectedText.substring(0, 120),
+            content: commentText.trim(),
+            timestamp: new Date().toISOString()
+        };
+        annotations.push(newAnnotation);
+        saveAnnotationsToLocal();
+        postAnnotationToAPI(newAnnotation);
+        return true;
+    }
+
+    function deleteAnnotationById(id, userRole) {
+        if (userRole !== 'teacher') return false;
+        annotations = annotations.filter(a => a.id != id);
+        saveAnnotationsToLocal();
+        return true;
+    }
+
+    function renderArticleWithHighlights(containerId = 'springContent') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let html = '';
+        springTextParagraphs.forEach((para, idx) => {
+            let modified = para;
+            const paraAnnotations = annotations.filter(ann => ann.paragraphIndex === idx).sort((a,b) => b.startOffset - a.startOffset);
+            for (let ann of paraAnnotations) {
+                const { startOffset, endOffset, content, userName, id } = ann;
+                if (startOffset >= 0 && endOffset <= modified.length && startOffset < endOffset) {
+                    const before = modified.substring(0, startOffset);
+                    const selected = modified.substring(startOffset, endOffset);
+                    const after = modified.substring(endOffset);
+                    const markerSpan = `<span class="annotation-marker" data-annotation-id="${id}" data-content="${escapeHtml(content)}" data-user="${escapeHtml(userName)}" title="【${escapeHtml(userName)}】${escapeHtml(content)}">${escapeHtml(selected)}</span>`;
+                    modified = before + markerSpan + after;
+                }
+            }
+            html += `<p>${modified}</p>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function getSelectionOffsets(paragraphElement, paragraphText) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return null;
+        const range = selection.getRangeAt(0);
+        let container = range.commonAncestorContainer;
+        if (!paragraphElement.contains(container)) return null;
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(paragraphElement);
+        preCaretRange.setEnd(range.startContainer, range.startOffset);
+        const startOffset = preCaretRange.toString().length;
+        const endOffset = startOffset + range.toString().length;
+        const selectedText = range.toString();
+        if (selectedText.trim() === "") return null;
+        const paraPureText = paragraphText;
+        if (paraPureText.substring(startOffset, endOffset) === selectedText) {
+            return { startOffset, endOffset, selectedText };
+        }
+        return null;
+    }
+
+    function renderAnnotationsList(isTeacher = false) {
+        const listContainer = document.querySelector('.annotations-list .list-area');
+        if (!listContainer) return;
+        if (annotations.length === 0) {
+            listContainer.innerHTML = '<div style="padding: 20px; text-align:center; color:#9bb07a;">暂无批注，选中文字留下感悟吧~</div>';
+            return;
+        }
+        let itemsHtml = '';
+        const sorted = [...annotations].reverse();
+        for (let ann of sorted) {
+            itemsHtml += `
+                <div class="annotation-item" data-ann-id="${ann.id}">
+                    <div><span class="annotation-user">${escapeHtml(ann.userName)}</span><span style="font-size:0.7rem; color:#9aa96b;"> ${new Date(ann.timestamp).toLocaleString()}</span>
+                    ${isTeacher ? `<button class="delete-annotation" data-id="${ann.id}">✖ 删除</button>` : ''}
+                    </div>
+                    <div class="annotation-quote">“${escapeHtml(ann.selectedText.length > 40 ? ann.selectedText.substring(0,40)+'…' : ann.selectedText)}”</div>
+                    <div class="annotation-text">💬 ${escapeHtml(ann.content)}</div>
+                </div>
+            `;
+        }
+        listContainer.innerHTML = itemsHtml;
+        if (isTeacher) {
+            document.querySelectorAll('.delete-annotation').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = Number(btn.getAttribute('data-id'));
+                    if (deleteAnnotationById(id, 'teacher')) {
+                        renderTeacherDashboard();
+                    }
+                });
+            });
+        }
+    }
+
+    // 学生端
+    function renderStudentView() {
+        const mainHtml = `
+            <div class="container">
+                <div class="app-header">
+                    <h1>春 · 细读</h1>
+                    <div class="user-info">
+                        <span>🌱 读者：${escapeHtml(currentUser.name)}</span>
+                        <button class="logout-btn" id="logoutBtn">归去</button>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="article-panel">
+                        <div class="essay-title">春</div>
+                        <div class="essay-content" id="springContent"></div>
+                        <div style="margin-top:20px; font-size:0.7rem; color:#aabc7a; text-align:center;">—— 选中文字，留下你的春之批注 ——</div>
+                    </div>
+                    <div class="annotation-panel">
+                        <div class="selected-area">
+                            <div>📖 当前选中</div>
+                            <div class="selected-text" id="selectedTextPreview">未选中文字</div>
+                            <textarea class="annotation-input" id="commentInput" rows="3" placeholder="写下你的思考……（按回车或点击提交）"></textarea>
+                            <button class="submit-annotation" id="submitAnnBtn">✍️ 留下春思</button>
+                        </div>
+                        <div class="annotations-list">
+                            <h3>🌸 众声点评</h3>
+                            <div class="list-area" id="annListArea"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('app').innerHTML = mainHtml;
+        renderArticleWithHighlights('springContent');
+        renderAnnotationsList(false);
+        attachStudentEvents();
+    }
+
+    let currentSelectedRange = null;
+
+    function attachStudentEvents() {
+        const contentDiv = document.getElementById('springContent');
+        if (!contentDiv) return;
+
+        contentDiv.addEventListener('mouseup', () => {
+            const selection = window.getSelection();
+            if (!selection.isCollapsed) {
+                let node = selection.anchorNode;
+                while (node && node !== contentDiv && node.nodeName !== 'P') node = node.parentNode;
+                if (node && node.nodeName === 'P') {
+                    const paragraphElement = node;
+                    const paragraphIdx = Array.from(contentDiv.querySelectorAll('p')).indexOf(paragraphElement);
+                    if (paragraphIdx !== -1) {
+                        const paraText = springTextParagraphs[paragraphIdx];
+                        const offsets = getSelectionOffsets(paragraphElement, paraText);
+                        if (offsets) {
+                            currentSelectedRange = {
+                                paragraphIndex: paragraphIdx,
+                                startOffset: offsets.startOffset,
+                                endOffset: offsets.endOffset,
+                                selectedText: offsets.selectedText
+                            };
+                            document.getElementById('selectedTextPreview').innerHTML = `“${escapeHtml(offsets.selectedText.substring(0, 100))}”`;
+                            return;
+                        }
+                    }
+                }
+            }
+            currentSelectedRange = null;
+            document.getElementById('selectedTextPreview').innerHTML = '未选中文字';
+        });
+
+        const submitBtn = document.getElementById('submitAnnBtn');
+        const commentInput = document.getElementById('commentInput');
+        function handleSubmit() {
+            if (!currentSelectedRange) {
+                alert('请先在文中选中一段文字再点评~');
+                return;
+            }
+            const comment = commentInput.value.trim();
+            if (!comment) {
+                alert('请写下你的思考再提交。');
+                return;
+            }
+            const success = addAnnotation(
+                currentSelectedRange.paragraphIndex,
+                currentSelectedRange.startOffset,
+                currentSelectedRange.endOffset,
+                currentSelectedRange.selectedText,
+                comment
+            );
+            if (success) {
+                commentInput.value = '';
+                renderStudentView();
+                currentSelectedRange = null;
+                document.getElementById('selectedTextPreview').innerHTML = '未选中文字';
+            } else {
+                alert('批注无效，请重试。');
+            }
+        }
+        submitBtn.addEventListener('click', handleSubmit);
+        commentInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+            }
+        });
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            currentUser = null;
+            renderLogin();
+        });
+    }
+
+    // 教师端
+    function renderTeacherDashboard() {
+        const teacherHtml = `
+            <div class="container">
+                <div class="app-header">
+                    <h1>🍃 师者 · 春之阅微</h1>
+                    <div class="user-info">
+                        <span>👩‍🏫 教师：${escapeHtml(currentUser.name)}</span>
+                        <button class="logout-btn" id="logoutBtnTeacher">归去</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div class="article-panel" style="flex:1.5;">
+                        <div class="essay-title">春 · 原文批注总览</div>
+                        <div class="essay-content" id="teacherArticleView"></div>
+                    </div>
+                    <div class="annotation-panel" style="flex:1;">
+                        <h3>📚 所有学生点评 (${annotations.length})</h3>
+                        <div style="max-height: 70vh; overflow-y: auto;" id="teacherAnnTable"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('app').innerHTML = teacherHtml;
+        // 渲染文章高亮
+        const articleContainer = document.getElementById('teacherArticleView');
+        if (articleContainer) {
+            let html = '';
+            springTextParagraphs.forEach((para, idx) => {
+                let modified = para;
+                const paraAnnotations = annotations.filter(ann => ann.paragraphIndex === idx).sort((a,b)=>b.startOffset - a.startOffset);
+                for(let ann of paraAnnotations) {
+                    const {startOffset, endOffset, content, userName} = ann;
+                    if(startOffset>=0 && endOffset <= modified.length){
+                        const before = modified.substring(0,startOffset);
+                        const selected = modified.substring(startOffset,endOffset);
+                        const after = modified.substring(endOffset);
+                        const marker = `<span class="annotation-marker" title="【${escapeHtml(userName)}】${escapeHtml(content)}">${escapeHtml(selected)}</span>`;
+                        modified = before + marker + after;
+                    }
+                }
+                html += `<p>${modified}</p>`;
+            });
+            articleContainer.innerHTML = html;
+        }
+        // 表格渲染
+        const tableContainer = document.getElementById('teacherAnnTable');
+        if (tableContainer) {
+            if (annotations.length === 0) {
+                tableContainer.innerHTML = '<div class="badge" style="padding: 20px;">暂无批注数据</div>';
+            } else {
+                let tableHtml = `<table class="teacher-table"><thead><tr><th>学生</th><th>摘录</th><th>点评</th><th>时间</th><th>操作</th></tr></thead><tbody>`;
+                annotations.slice().reverse().forEach(ann => {
+                    tableHtml += `<tr>
+                        <td>${escapeHtml(ann.userName)}</td>
+                        <td><span style="background:#f2f7e2;">“${escapeHtml(ann.selectedText.length>30?ann.selectedText.substring(0,30)+'…':ann.selectedText)}”</span></td>
+                        <td>${escapeHtml(ann.content)}</td>
+                        <td style="font-size:0.7rem;">${new Date(ann.timestamp).toLocaleDateString()}</td>
+                        <td><button class="del-teacher-ann" data-id="${ann.id}" style="background:#e9f0da;border:none;border-radius:20px;padding:4px 12px;cursor:pointer;">删</button></td>
+                    </tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+                tableContainer.innerHTML = tableHtml;
+                document.querySelectorAll('.del-teacher-ann').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = Number(btn.getAttribute('data-id'));
+                        if(deleteAnnotationById(id, 'teacher')) {
+                            renderTeacherDashboard();
+                        }
+                    });
+                });
+            }
+        }
+        document.getElementById('logoutBtnTeacher')?.addEventListener('click', () => {
+            currentUser = null;
+            renderLogin();
+        });
+    }
+
+    // 登录界面
+    function renderLogin() {
+        const loginHtml = `
+            <div class="login-wrapper">
+                <div class="login-card">
+                    <h2>春 · 细读</h2>
+                    <div class="sub">微批注 · 拾春意</div>
+                    <div class="input-group">
+                        <label>姓名</label>
+                        <input type="text" id="username" placeholder="例如：朱自清 / 佩弦" value="春之读者">
+                    </div>
+                    <div class="input-group">
+                        <label>角色</label>
+                        <select id="roleSelect">
+                            <option value="student">阅读者 · 含英咀华</option>
+                            <option value="teacher">教师 · 点染春风</option>
+                        </select>
+                    </div>
+                    <button class="login-btn" id="doLogin">步入春野</button>
+                    <div style="margin-top: 20px; font-size: 0.7rem; color:#9aa979;">—— 春风如贵客，批注寄心语 ——</div>
+                </div>
+            </div>
+        `;
+        document.getElementById('app').innerHTML = loginHtml;
+        document.getElementById('doLogin').addEventListener('click', () => {
+            let name = document.getElementById('username').value.trim();
+            if (!name) name = "春客";
+            const role = document.getElementById('roleSelect').value;
+            currentUser = { name: name, role: role };
+            if (role === 'teacher') {
+                renderTeacherDashboard();
+            } else {
+                renderStudentView();
+            }
+        });
+    }
+
+    function init() {
+        loadAnnotationsFromLocal();
+        renderLogin();
+    }
+    init();
+</script>
+</body>
+</html>

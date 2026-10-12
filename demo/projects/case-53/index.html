@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":53,"key":"case-53","title":"交通信号灯控制（全亮播放音乐）","category":"simulation","description":"信号灯状态记录：围绕红灯、黄灯、绿灯开展交互学习，在数据大屏中回看记录。","headline":"信号灯状态记录","view":"flow","fields":[{"key":"red","label":"红灯"},{"key":"yellow","label":"黄灯"},{"key":"green","label":"绿灯"},{"key":"allOn","label":"三灯全亮"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"Nh8FKZGyiZS"},"mapping":{},"accent":"#3c697b","capture":true,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>交通信号灯控制 - 全亮播放音乐</title>
+    <style>
+        /* --- Basic Styles (Mostly Unchanged) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(145deg, #e0e5ec, #f0f4fa);
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #1e2a3a;
+            font-weight: 600;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #eef2f7;
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255,255,255,0.8);
+            gap: 40px;
+            width: 95%;
+            max-width: 1000px;
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(1px);
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            flex-grow: 1;
+        }
+        .circuit-diagram-container {
+            width: 100%;
+            text-align: center;
+            background: #fafcfd;
+            border-radius: 28px;
+            padding: 10px 5px 5px 5px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .circuit-diagram-container h3 {
+            margin: 8px 0 12px 0;
+            color: #2c3e4e;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        .circuit-svg {
+            width: 100%;
+            max-width: 520px;
+            height: auto;
+            background: #fefef7;
+            border-radius: 20px;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.05), 0 2px 6px rgba(0,0,0,0.1);
+            display: block;
+            margin: 0 auto;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        /* --- Premium Button Styles (Enhanced) --- */
+        .controls button {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: all 0.18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            border: none;
+            outline: none;
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25), 0 3px 5px rgba(0, 0, 0, 0.2), inset 0 -3px 3px rgba(0,0,0,0.2), inset 0 3px 4px rgba(255,255,255,0.5);
+            font-family: inherit;
+        }
+        .controls button:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.08);
+            box-shadow: 0 14px 22px rgba(0, 0, 0, 0.3);
+        }
+        .controls button:active {
+            transform: translateY(4px);
+            filter: brightness(0.92);
+            transition-duration: 0.05s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #btn-red { background: radial-gradient(circle at 30% 25%, #ff7878, #e03a2e); }
+        #btn-yellow { background: radial-gradient(circle at 30% 25%, #ffe180, #f0b30f); color: #4a3e1f; text-shadow: 0 1px 0 rgba(255,255,200,0.8);}
+        #btn-green { background: radial-gradient(circle at 30% 25%, #6feb8c, #22aa4a); }
+
+        /* --- Traffic Light Display (Glassmorphism) --- */
+        .traffic-light-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            background: #1e2f3f;
+            padding: 35px 28px;
+            border-radius: 50px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 12px 20px rgba(0,0,0,0.3);
+            width: auto;
+            backdrop-filter: blur(2px);
+        }
+        .light {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background-color: #2d3e4e;
+            border: 2px solid #111;
+            opacity: 0.28;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.6);
+        }
+        .light.on {
+            opacity: 1;
+            box-shadow: 0 0 18px 6px rgba(255,255,200,0.6), inset 0 1px 3px rgba(255,255,255,0.4);
+        }
+        .light.red.on { background-color: #ff3a2f; box-shadow: 0 0 28px 8px #ff3a2f, inset 0 1px 3px rgba(255,255,255,0.6); }
+        .light.yellow.on { background-color: #ffe066; box-shadow: 0 0 28px 8px #ffcc33, inset 0 1px 3px rgba(255,255,200,0.8); }
+        .light.green.on { background-color: #3eff6e; box-shadow: 0 0 28px 8px #2eff5a, inset 0 1px 3px rgba(255,255,255,0.6); }
+
+        /* --- SVG Element Styles (电路动态效果) --- */
+        .wire { stroke: #7f8c8d; stroke-width: 2.5; fill: none; transition: stroke 0.2s ease, stroke-width 0.2s; }
+        .wire.active { stroke: #1e88e5; stroke-width: 4; filter: drop-shadow(0 0 3px #3ea5ff); }
+        .bus-wire.active { stroke: #1e88e5; stroke-width: 4; filter: drop-shadow(0 0 3px #3ea5ff); }
+        .switch-group { cursor: pointer; transition: all 0.1s; }
+        .switch-lever { stroke: #1f2b38; stroke-width: 5; stroke-linecap: round; transition: transform 0.28s cubic-bezier(0.34, 1.2, 0.64, 1); transform-origin: 0px 0px; }
+        .switch-contact { fill: #4a5b6e; stroke: #2c3e50; stroke-width: 0.8; }
+        .switch-group.open .switch-lever { transform: rotate(-42deg); }
+        .switch-group.closed .switch-lever { transform: rotate(0deg); }
+        .light-terminal { fill: #a0b3c9; stroke: #3a4a5e; stroke-width: 1; transition: fill 0.2s, filter 0.2s; }
+        .light-terminal.active-red { fill: #ff5c52; filter: drop-shadow(0 0 6px #ff4d4d); }
+        .light-terminal.active-yellow { fill: #ffe066; filter: drop-shadow(0 0 6px #ffcc33); }
+        .light-terminal.active-green { fill: #5aff7a; filter: drop-shadow(0 0 6px #33ff55); }
+        .terminal-text { font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+        .terminal-pos { fill: #c7362b; }
+        .terminal-neg { fill: #2c7cb6; }
+        .bus-wire { transition: stroke 0.2s; }
+        
+        /* 音乐小提示（优雅） */
+        .music-hint {
+            margin-top: 18px;
+            font-size: 0.8rem;
+            background: #d9e2ec;
+            padding: 5px 14px;
+            border-radius: 50px;
+            color: #2c3e50;
+            font-weight: 500;
+            display: inline-block;
+            box-shadow: inset 0 1px 2px #ffffff80, 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .music-hint i {
+            font-style: normal;
+            display: inline-block;
+            animation: subtlePulse 1.2s infinite;
+        }
+        @keyframes subtlePulse {
+            0% { opacity: 0.6; text-shadow: 0 0 0px; }
+            100% { opacity: 1; text-shadow: 0 0 3px #ffb347; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="circuit-diagram-container">
+                 <h3>⚡ 并联电路 · 三色信号灯 ⚡</h3>
+                 <svg class="circuit-svg" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid meet">
+                    
+                    <text x="45" y="32" class="terminal-text terminal-pos">+</text>
+                    <line class="wire bus-wire" id="positive-bus" x1="70" y1="28" x2="430" y2="28" />
+                    <text x="45" y="278" class="terminal-text terminal-neg">-</text>
+                    <line class="wire bus-wire" id="negative-bus" x1="70" y1="272" x2="430" y2="272" />
+
+                    
+                    <g class="circuit-path" data-path="red">
+                        <line class="wire wire-path-red" id="wire-r-in" x1="150" y1="28" x2="150" y2="70" />
+                        <g class="switch-group open" id="switch-red" transform="translate(150, 70)">
+                             <circle class="switch-contact" cx="0" cy="0" r="5" />
+                             <circle class="switch-contact" cx="0" cy="30" r="5" />
+                             <line class="switch-lever" id="switch-lever-red" x1="0" y1="0" x2="0" y2="30" />
+                        </g>
+                        <line class="wire wire-path-red" id="wire-r-mid" x1="150" y1="100" x2="150" y2="200" />
+                        <circle class="light-terminal" id="terminal-red" cx="150" cy="210" r="10" />
+                        <line class="wire wire-path-red" id="wire-r-out" x1="150" y1="220" x2="150" y2="272" />
+                    </g>
+
+                    
+                    <g class="circuit-path" data-path="yellow">
+                         <line class="wire wire-path-yellow" id="wire-y-in" x1="250" y1="28" x2="250" y2="70" />
+                        <g class="switch-group open" id="switch-yellow" transform="translate(250, 70)">
+                             <circle class="switch-contact" cx="0" cy="0" r="5" />
+                             <circle class="switch-contact" cx="0" cy="30" r="5" />
+                             <line class="switch-lever" id="switch-lever-yellow" x1="0" y1="0" x2="0" y2="30" />
+                        </g>
+                         <line class="wire wire-path-yellow" id="wire-y-mid" x1="250" y1="100" x2="250" y2="200" />
+                         <circle class="light-terminal" id="terminal-yellow" cx="250" cy="210" r="10" />
+                         <line class="wire wire-path-yellow" id="wire-y-out" x1="250" y1="220" x2="250" y2="272" />
+                     </g>
+
+                    
+                    <g class="circuit-path" data-path="green">
+                         <line class="wire wire-path-green" id="wire-g-in" x1="350" y1="28" x2="350" y2="70" />
+                        <g class="switch-group open" id="switch-green" transform="translate(350, 70)">
+                             <circle class="switch-contact" cx="0" cy="0" r="5" />
+                             <circle class="switch-contact" cx="0" cy="30" r="5" />
+                             <line class="switch-lever" id="switch-lever-green" x1="0" y1="0" x2="0" y2="30" />
+                        </g>
+                         <line class="wire wire-path-green" id="wire-g-mid" x1="350" y1="100" x2="350" y2="200" />
+                         <circle class="light-terminal" id="terminal-green" cx="350" cy="210" r="10" />
+                         <line class="wire wire-path-green" id="wire-g-out" x1="350" y1="220" x2="350" y2="272" />
+                     </g>
+                 </svg>
+            </div>
+
+            <div class="controls">
+                 <button id="btn-red" data-color="red">🔴 红灯</button>
+                 <button id="btn-yellow" data-color="yellow">🟡 黄灯</button>
+                 <button id="btn-green" data-color="green">🟢 绿灯</button>
+            </div>
+            <div class="music-hint">
+                🎵 三灯齐亮 → 播放《signal.wav》 ✨ | 任一熄灭则音乐停止
+            </div>
+        </div>
+
+        <div class="traffic-light-display">
+            <div class="light red" id="light-red"></div>
+            <div class="light yellow" id="light-yellow"></div>
+            <div class="light green" id="light-green"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ---------- DOM 元素绑定 ----------
+            const buttons = document.querySelectorAll('.controls button');
+            const lights = {
+                red: document.getElementById('light-red'),
+                yellow: document.getElementById('light-yellow'),
+                green: document.getElementById('light-green')
+            };
+            // 各分支所有导线 (并联通路)
+            const circuitPathWires = {
+                red: document.querySelectorAll('.wire-path-red'),
+                yellow: document.querySelectorAll('.wire-path-yellow'),
+                green: document.querySelectorAll('.wire-path-green'),
+            };
+            const terminals = {
+                red: document.getElementById('terminal-red'),
+                yellow: document.getElementById('terminal-yellow'),
+                green: document.getElementById('terminal-green'),
+            };
+            const switches = {
+                red: document.getElementById('switch-red'),
+                yellow: document.getElementById('switch-yellow'),
+                green: document.getElementById('switch-green'),
+            };
+            const commonBusWires = document.querySelectorAll('#positive-bus, #negative-bus');
+            
+            // 电路状态追踪 (true = 点亮/闭合)
+            const circuitStates = { red: false, yellow: false, green: false }; window.captureLesson=()=>({...circuitStates,allOn:Object.values(circuitStates).every(Boolean)});
+            
+            // ---------- 音频控制 (核心功能: 三灯全亮播放 signal.wav) ----------
+            // 创建音频实例，使用同目录下的 signal.wav，循环播放
+            const bgMusic = new Audio('./signal.wav');
+            bgMusic.loop = true;      // 循环播放，保持音乐持续
+            bgMusic.preload = 'auto'; // 预加载，提升响应速度
+            
+            // 可选: 处理音频加载失败的情况 (静默降级，不影响使用体验)
+            bgMusic.addEventListener('error', (e) => {
+                console.warn('⚠️ 音乐文件加载失败，请检查 signal.wav 是否存在于同一目录下', e);
+                // 不影响核心交互，只输出提醒
+            });
+            
+            // 标记音乐播放状态 (用于避免重复play/pause干扰)
+            let musicPlayingFlag = false; // 辅助记录，实际以 audio 元素状态为准
+            
+            // 核心函数: 根据当前红黄绿灯状态决定音乐播放或停止
+            function updateMusicPlayback() {
+                // 检测是否三个灯全部点亮 (红、黄、绿都为 true)
+                const allThreeOn = circuitStates.red === true && circuitStates.yellow === true && circuitStates.green === true;
+                
+                // 需要播放的条件: 三个全亮，并且音乐目前是暂停状态(或未播放)
+                if (allThreeOn) {
+                    // 若音乐尚未播放 或 由于某种原因被暂停，则从头播放并开启循环
+                    if (bgMusic.paused) {
+                        // 重置播放位置，让每次全亮时从开头重新播放，体验更佳
+                        bgMusic.currentTime = 0;
+                        // 播放音乐 (在用户手势上下文中已经被触发，安全)
+                        const playPromise = bgMusic.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                musicPlayingFlag = true;
+                                // 可选：轻量反馈（控制台不刷屏，可忽略）
+                            }).catch(err => {
+                                // 捕获自动播放策略错误: 但是所有全亮均是由按钮点击引发，一般不会拒绝
+                                console.warn('音乐播放失败，可能是浏览器限制或文件问题:', err);
+                                musicPlayingFlag = false;
+                            });
+                        }
+                    } else {
+                        // 已经在播放状态，无需操作，但确保标志同步
+                        musicPlayingFlag = true;
+                    }
+                } else {
+                    // 不全亮情况: 如果音乐正在播放则停止并重置时间
+                    if (!bgMusic.paused) {
+                        bgMusic.pause();
+                        // 重置播放进度，以便下次全亮从头播放，符合直觉
+                        bgMusic.currentTime = 0;
+                        musicPlayingFlag = false;
+                    } else {
+                        musicPlayingFlag = false;
+                    }
+                }
+            }
+            
+            // 辅助: 更新公共母线高亮 (只要任一电路激活，母线就亮)
+            function updateCommonBusWires() {
+                const anyCircuitActive = Object.values(circuitStates).some(state => state === true);
+                commonBusWires.forEach(wire => {
+                    if (anyCircuitActive) {
+                        wire.classList.add('active');
+                    } else {
+                        wire.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 激活某一路径 (闭合开关，点亮对应灯)
+            function activateCircuit(color) {
+                if (!circuitStates[color]) {
+                    circuitStates[color] = true;
+                    // 更新物理灯效
+                    if (lights[color]) lights[color].classList.add('on');
+                    // 点亮该路径所有导线
+                    if (circuitPathWires[color]) {
+                        circuitPathWires[color].forEach(wire => wire.classList.add('active'));
+                    }
+                    // 更新灯符号终端高亮
+                    if (terminals[color]) {
+                        // 清除之前可能残留的其他颜色类，再添加特定类
+                        terminals[color].classList.remove('active-red', 'active-yellow', 'active-green');
+                        terminals[color].classList.add(`active-${color}`);
+                    }
+                    // 切换开关样式 (闭合)
+                    if (switches[color]) {
+                        switches[color].classList.remove('open');
+                        switches[color].classList.add('closed');
+                    }
+                    // 更新母线高亮
+                    updateCommonBusWires();
+                    // 🎵 状态改变后立即检查全亮条件并更新音乐播放
+                    updateMusicPlayback();
+                }
+            }
+            
+            // 关闭某一路径 (断开开关，熄灭对应灯)
+            function deactivateCircuit(color) {
+                if (circuitStates[color]) {
+                    circuitStates[color] = false;
+                    // 熄灭物理灯
+                    if (lights[color]) lights[color].classList.remove('on');
+                    // 熄灭路径所有导线高亮
+                    if (circuitPathWires[color]) {
+                        circuitPathWires[color].forEach(wire => wire.classList.remove('active'));
+                    }
+                    // 熄灭终端高亮
+                    if (terminals[color]) {
+                        terminals[color].classList.remove('active-red', 'active-yellow', 'active-green');
+                    }
+                    // 开关恢复断开姿态
+                    if (switches[color]) {
+                        switches[color].classList.remove('closed');
+                        switches[color].classList.add('open');
+                    }
+                    // 更新母线
+                    updateCommonBusWires();
+                    // 🎵 状态改变后检查音乐播放（任意灯关闭导致不全亮时应停止音乐）
+                    updateMusicPlayback();
+                }
+            }
+            
+            // ---------- 绑定按钮交互 (切换电路) ----------
+            buttons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const color = button.dataset.color;
+                    // 当前状态: 如果已激活就关闭，否则激活
+                    if (circuitStates[color]) {
+                        deactivateCircuit(color);
+                    } else {
+                        activateCircuit(color);
+                    }
+                });
+            });
+            
+            // ---------- 额外优雅处理: 页面可见性变化时若音乐还在播放但条件不满足则停止(安全) ----------
+            document.addEventListener('visibilitychange', () => {
+                // 当页面隐藏，且音乐正在播放但条件可能已经不符合时，主动暂停避免后台消耗
+                if (document.hidden && !bgMusic.paused) {
+                    const allThreeOn = circuitStates.red && circuitStates.yellow && circuitStates.green;
+                    if (!allThreeOn && !bgMusic.paused) {
+                        bgMusic.pause();
+                        bgMusic.currentTime = 0;
+                        musicPlayingFlag = false;
+                    } else if (allThreeOn && !bgMusic.paused) {
+                        // 页面隐藏但全亮条件满足，音乐继续播放（合理），不做额外操作
+                    }
+                } else if (!document.hidden) {
+                    // 恢复可见时，重新检查状态 (确保UI与音乐同步)
+                    const allThreeOn = circuitStates.red && circuitStates.yellow && circuitStates.green;
+                    if (allThreeOn && bgMusic.paused) {
+                        // 由于页面恢复且全亮条件满足但音乐没播（异常情况），重新播放
+                        bgMusic.currentTime = 0;
+                        bgMusic.play().catch(e => console.warn("恢复播放失败", e));
+                    } else if (!allThreeOn && !bgMusic.paused) {
+                        bgMusic.pause();
+                        bgMusic.currentTime = 0;
+                    }
+                }
+            });
+            
+            // 初始化: 确保所有电路为断开状态 (红灯、黄灯、绿灯全灭)
+            // 手动调用deactivate确保初始样式干净 (已经默认open)
+            deactivateCircuit('red');
+            deactivateCircuit('yellow');
+            deactivateCircuit('green');
+            // 最后额外更新一次母线状态，保证母线视觉无高亮 (updateCommonBusWires已经在deactivate里调用过，但以防万一)
+            updateCommonBusWires();
+            // 确保音乐处于停止状态 (初始无全亮)
+            if (!bgMusic.paused) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+            }
+            musicPlayingFlag = false;
+            
+            // 附加说明: 如果用户快速点击并且三个灯同时点亮，音乐会在最后一个灯激活瞬间触发播放。
+            // 当任意灯关闭时音乐立刻停止，完全符合需求。
+            // 为防止音频加载延迟，调用预加载友好
+            if (bgMusic.readyState === 0) {
+                bgMusic.load(); // 主动预加载但不播放，避免无交互报错
+            }
+            
+            // 小彩蛋: 控制台输出提示
+            console.log('🎛️ 交通信号灯已启动 | 三灯齐亮 → 播放 signal.wav ✨');
+        });
+    </script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

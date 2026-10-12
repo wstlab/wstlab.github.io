@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":17,"key":"case-17","title":"小组协作与积分","category":"activities","description":"以模拟成员开展分组与积分活动，保存小组快照，观察协作中的变化。","headline":"小组协作记分板","view":"groups","fields":[{"key":"groups","label":"小组积分"},{"key":"group","label":"小组"},{"key":"score","label":"积分"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"OE6TiaVFqGL"},"mapping":{"n48ag09pge":"OE6TiaVFqGL"},"accent":"#8463a2","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(45deg, #000428, #004e92);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 动态小星星样式 */
+       .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        #container {
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #rollName {
+            font-size: 4em;
+            text-align: center;
+            margin: 20px;
+            text-shadow: 0 0 10px #00f7ff;
+        }
+
+        .groups {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .group {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .group:hover {
+            transform: scale(1.05);
+        }
+
+        /* 每组第1个学生特效 */
+       .group div:nth-child(2) {
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700;
+            animation: enhancedGlow 2s infinite;
+        }
+
+        /* 每组第2个学生稍弱特效 */
+       .group div:nth-child(3) {
+            color: #00ff7f;
+            text-shadow: 0 0 10px #00ff7f;
+            animation: lessEnhancedGlow 2s infinite;
+        }
+
+        @keyframes enhancedGlow {
+            0%, 100% {
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(45deg);
+            }
+        }
+
+        @keyframes lessEnhancedGlow {
+            0%, 100% {
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(20deg);
+            }
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #00f7ff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00f7ff33;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .score {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        #ranking {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 1px solid #00f7ff;
+            z-index: 1;
+        }
+
+       .rank-item {
+            font-size: 1.2em;
+            margin: 10px 0;
+            padding: 5px;
+            background: linear-gradient(90deg, transparent, #ffffff33);
+            /* 增加分数变化的过渡效果 */
+            transition: all 0.3s ease;
+        }
+
+        #saveRestoreButtons {
+            margin-bottom: 20px;
+        }
+
+        /* 积分记录窗口样式 */
+        #scoreRecordModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #scoreRecordContent {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00f7ff;
+            width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        #closeScoreRecordButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* 个人积分项样式 */
+       .individual-score-item {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 抽奖区域样式 */
+        #lotteryArea {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        #lotteryArea button {
+            font-size: 1.2em;
+            margin: 5px;
+            box-shadow: 0 0 20px #ffd700;
+            animation: lotteryButtonGlow 2s infinite;
+        }
+
+        @keyframes lotteryButtonGlow {
+            0%, 100% {
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(45deg);
+            }
+        }
+
+        #lotteryResult {
+            font-size: 2em;
+            margin-top: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700;
+            animation: lotteryResultGlow 2s infinite;
+            /* 增加奖品显示栏的框 */
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        @keyframes lotteryResultGlow {
+            0%, 100% {
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(45deg);
+            }
+        }
+
+        /* 抽奖特效星星 */
+       .lottery-star {
+            position: absolute;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: lotteryStarTwinkle 2s infinite;
+        }
+
+        @keyframes lotteryStarTwinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 抽奖速度调节滑轮样式 */
+        #lotterySpeedSlider {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* 一键减分输入框和按钮样式 */
+        #reduceScoreInput {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #00f7ff;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: 10px;
+        }
+
+        #reduceScoreButton {
+            padding: 8px 16px;
+        }
+    </style>
+<style>body{height:auto!important;min-height:100vh;overflow:auto!important}#case-nav,#case-connection{grid-column:1/-1}#rollName{font-size:2.4rem!important}@media(max-width:640px){body{display:block!important}.group:hover{transform:none!important}}</style></head>
+
+<body>
+    <div id="container">
+        <div id="saveRestoreButtons">
+            <button onclick="saveScores()">💾 保存小组积分</button>
+            <button onclick="restoreScores()">⏪ 撤回到上一次存档积分</button>
+            <button onclick="addScoreToAllGroups(1)">➕ 一键给所有小组加1分</button>
+            
+            <button onclick="clearAllScores()">🗑️ 一键清空所有积分</button>
+            
+            <button onclick="recordCurrentScores()">📝 分配个人积分</button>
+            <button onclick="viewCurrentScores()">👀 查看当前积分</button>
+        </div>
+        <div id="rollName">Ready</div>
+        <button onclick="startRoll()">🚀 开始点名啦</button>
+        <button onclick="stopRoll()">🛑 停止点名咯</button>
+        
+        <div>调节点名速度👉</div>
+        <input type="range" id="speedSlider" min="10" max="200" value="10" oninput="changeSpeed(this.value)">
+        <div class="groups" id="groups"></div>
+    </div>
+    <div id="ranking"></div>
+    
+    <div id="scoreRecordModal">
+        <div id="scoreRecordContent"></div>
+    </div>
+
+    <script>
+        const students = Array.from({length:56},(_,i)=>"探索者"+String(i+1).padStart(2,"0"));
+
+        let rolling = false;
+        let groups = Array(14).fill().map((_, i) => ({
+            members: students.slice(i * 4, i * 4 + 4),
+            score: Number(localStorage.getItem(`group-${i}`)) || 0
+        }));
+        // 滚动速度
+        let rollSpeed = 200;
+        let savedScores = []; // 不再用于网络存档，保留以防其他地方误用
+        // 记录上次点名的学生索引
+        let lastRolledIndex = Math.floor(Math.random() * students.length);
+        // 记录各成员的个人积分
+        let individualScores = students.map((student, index) => ({
+            name: student,
+            group: Math.floor(index / 4) + 1,
+            score: 0
+        }));
+
+        // 奖品和概率
+        const prizes = [
+            { name: "一张贴纸", probability: 0.5 },
+            { name: "课间在班级内播放一首你喜欢的歌曲", probability: 0.05 },
+            { name: "与喜欢的老师或好朋友合影（老师帮忙拍摄）", probability: 0.03 },
+            { name: "指定一名同学帮你回答老师的提问（一次）", probability: 0.05 },
+            { name: "过生日时，全班同学给你唱生日歌，老师录像", probability: 0.01 },
+            { name: "当一天值日班长", probability: 0.05 },
+            { name: "免罚金牌", probability: 0.05 },
+            { name: "选一个同学做一天同桌", probability: 0.01 },
+            { name: "再抽一次", probability: 0.05 },
+            { name: "随机一个本子", probability: 0.2 }
+        ];
+
+        let isLotteryRolling = false;
+        let lotteryInterval;
+        let lotterySpeed = 100;
+
+        // 创建动态小星星
+        function createStars() {
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className ='star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = Math.random() * 3 + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = Math.random() * 5 + 3 +'s';
+                document.body.appendChild(star);
+            }
+        }
+
+        function createGroups() {
+            const container = document.getElementById('groups');
+            groups.forEach((group, i) => {
+                const div = document.createElement('div');
+                div.className = 'group';
+                let memberHTML = '';
+                group.members.forEach((member, index) => {
+                    memberHTML += `<div>${member}</div>`;
+                });
+                div.innerHTML = `
+                    <div>第${i + 1}组</div>
+                    ${memberHTML}
+                    <div class="score">
+                        <button onclick="changeScore(${i}, -1)">-</button>
+                        <span id="score-${i}">${group.score}</span>
+                        <button onclick="changeScore(${i}, 1)">+</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function changeScore(groupIndex, delta) {
+            groups[groupIndex].score = Math.max(0, +groups[groupIndex].score + delta);
+            document.getElementById(`score-${groupIndex}`).textContent = groups[groupIndex].score;
+            localStorage.setItem(`group-${groupIndex}`, groups[groupIndex].score);
+            updateRanking();
+        }
+
+        function updateRanking() {
+            const sorted = [...groups].sort((a, b) => b.score - a.score).slice(0, 6);
+            document.getElementById('ranking').innerHTML = `
+                <div style="font-size:2em;margin-bottom:20px;">🏆 排行榜</div>
+                ${sorted.map((g, i) => `
+                    <div class="rank-item">
+                        ${i < 3? '👑'.repeat(3 - i) : ''} 第${groups.indexOf(g) + 1}组 
+                        <span style="float:right">${g.score}分</span>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function startRoll() {
+            rolling = true;
+            const roll = () => {
+                if (!rolling) return;
+                // 随机选择下一个学生，从上次的索引开始
+                lastRolledIndex = (lastRolledIndex + 1) % students.length;
+                document.getElementById('rollName').textContent = students[lastRolledIndex];
+                setTimeout(roll, rollSpeed);
+            }
+            roll();
+        }
+
+        function stopRoll() {
+            rolling = false;
+        }
+
+        // 改变滚动速度
+        function changeSpeed(speed) {
+            // 反向处理速度值
+            rollSpeed = 210 - speed;
+        }
+
+        // 一键给所有小组加指定分数
+        function addScoreToAllGroups(delta) {
+            groups.forEach((group, i) => {
+                changeScore(i, delta);
+            });
+        }
+
+        // ★ 保存小组积分 → POST 到云端
+        function saveScores() {
+            const scores = groups.map(g => Number(g.score));
+            fetch('https://qf.kjxs.site/api/OE6TiaVFqGL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ groupsScores: scores })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('✅ 小组积分已保存到云端');
+                } else {
+                    alert('❌ 保存失败，状态码：' + response.status);
+                }
+            })
+            .catch(error => {
+                alert('❌ 网络错误，保存失败：' + error.message);
+            });
+        }
+
+        // ★ 修改：撤回到上一次存档积分 → 从云端 GET 并解析 submissions 数组
+        function restoreScores() {
+            fetch('https://qf.kjxs.site/api/OE6TiaVFqGL')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('获取数据失败，状态码：' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 根据实际API返回格式，数据放在 data.submissions 中
+                if (!data || !Array.isArray(data.submissions) || data.submissions.length === 0) {
+                    throw new Error('云端没有存档记录');
+                }
+
+                // 取第一条记录
+                const firstSubmission = data.submissions[0];
+                if (!firstSubmission.groupsScores || !Array.isArray(firstSubmission.groupsScores)) {
+                    throw new Error('存档数据格式错误：缺少 groupsScores 数组');
+                }
+
+                const groupsScores = firstSubmission.groupsScores;
+                if (groupsScores.length !== groups.length) {
+                    throw new Error(`存档数据小组数量不匹配 (云端 ${groupsScores.length} 组, 本地 ${groups.length} 组)`);
+                }
+
+                // 更新每个小组的积分
+                groups.forEach((group, i) => {
+                    // 转为数字并确保非负
+                    const newScore = Math.max(0, Number(groupsScores[i]));
+                    group.score = newScore;
+                    document.getElementById(`score-${i}`).textContent = newScore;
+                    localStorage.setItem(`group-${i}`, newScore);
+                });
+
+                updateRanking();
+                alert(`✅ 已撤回到 ${firstSubmission.submitted_at || '上一次'} 的存档积分`);
+            })
+            .catch(error => {
+                alert('❌ 恢复失败：' + error.message);
+            });
+        }
+
+        // 一键清空所有积分
+        function clearAllScores() {
+            groups.forEach((group, i) => {
+                group.score = 0;
+                document.getElementById(`score-${i}`).textContent = 0;
+                localStorage.setItem(`group-${i}`, 0);
+            });
+            updateRanking();
+        }
+
+        // 分配个人积分
+        function recordCurrentScores() {
+            groups.forEach((group, groupIndex) => {
+                const avgScore = parseFloat((group.score / group.members.length).toFixed(2));
+                group.members.forEach(member => {
+                    const individualScoreIndex = individualScores.findIndex(score => score.name === member);
+                    if (individualScoreIndex!== -1) {
+                        individualScores[individualScoreIndex].score += avgScore;
+                    }
+                });
+            });
+            viewCurrentScores();
+        }
+
+        // 查看当前积分
+        function viewCurrentScores() {
+            const modal = document.getElementById('scoreRecordModal');
+            const content = document.getElementById('scoreRecordContent');
+            let html = '<button id="closeScoreRecordButton" onclick="closeScoreRecordModal()">关闭</button>';
+            html += '<h2 style="grid-column: 1 / -1;">各小组各成员个人积分</h2>';
+            individualScores.forEach((score, index) => {
+                html += `
+                    <div class="individual-score-item">
+                        第${score.group}组 - ${score.name}: 
+                        <span id="individual-score-${index}">${score.score}</span>
+                        <button onmousedown="startReduceIndividualScore(${index})" onmouseup="stopReduceIndividualScore()" onmouseleave="stopReduceIndividualScore()">-</button>
+                        <button onclick="changeIndividualScore(${index}, 1)">+</button>
+                    </div>
+                `;
+            });
+            // 一键给任意人减任意积分的输入框和按钮
+            html += `
+                <div style="grid-column: 1 / -1; text-align: center;">
+                    <input type="text" id="reduceScoreInput" placeholder="输入要减分的姓名">
+                    <input type="number" id="reduceScoreAmount" placeholder="输入减分数量">
+                    <button id="reduceScoreButton" onclick="reduceIndividualScore()">一键减分</button>
+                </div>
+            `;
+            // 调整抽奖区域布局，添加速度调节滑轮
+            html += `
+                <div id="lotteryArea">
+                    <button onclick="startLottery()">随机抽奖</button>
+                    <button onclick="stopLottery()">停</button>
+                    <div id="lotteryResult" style="font-size: 2em; margin-top: 20px;">未开始抽奖</div>
+                    <div>调节抽奖速度👉</div>
+                    <input type="range" id="lotterySpeedSlider" min="10" max="200" value="100" oninput="changeLotterySpeed(this.value)">
+                </div>
+            `;
+            content.innerHTML = html;
+            modal.style.display = 'flex';
+            createLotteryStars();
+        }
+
+        // 改变个人积分
+        function changeIndividualScore(index, delta) {
+            individualScores[index].score = Math.max(0, individualScores[index].score + delta);
+            document.getElementById(`individual-score-${index}`).textContent = individualScores[index].score;
+        }
+
+        // 长按连续减分的定时器
+        let reduceInterval;
+        function startReduceIndividualScore(index) {
+            reduceInterval = setInterval(() => {
+                changeIndividualScore(index, -1);
+            }, 100);
+        }
+
+        function stopReduceIndividualScore() {
+            clearInterval(reduceInterval);
+        }
+
+        // 关闭积分记录窗口
+        function closeScoreRecordModal() {
+            const modal = document.getElementById('scoreRecordModal');
+            modal.style.display = 'none';
+            stopLottery(); // 关闭窗口时停止抽奖
+            removeLotteryStars();
+        }
+
+        // 开始抽奖
+        function startLottery() {
+            if (isLotteryRolling) return;
+            isLotteryRolling = true;
+            lotteryInterval = setInterval(() => {
+                const random = Math.random();
+                let cumulativeProbability = 0;
+                for (let prize of prizes) {
+                    cumulativeProbability += prize.probability;
+                    if (random < cumulativeProbability) {
+                        document.getElementById('lotteryResult').textContent = prize.name;
+                        break;
+                    }
+                }
+            }, lotterySpeed);
+            createLotteryStars();
+        }
+
+        // 停止抽奖
+        function stopLottery() {
+            if (!isLotteryRolling) return;
+            isLotteryRolling = false;
+            clearInterval(lotteryInterval);
+            removeLotteryStars();
+        }
+
+        // 改变抽奖滚动速度
+        function changeLotterySpeed(speed) {
+            // 反向处理速度值
+            lotterySpeed = 210 - speed;
+            if (isLotteryRolling) {
+                clearInterval(lotteryInterval);
+                startLottery();
+            }
+        }
+
+        // 创建抽奖特效星星
+        function createLotteryStars() {
+            const lotteryArea = document.getElementById('lotteryArea');
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.className = 'lottery-star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = Math.random() * 3 + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = Math.random() * 2 + 1 +'s';
+                lotteryArea.appendChild(star);
+            }
+        }
+
+        // 移除抽奖特效星星
+        function removeLotteryStars() {
+            const lotteryArea = document.getElementById('lotteryArea');
+            const stars = lotteryArea.querySelectorAll('.lottery-star');
+            stars.forEach(star => star.remove());
+        }
+
+        // 一键给任意人减任意积分
+        function reduceIndividualScore() {
+            const name = document.getElementById('reduceScoreInput').value;
+            const amount = parseInt(document.getElementById('reduceScoreAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('请输入有效的减分数量');
+                return;
+            }
+            const index = individualScores.findIndex(score => score.name === name);
+            if (index === -1) {
+                alert('未找到该学生');
+                return;
+            }
+            individualScores[index].score = Math.max(0, individualScores[index].score - amount);
+            document.getElementById(`individual-score-${index}`).textContent = individualScores[index].score;
+        }
+
+        // 初始化
+        createGroups();
+        updateRanking();
+        createStars();
+    </script>
+</body>
+
+</html>

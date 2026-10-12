@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":28,"key":"case-28","title":"学习笔记协作","category":"creation","description":"共学笔记工作室：围绕笔记标题、笔记、交流开展交互学习，在数据大屏中回看记录。","headline":"共学笔记工作室","view":"wall","fields":[{"key":"title","label":"笔记标题"},{"key":"content","label":"笔记"},{"key":"comments","label":"交流"},{"key":"subject","label":"主题"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"应用展示"}],"tasks":{"records":"HwmH5OCAeVR"},"mapping":{"6qxxvy07tw":"HwmH5OCAeVR"},"accent":"#916749","capture":false,"lesson":"应用展示"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生端 - 学习笔记协作平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --bg-white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        /* 登录页面 */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* 主界面 */
+        .app-container {
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            padding: 1.25rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1.25rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #e53e3e;
+            transform: translateY(-1px);
+        }
+
+        /* Tab 切换 */
+        .tabs-container {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 笔记表单 */
+        .note-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 笔记网格 */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 笔记卡片 - 美化版 */
+        .note-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .note-card.highlighted {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border: 3px solid #ffd700;
+        }
+
+        .note-card.highlighted::before {
+            content: '🎨 教师推荐';
+            position: absolute;
+            top: 12px;
+            right: -35px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.25rem 3rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transform: rotate(45deg);
+            z-index: 10;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-pinned {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .badge-featured {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+            color: #333;
+        }
+
+        .badge-selected {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-subject {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+            line-height: 1.4;
+        }
+
+        .card-content {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .action-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* 开关 */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--text-dark) 0%, #1a202c 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 模态框 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .modal-subject {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-content-text {
+            line-height: 1.8;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+            font-size: 1rem;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .comments-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .comments-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .comment-item {
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-author {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .comment-text {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .comment-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .comment-input {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .comment-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .comment-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .comment-input button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .comment-input button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .tabs-container {
+                padding: 0.75rem 1rem;
+            }
+
+            .tab-content {
+                padding: 1rem;
+            }
+
+            .note-form {
+                padding: 1.5rem;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============================================================
+           协作平台体验补强
+           原有 :root 令牌已很完整（Indigo #667eea + 紫 #764ba2 + 语义色 + 阴影变量），
+           本层不动配色，只补三处缺口：
+             ① 键盘可达性：原文件 :focus-visible 为 0
+             ② 触屏与按压反馈：卡片原来只有 :hover，触屏点不到反馈
+             ③ 动效偏好：原文件未见 prefers-reduced-motion
+           ============================================================ */
+
+        /* ① 统一焦点环（主色 Indigo，与既有视觉一致） */
+        .btn:focus-visible,
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        .btn-logout:focus-visible,
+        .tab-btn:focus-visible,
+        .note-card:focus-visible,
+        .action-btn:focus-visible,
+        .modal-close:focus-visible,
+        .toggle-switch input:focus-visible + .toggle-slider,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, .45);
+        }
+
+        /* 卡片本身可聚焦（支持键盘打开详情） */
+        .note-card:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), 0 0 0 4px rgba(102, 126, 234, .45);
+        }
+
+        /* ② 触屏可点性 + 按压反馈 */
+        .note-card { cursor: pointer; }
+        .note-card:active { transform: translateY(-2px) scale(.995); }
+        .action-btn { min-height: 36px; }
+        .action-btn:active { transform: scale(.96); }
+        .tab-btn { min-height: 40px; }
+        .modal-close {
+            min-width: 36px; min-height: 36px;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+
+        /* ③ 尊重系统「减少动态效果」偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            .note-card,
+            .note-card:hover,
+            .note-card:focus-visible,
+            .action-btn,
+            .tab-btn {
+                transition: none;
+                transform: none;
+            }
+        }
+
+        /* 中等宽度：卡片两列，避免 320px 单列导致一屏只看到一张 */
+        @media (max-width: 900px) and (min-width: 620px) {
+            .notes-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        }
+
+        /* 窄屏：操作按钮撑满一行，触屏更易点按；同时去掉粘滞 hover */
+        @media (max-width: 620px) {
+            .card-actions { flex-wrap: wrap; }
+            .action-btn { flex: 1 1 auto; }
+            .note-card:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2 class="login-title">👨‍🎓 学生登录</h2>
+            <p class="login-subtitle">输入学号和姓名开始记录笔记</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="studentId">学号</label>
+                    <input type="text" id="studentId" required placeholder="请输入学号">
+                </div>
+                <div class="form-group">
+                    <label for="studentName">姓名</label>
+                    <input type="text" id="studentName" required placeholder="请输入演示称呼">
+                </div>
+                <button type="submit" class="btn btn-primary">登 录</button>
+            </form>
+        </div>
+    </div>
+
+    
+    <div id="mainApp" class="app-container" style="display: none;">
+        <header class="app-header">
+            <h1 class="app-title">📚 学习笔记协作平台</h1>
+            <div class="user-info">
+                <span class="user-name">欢迎，<span id="currentUserName"></span></span>
+                <button class="btn-logout" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('myNotes')">📝 我的笔记</button>
+            <button class="tab-btn" onclick="switchTab('community')">🌟 科高思享汇</button>
+        </div>
+
+        
+        <div id="myNotesTab" class="tab-content active">
+            <div class="note-form">
+                <h3 class="form-title">✨ 创建新笔记</h3>
+                <form id="noteForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="noteSubject">主题</label>
+                            <input type="text" id="noteSubject" required placeholder="输入笔记主题">
+                        </div>
+                        <div class="form-group">
+                            <label for="noteImage">图片（可选）</label>
+                            <input type="file" id="noteImage" accept="image/jpeg,image/png">
+                            <small>支持 jpg/png，最大 500KB</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="noteContent">正文内容</label>
+                        <textarea id="noteContent" required placeholder="记录你的学习心得..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">发布笔记</button>
+                </form>
+            </div>
+            <div id="myNotesList" class="notes-grid"></div>
+        </div>
+
+        
+        <div id="communityTab" class="tab-content">
+            <div id="communityNotesList" class="notes-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 配置 =====
+        const API_BASE = 'https://qf.kjxs.site/api/HwmH5OCAeVR';
+        
+        // ===== 状态管理 =====
+        let currentStudentId = null;
+        let currentStudentName = null;
+        let allNotesCache = []; // 缓存所有笔记
+        let syncInterval = null;
+
+        // ===== 工具函数 =====
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function truncateText(text, maxLength = 120) {
+            if (!text) return '';
+            if (text.length <= maxLength) return text;
+            return text.substr(0, maxLength) + '...';
+        }
+
+        // ===== API 操作 =====
+        async function submitNoteToAPI(note) {
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(note)
+                });
+                if (!response.ok) throw new Error('API请求失败');
+                const result = await response.json();
+                console.log('笔记已同步到API:', note.noteId);
+                return result;
+            } catch (error) {
+                console.error('提交笔记失败:', error);
+                return null;
+            }
+        }
+
+        async function fetchAllNotesFromAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/all`);
+                if (!response.ok) throw new Error('API请求失败');
+                const data = await response.json();
+                const allSubmissions = data.submissions || [];
+                
+                // 按 noteId 去重，保留最新的一条（按 submitted_at 时间）
+                const noteMap = new Map();
+                allSubmissions.forEach(note => {
+                    const existing = noteMap.get(note.noteId);
+                    if (!existing || new Date(note.submitted_at) > new Date(existing.submitted_at)) {
+                        noteMap.set(note.noteId, note);
+                    }
+                });
+                
+                return Array.from(noteMap.values());
+            } catch (error) {
+                console.error('获取笔记失败:', error);
+                return [];
+            }
+        }
+
+        // ===== 数据同步 =====
+        async function syncFromAPI() {
+            const apiNotes = await fetchAllNotesFromAPI();
+            if (apiNotes.length > 0) {
+                allNotesCache = apiNotes;
+                // 同时更新本地缓存
+                localStorage.setItem('notesCache', JSON.stringify(apiNotes));
+                console.log(`已同步 ${apiNotes.length} 条笔记`);
+            }
+            return allNotesCache;
+        }
+
+        // ===== 登录相关 =====
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            
+            if (!studentId || !studentName) {
+                showToast('⚠️ 请填写完整信息');
+                return;
+            }
+            
+            currentStudentId = studentId;
+            currentStudentName = studentName;
+            
+            sessionStorage.setItem('studentId', studentId);
+            sessionStorage.setItem('studentName', studentName);
+            
+            // 从API同步所有笔记
+            await syncFromAPI();
+            
+            showMainApp();
+        });
+
+        function showMainApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('currentUserName').textContent = currentStudentName;
+            
+            renderMyNotes();
+            
+            // 启动定时同步
+            if (syncInterval) clearInterval(syncInterval);
+            syncInterval = setInterval(async () => {
+                await syncFromAPI();
+                // 如果在社区页面，刷新显示
+                if (document.getElementById('communityTab').classList.contains('active')) {
+                    renderCommunityNotes();
+                }
+            }, 30000);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('studentId');
+            sessionStorage.removeItem('studentName');
+            if (syncInterval) clearInterval(syncInterval);
+            
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            
+            currentStudentId = null;
+            currentStudentName = null;
+        }
+
+        // ===== Tab 切换 =====
+        async function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'myNotes') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('myNotesTab').classList.add('active');
+                renderMyNotes();
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('communityTab').classList.add('active');
+                await syncFromAPI(); // 切换到社区时同步
+                renderCommunityNotes();
+            }
+        }
+
+        // ===== 创建笔记 =====
+        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const subject = document.getElementById('noteSubject').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const imageFile = document.getElementById('noteImage').files[0];
+            
+            if (!subject || !content) {
+                showToast('⚠️ 请填写主题和内容');
+                return;
+            }
+            
+            let imageBase64 = '';
+            if (imageFile) {
+                if (imageFile.size > 500 * 1024) {
+                    showToast('⚠️ 图片大小不能超过 500KB');
+                    return;
+                }
+                if (!['image/jpeg', 'image/png'].includes(imageFile.type)) {
+                    showToast('⚠️ 仅支持 jpg/png 格式');
+                    return;
+                }
+                
+                imageBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imageFile);
+                });
+            }
+            
+            const note = {
+                noteId: generateId(),
+                studentId: currentStudentId,
+                studentName: currentStudentName,
+                className: '',
+                subject: subject,
+                content: content,
+                imageBase64: imageBase64,
+                createdAt: new Date().toISOString(),
+                isPublic: false,
+                likeCount: 0,
+                commentList: [],
+                isHighlighted: false,
+                isFeatured: false,
+                isSelected: false,
+                isPinned: false
+            };
+            
+            // 先提交到API
+            const result = await submitNoteToAPI(note);
+            
+            if (result) {
+                // 成功后更新本地缓存
+                allNotesCache.unshift(note);
+                localStorage.setItem('notesCache', JSON.stringify(allNotesCache));
+                
+                document.getElementById('noteForm').reset();
+                renderMyNotes();
+                showToast('✅ 笔记创建成功');
+            } else {
+                showToast('⚠️ 创建失败，请重试');
+            }
+        });
+
+        // ===== 渲染我的笔记 =====
+        function renderMyNotes() {
+            const myNotes = allNotesCache.filter(n => n.studentId === currentStudentId)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            const container = document.getElementById('myNotesList');
+            
+            if (myNotes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">📝</div>
+                        <p class="empty-state-text">暂无笔记，快来创建第一篇吧！</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = myNotes.map(note => renderNoteCard(note, true)).join('');
+        }
+
+        // ===== 渲染科高思享汇 =====
+        function renderCommunityNotes() {
+            const publicNotes = allNotesCache
+                .filter(n => n.isPublic === true)
+                .sort((a, b) => {
+                    if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+            
+            const container = document.getElementById('communityNotesList');
+            
+            if (publicNotes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🌟</div>
+                        <p class="empty-state-text">暂无公开笔记，快去分享你的笔记吧！</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const likedNotes = getLikedNotes();
+            container.innerHTML = publicNotes.map(note => renderNoteCard(note, false, likedNotes.includes(note.noteId))).join('');
+        }
+
+        // ===== 渲染笔记卡片 =====
+        function renderNoteCard(note, isMyNote, isLiked = false) {
+            const badges = [];
+            if (note.isPinned) badges.push('<span class="badge badge-pinned">📌 置顶</span>');
+            if (note.isFeatured) badges.push('<span class="badge badge-featured">⭐ 精华</span>');
+            if (note.isSelected) badges.push('<span class="badge badge-selected">✅ 严选</span>');
+            
+            return `
+                <div class="note-card ${note.isHighlighted ? 'highlighted' : ''}" data-note-id="${note.noteId}"
+                     tabindex="0" role="article"
+                     aria-label="笔记：${note.subject || '未命名'}">
+                    ${badges.length > 0 ? `<div class="card-badges">${badges.join('')}</div>` : ''}
+                    ${note.imageBase64 ? `<img src="${note.imageBase64}" class="card-image" alt="笔记配图：${note.subject || ''}">` : ''}
+                    <div class="card-body">
+                        <h3 class="card-subject">${note.subject}</h3>
+                        <p class="card-content">${truncateText(note.content)}</p>
+                        <div class="card-meta">
+                            <span>📅 ${formatDate(note.createdAt)}</span>
+                            <div class="card-stats">
+                                <span class="stat-item" aria-label="点赞数 ${note.likeCount || 0}">❤️ ${note.likeCount || 0}</span>
+                                <span class="stat-item" aria-label="评论数 ${note.commentList ? note.commentList.length : 0}">💬 ${note.commentList ? note.commentList.length : 0}</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            ${isMyNote ? `
+                                <div class="toggle-wrapper">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" ${note.isPublic ? 'checked' : ''} onchange="togglePublic('${note.noteId}', this.checked)"
+                                               aria-label="公开这篇笔记">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span style="font-size: 0.85rem; color: var(--text-light);">${note.isPublic ? '公开' : '私密'}</span>
+                                </div>
+                            ` : `
+                                <button class="action-btn ${isLiked ? 'active' : ''}" onclick="toggleLike('${note.noteId}')"
+                                        aria-label="${isLiked ? '取消点赞' : '点赞'}这篇笔记" aria-pressed="${isLiked ? 'true' : 'false'}">
+                                    ${isLiked ? '❤️ 已赞' : '🤍 点赞'}
+                                </button>
+                            `}
+                            <button class="action-btn" onclick="viewNoteDetail('${note.noteId}')"
+                                    aria-label="查看笔记详情">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== 点赞记录 =====
+        function getLikedNotes() {
+            const key = `likedNotes_${currentStudentId}`;
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveLikedNotes(likedIds) {
+            const key = `likedNotes_${currentStudentId}`;
+            localStorage.setItem(key, JSON.stringify(likedIds));
+        }
+
+        // ===== 切换公开状态 =====
+        async function togglePublic(noteId, isPublic) {
+            const note = allNotesCache.find(n => n.noteId === noteId);
+            if (!note) return;
+            
+            note.isPublic = isPublic;
+            
+            const result = await submitNoteToAPI(note);
+            
+            if (result) {
+                localStorage.setItem('notesCache', JSON.stringify(allNotesCache));
+                showToast(isPublic ? '✅ 已设为公开' : '📝 已设为私密');
+            }
+        }
+
+        // ===== 点赞 =====
+        async function toggleLike(noteId) {
+            const likedNotes = getLikedNotes();
+            const isLiked = likedNotes.includes(noteId);
+            
+            if (isLiked) {
+                const index = likedNotes.indexOf(noteId);
+                likedNotes.splice(index, 1);
+            } else {
+                likedNotes.push(noteId);
+            }
+            saveLikedNotes(likedNotes);
+            
+            const note = allNotesCache.find(n => n.noteId === noteId);
+            if (note) {
+                note.likeCount = isLiked ? Math.max(0, (note.likeCount || 0) - 1) : (note.likeCount || 0) + 1;
+                await submitNoteToAPI(note);
+                localStorage.setItem('notesCache', JSON.stringify(allNotesCache));
+            }
+            
+            renderCommunityNotes();
+            showToast(isLiked ? '已取消点赞' : '❤️ 点赞成功');
+        }
+
+        // ===== 查看详情 =====
+        function viewNoteDetail(noteId) {
+            const note = allNotesCache.find(n => n.noteId === noteId);
+            if (!note) return;
+            
+            const isMyNote = note.studentId === currentStudentId;
+            const likedNotes = getLikedNotes();
+            const isLiked = likedNotes.includes(noteId);
+            
+            const badges = [];
+            if (note.isPinned) badges.push('<span class="badge badge-pinned">📌 置顶</span>');
+            if (note.isFeatured) badges.push('<span class="badge badge-featured">⭐ 精华</span>');
+            if (note.isSelected) badges.push('<span class="badge badge-selected">✅ 严选</span>');
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-badges">${badges.join('')}</div>
+                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <h2 class="modal-subject">${note.subject}</h2>
+                        <div class="modal-meta">
+                            <span>👤 ${note.studentName}</span>
+                            <span>📅 ${formatDate(note.createdAt)}</span>
+                        </div>
+                        ${note.imageBase64 ? `<img src="${note.imageBase64}" class="modal-image">` : ''}
+                        <p class="modal-content-text">${note.content}</p>
+                        
+                        <div class="modal-stats">
+                            <span>❤️ ${(note.likeCount || 0)} 点赞</span>
+                            <span>💬 ${note.commentList ? note.commentList.length : 0} 评论</span>
+                        </div>
+                        
+                        ${!isMyNote ? `
+                            <div style="margin-top: 1rem;">
+                                <button class="action-btn ${isLiked ? 'active' : ''}" id="modalLikeBtn" onclick="toggleLikeInModal('${noteId}')">
+                                    ${isLiked ? '❤️ 已赞' : '🤍 点赞'}
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="comments-section">
+                            <h3 class="comments-title">💬 评论 (${note.commentList ? note.commentList.length : 0})</h3>
+                            <div id="commentsList">
+                                ${note.commentList && note.commentList.length > 0 ? 
+                                    note.commentList.map(c => `
+                                        <div class="comment-item">
+                                            <div class="comment-author">${c.studentName}</div>
+                                            <div class="comment-text">${c.content}</div>
+                                            <div class="comment-time">${formatDate(c.createdAt)}</div>
+                                        </div>
+                                    `).join('') : 
+                                    '<p style="color: var(--text-light);">暂无评论</p>'
+                                }
+                            </div>
+                            ${!isMyNote ? `
+                                <div class="comment-input">
+                                    <input type="text" id="commentInput" placeholder="写下你的评论...">
+                                    <button onclick="submitComment('${noteId}')">发送</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        // ===== 模态框中点赞 =====
+        async function toggleLikeInModal(noteId) {
+            await toggleLike(noteId);
+            const likedNotes = getLikedNotes();
+            const isLiked = likedNotes.includes(noteId);
+            const btn = document.getElementById('modalLikeBtn');
+            if (btn) {
+                btn.className = `action-btn ${isLiked ? 'active' : ''}`;
+                btn.textContent = isLiked ? '❤️ 已赞' : '🤍 点赞';
+            }
+        }
+
+        // ===== 提交评论 =====
+        async function submitComment(noteId) {
+            const input = document.getElementById('commentInput');
+            const content = input.value.trim();
+            
+            if (!content) {
+                showToast('⚠️ 请输入评论内容');
+                return;
+            }
+            
+            const comment = {
+                commentId: generateId(),
+                studentId: currentStudentId,
+                studentName: currentStudentName,
+                content: content,
+                createdAt: new Date().toISOString()
+            };
+            
+            const note = allNotesCache.find(n => n.noteId === noteId);
+            if (note) {
+                if (!note.commentList) note.commentList = [];
+                note.commentList.push(comment);
+                
+                await submitNoteToAPI(note);
+                localStorage.setItem('notesCache', JSON.stringify(allNotesCache));
+            }
+            
+            input.value = '';
+            showToast('✅ 评论成功');
+            
+            // 刷新模态框
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+                viewNoteDetail(noteId);
+            }
+        }
+
+        // ===== 页面加载 =====
+        // 键盘可达性：笔记卡支持 Enter / 空格打开详情（事件委托，覆盖所有渲染路径）
+        document.addEventListener('keydown', (e) => {
+            const card = e.target && e.target.closest ? e.target.closest('.note-card') : null;
+            if (!card) return;
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                // 卡片内的按钮自行处理，避免重复触发
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+                e.preventDefault();
+                const id = card.getAttribute('data-note-id');
+                if (id) viewNoteDetail(id);
+            }
+        });
+
+        window.addEventListener('load', async () => {
+            // 先加载本地缓存
+            const cached = localStorage.getItem('notesCache');
+            if (cached) {
+                allNotesCache = JSON.parse(cached);
+            }
+            
+            const savedId = sessionStorage.getItem('studentId');
+            const savedName = sessionStorage.getItem('studentName');
+            
+            if (savedId && savedName) {
+                currentStudentId = savedId;
+                currentStudentName = savedName;
+                await syncFromAPI();
+                showMainApp();
+            }
+        });
+    </script>
+</body>
+</html>

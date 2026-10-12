@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":37,"key":"case-37","title":"编码与解码的应用（4 课时）","category":"programming","description":"依次体验计算机、图像、声音和文字符号编码，保存各课时的学习证据。","headline":"编码作品实验室","view":"flow","fields":[{"key":"totalScore","label":"总分"},{"key":"taskAnswers","label":"编码答案"},{"key":"retries","label":"尝试次数"},{"key":"pixelData","label":"像素编码"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"① 计算机编码之旅"},{"file":"lesson-2.html","title":"② 图像编码设计师"},{"file":"lesson-3.html","title":"③ 声音编码设计师"},{"file":"lesson-4.html","title":"④ 文字符号编码设计师"}],"tasks":{"records":"TR2T7uOoqYR"},"mapping":{"6r3hj8caqg":"TR2T7uOoqYR"},"accent":"#416d89","capture":true,"lesson":"① 计算机编码之旅"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园探秘 - 计算机编码之旅（重试分析版）</title>
+    <style>
+        /* ========== 完整样式（与原版一致） ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        :root {
+            --primary-light: #F5E8C8;
+            --primary-medium: #E6D5B8;
+            --primary-dark: #D4C1A7;
+            --accent-orange: #D2691E;
+            --accent-gold: #D4A76A;
+            --accent-cream: #FFF9E6;
+            --text-dark: #5C4B37;
+            --text-medium: #8B7355;
+            --text-light: #3C2A21;
+            --background-light: #FFFDF5;
+            --background-medium: #F9F5EB;
+            --background-dark: #F0E6D6;
+            --success-color: #8F7B5E;
+            --warning-color: #B5651D;
+            --border-color: #D4C1A7;
+        }
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            line-height: 1.6;
+            background-image: radial-gradient(circle at 10% 20%, rgba(245, 232, 200, 0.9) 0%, rgba(245, 232, 200, 0.7) 90%),
+                              radial-gradient(circle at 90% 80%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* 登录遮罩 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .login-card {
+            background: var(--background-light);
+            border-radius: 28px;
+            padding: 32px 28px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 2px solid var(--accent-orange);
+        }
+        .login-card h2 {
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .login-card input, .login-card select {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 60px;
+            font-size: 1rem;
+            background: white;
+        }
+        .login-card button {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .error-msg {
+            color: #c0392b;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        /* 积分栏 */
+        .score-bar {
+            background: var(--background-light);
+            border-radius: 60px;
+            padding: 10px 24px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--accent-gold);
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+        .score-info {
+            font-weight: bold;
+            color: var(--accent-orange);
+            font-size: 1.1rem;
+        }
+        .student-info {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            background: var(--background-dark);
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+        /* 任务卡片样式（略，完整保留） */
+        header {
+            background: linear-gradient(135deg, var(--primary-medium), var(--primary-dark));
+            color: var(--text-light);
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--accent-orange);
+        }
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(210, 105, 30, 0.15) 0%, rgba(210, 105, 30, 0) 70%);
+            transform: rotate(30deg);
+        }
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            color: var(--text-light);
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            position: relative;
+            color: var(--text-medium);
+        }
+        .mission-container {
+            background: var(--background-medium);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        .mission-container:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 8px 25px rgba(210, 105, 30, 0.15);
+            border-color: var(--accent-orange);
+        }
+        .mission-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent-orange), var(--accent-gold), var(--accent-orange));
+        }
+        .mission-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .mission-number {
+            background: linear-gradient(135deg, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+        .mission-title {
+            font-size: 1.6rem;
+            color: var(--text-light);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        .task-description {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: var(--text-medium);
+        }
+        .interactive-area {
+            background: var(--background-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+        .ascii-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .ascii-table th, .ascii-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+        }
+        .ascii-table th {
+            background: linear-gradient(to bottom, var(--primary-medium), var(--primary-dark));
+            color: var(--text-light);
+        }
+        .pixel-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto;
+            max-width: 500px;
+            padding: 20px 0;
+        }
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            width: 400px;
+            margin: 0;
+            background-color: var(--background-medium);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+        .pixel {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .pixel.active {
+            background-color: #000000;
+        }
+        .grid-label {
+            position: absolute;
+            font-size: 14px;
+            color: var(--text-light);
+            background: linear-gradient(135deg, var(--accent-gold), var(--primary-dark));
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .label-top { top: -45px; left: 50%; transform: translateX(-50%); }
+        .label-bottom { bottom: -45px; left: 50%; transform: translateX(-50%); }
+        .binary-input {
+            font-family: monospace;
+            font-size: 1.2rem;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            margin: 10px 0;
+            border: 2px solid var(--accent-orange);
+            border-radius: 8px;
+            background-color: var(--background-light);
+            color: var(--text-light);
+        }
+        .btn {
+            background: linear-gradient(to bottom, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--primary-medium));
+            transform: translateY(-2px);
+        }
+        .result-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid;
+        }
+        .success {
+            background: linear-gradient(135deg, rgba(143, 123, 94, 0.1), rgba(139, 115, 85, 0.1));
+            color: var(--success-color);
+            border-color: var(--accent-gold);
+        }
+        .error {
+            background: linear-gradient(135deg, rgba(181, 101, 29, 0.1), rgba(184, 169, 154, 0.1));
+            color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+        .hidden { display: none; }
+        .mission-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--background-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            color: var(--text-medium);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        .progress-step.active {
+            background: linear-gradient(135deg, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            transform: scale(1.1);
+        }
+        .progress-step.completed {
+            background: linear-gradient(135deg, var(--accent-gold), var(--primary-dark));
+            color: var(--accent-cream);
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-medium);
+            border-top: 1px solid var(--border-color);
+        }
+        .experiment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .experiment-table th, .experiment-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+        }
+        .experiment-table th {
+            background: linear-gradient(to bottom, var(--primary-medium), var(--primary-dark));
+        }
+        .experiment-table input, .experiment-table select {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .conclusion-input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 10px; }
+        .experiment-instructions {
+            background: linear-gradient(135deg, rgba(210, 105, 30, 0.05), rgba(139, 115, 85, 0.05));
+            border-left: 5px solid var(--accent-orange);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        pre {
+            background-color: var(--background-light);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        @media (max-width: 768px) {
+            .pixel-grid { width: 320px; }
+            .pixel { width: 30px; height: 30px; }
+        }
+        /* 成绩报告弹窗 */
+        .report-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        .report-card {
+            background: #FFF9F0;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 60px 60px 50px 50px;
+            padding: 30px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            border: 8px solid #FFD966;
+            text-align: center;
+            position: relative;
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive;
+        }
+        .report-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 32px;
+            cursor: pointer;
+            color: #D2691E;
+            width: 42px;
+            height: 42px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .report-title {
+            font-size: 2.2rem;
+            color: #D2691E;
+            background: #FFE0A3;
+            display: inline-block;
+            padding: 8px 28px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 0 #B45F1B;
+        }
+        .student-badge {
+            background: #E6D5B8;
+            border-radius: 50px;
+            padding: 14px 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-circle {
+            background: #FFB347;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 10px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 6px 0 #C16F1A;
+        }
+        .score-number {
+            font-size: 2.8rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .rank-box {
+            background: #C9E4DE;
+            border-radius: 40px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+        .task-review {
+            background: #FFF2DF;
+            border-radius: 35px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+            border: 2px solid #FFCE8E;
+        }
+        .task-item {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #FFCE8E;
+            padding-bottom: 10px;
+        }
+        .task-question {
+            font-weight: bold;
+            color: #B45309;
+        }
+        .task-answer {
+            color: #2C5F2D;
+            margin-left: 20px;
+            font-size: 0.9rem;
+        }
+        .correct-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+        .wrong-badge { background: #E67E22; }
+        .encourage-text {
+            background: #FFD966;
+            border-radius: 50px;
+            padding: 14px;
+            margin-top: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #5D3A1A;
+        }
+        .btn-report {
+            background: #FFB347;
+            color: #5D3A1A;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+        <h2>🔐 编码课堂登录</h2>
+        <input type="text" id="studentName" placeholder="姓名" autocomplete="off">
+        <select id="studentClass">
+            <option value="">请选择班级</option>
+            <option value="四年级1班">四年级1班</option>
+            <option value="四年级2班">四年级2班</option>
+            <option value="四年级3班">四年级3班</option>
+            <option value="四年级4班">四年级4班</option>
+            <option value="四年级5班">四年级5班</option>
+            <option value="四年级6班">四年级6班</option>
+        </select>
+        <input type="text" id="studentId" placeholder="学号（2位数）" maxlength="2" autocomplete="off">
+        <button class="btn" id="loginBtn">开始挑战</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+
+<div class="container" id="mainContainer" style="display: none;">
+    <div class="score-bar">
+        <div class="student-info" id="studentInfoDisplay">学生：---</div>
+        <div class="score-info">🏆 当前积分：<span id="totalScore">0</span> 分</div>
+    </div>
+    <header>
+        <h1>校园探秘：计算机编码之旅</h1>
+        <p class="subtitle">与何老师一起破解数字密码吧！！</p>
+    </header>
+    <div class="progress-container">
+        <div class="progress-step active" id="step1">1</div>
+        <div class="progress-step" id="step2">2</div>
+        <div class="progress-step" id="step3">3</div>
+        <div class="progress-step" id="step4">4</div>
+        <div class="progress-step" id="step5">5</div>
+    </div>
+
+    
+    <section class="mission-container" id="mission1">
+        <div class="mission-header"><div class="mission-number">1</div><h2 class="mission-title">图文馆的神秘编码</h2></div>
+        <p class="task-description">我们在图文馆发现了一块神秘的"数字石板"，上面刻着一串奇怪的二进制代码。请使用ASCII码表破译这段代码，找出下一个地点的线索！</p>
+        <div class="interactive-area">
+            <h3>二进制代码：</h3>
+            <p class="binary-input">1101010 1101001 1100110 1100001 1101110 1100111</p>
+            <h3>ASCII码表（部分）</h3>
+            <table class="ascii-table"><thead><tr><th>字符</th><th>二进制</th><th>十进制</th></tr></thead><tbody>
+                <tr><td>a</td><td>1100001</td><td>97</td><tr><td>f</td><td>1100110</td><td>102</td></tr>
+                <tr><td>g</td><td>1100111</td><td>103</td></tr><tr><td>i</td><td>1101001</td><td>105</td></tr>
+                <tr><td>j</td><td>1101010</td><td>106</td></tr><tr><td>n</td><td>1101110</td><td>110</td></tr>
+            </tbody></table>
+            <p>破译结果：</p>
+            <input type="text" id="decodeResult" placeholder="输入破译出的拼音" class="binary-input">
+            <button class="btn" onclick="checkDecode()">验证答案</button>
+            <div id="decodeFeedback" class="result-message hidden"></div>
+            <div id="nextLocation1" class="hidden">
+                <p class="success">恭喜！你成功破译了代码："jifang"！这代表"机房"。让我们前往机房寻找下一个线索！</p>
+                <div class="mission-nav"><button class="btn" disabled>上一任务</button><button class="btn" onclick="showMission(2)">前往任务2</button></div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="mission-container hidden" id="mission2">
+        <div class="mission-header"><div class="mission-number">2</div><h2 class="mission-title">机房的像素画</h2></div>
+        <p class="task-description">我们在机房发现了一张纸片，上面写着奇怪的二进制代码。请根据二进制代码将像素格涂黑，看看这幅图指向哪里。我们将逐行检查，一行正确后再检查下一行。</p>
+        <div class="interactive-area">
+            <h3>像素画二进制代码：</h3>
+            <p>每一行代表像素画的一行像素，0表示白色，1表示黑色。点击像素格可以在黑白之间切换。</p>
+            <pre>00011000
+00111100
+01111110
+00011000
+00011000
+00011000</pre>
+            <div class="pixel-container">
+                <div class="grid-label label-top">桌面文件夹1</div>
+                <div class="grid-label label-bottom">桌面文件夹2</div>
+                <div id="userPixelGrid" class="pixel-grid"></div>
+            </div>
+            <button class="btn" onclick="checkPixelArt()">检查当前行</button>
+            <button class="btn" onclick="resetPixelArt()">重置</button>
+            <div id="pixelResult" class="result-message hidden"></div>
+            <div id="currentRowHint" style="margin-top:10px; font-style:italic; color:var(--text-medium);"></div>
+        </div>
+    </section>
+
+    
+    <section class="mission-container hidden" id="mission3">
+        <div class="mission-header"><div class="mission-number">3</div><h2 class="mission-title">校徽中的色彩谜题</h2></div>
+        <p class="task-description">在文件夹中，我们发现了学校的校徽。请根据教材44页实验要求，将校徽图片分别另存为24位位图、256色位图、16色位图以及单色位图，并将实验后的观察结果记录在下方。</p>
+        <div class="interactive-area">
+            <div class="experiment-instructions"><h3>实验步骤：</h3><ol><li>打开桌面上的"文件夹1"</li><li>将校徽图片分别另存为以下四种格式：<ul><li>24位位图（真彩色）</li><li>8位位图（256色）</li><li>4位位图（16色）</li><li>1位位图（单色）</li></ul></li><li>观察不同格式图片的色彩质量和文件大小</li><li>将观察结果记录在下方表格中</li></ol></div>
+            <h3>实验记录表：</h3>
+            <table class="experiment-table">
+                <thead><tr><th>位图种类</th><th>图像的色彩质量</th><th>文件大小（KB）</th><th>推测结论</th></tr></thead>
+                <tbody>
+                    <tr><td>24位（真彩色）位图</td><td><select id="quality24"><option value="">请选择</option><option value="丰富">丰富</option><option value="良好">良好</option><option value="一般">一般</option><option value="差">差</option></select></td><td><input type="text" id="size24" placeholder="例如: 1200"></td><td rowspan="4">编码长度越长，所能表示的色彩越丰富，对应图像的文件大小越 <input type="text" id="conclusion" placeholder="填写“大”或“小”" class="conclusion-input"></td></tr>
+                    <tr><td>8位（256色）位图</td><td><select id="quality8"><option value="">请选择</option><option value="丰富">丰富</option><option value="良好">良好</option><option value="一般">一般</option><option value="差">差</option></select></td><td><input type="text" id="size8" placeholder="例如: 300"></td></tr>
+                    <tr><td>4位（16色）位图</td><td><select id="quality4"><option value="">请选择</option><option value="丰富">丰富</option><option value="良好">良好</option><option value="一般">一般</option><option value="差">差</option></select></td><td><input type="text" id="size4" placeholder="例如: 150"></td></tr>
+                    <tr><td>1位（单色）位图</td><td><select id="quality1"><option value="">请选择</option><option value="丰富">丰富</option><option value="良好">良好</option><option value="一般">一般</option><option value="差">差</option></select></td><td><input type="text" id="size1" placeholder="例如: 30"></td></tr>
+                </tbody>
+            </table>
+            <button class="btn" onclick="checkImageAnswers()">提交实验结果</button>
+            <div id="imageFeedback" class="result-message hidden"></div>
+            <div id="nextLocation3" class="hidden">
+                <p class="success">正确！你发现了编码长度与色彩质量、文件大小的关系！让我们前往终极任务！</p>
+                <div class="mission-nav"><button class="btn" onclick="showMission(2)">返回任务2</button><button class="btn" onclick="showMission(4)">前往任务4</button></div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="mission-container hidden" id="mission4">
+        <div class="mission-header"><div class="mission-number">4</div><h2 class="mission-title">解码终极秘钥</h2></div>
+        <p class="task-description">我们来到最终任务，电脑中显示了一串混合乱码，请选择合适的编码来修复这段信息，揭示最终的校训！</p>
+        <div class="interactive-area">
+            <h3>乱码信息：</h3>
+            <p class="binary-input" id="garbledText">åå­¦ åè¡</p>
+            <p>这段信息使用了错误的编码显示，请选择正确的编码：</p>
+            <select id="encodingSelect" class="binary-input">
+                <option value="">--请选择编码--</option>
+                <option value="ASCII">ASCII (美国信息交换标准代码)</option>
+                <option value="GBK">GBK (汉字内码扩展规范)</option>
+                <option value="UTF-8">UTF-8 (万国码)</option>
+            </select>
+            <button class="btn" onclick="fixEncoding()">修复编码</button>
+            <div id="encodingResult" class="result-message hidden"></div>
+        </div>
+    </section>
+
+    
+    <section class="mission-container hidden" id="mission5">
+        <div class="mission-header"><div class="mission-number">5</div><h2 class="mission-title">🎯 拓展挑战：小小编码设计师</h2></div>
+        <p class="task-description">太棒了！你已经掌握了编码的基本原理。现在，请选择你感兴趣的挑战，<strong>设计属于你自己的编码系统</strong>。<br>这是为学有余力的小侦探准备的进阶任务，完成任意一项即可获得“编码大师”称号！</p>
+        <div class="interactive-area" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+            <div style="flex:1; min-width:200px; text-align:center; padding:20px; background:var(--background-light); border-radius:15px; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+                <div style="font-size:3rem;">🎵</div>
+                <h3>声音编码设计师</h3>
+                <p>用0和1表示节奏与音调，设计一段“二进制旋律”。</p>
+                <a href="index.html" target="_blank" class="btn" style="display:inline-block; text-decoration:none;">开始挑战 →</a>
+            </div>
+            <div style="flex:1; min-width:200px; text-align:center; padding:20px; background:var(--background-light); border-radius:15px; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+                <div style="font-size:3rem;">🖼️</div>
+                <h3>图像编码设计师</h3>
+                <p>自由绘制像素画，生成对应的二进制编码。</p>
+                <a href="index.html" target="_blank" class="btn" style="display:inline-block; text-decoration:none;">开始挑战 →</a>
+            </div>
+            <div style="flex:1; min-width:200px; text-align:center; padding:20px; background:var(--background-light); border-radius:15px; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+                <div style="font-size:3rem;">🔣</div>
+                <h3>文字符号编码设计师</h3>
+                <p>创建你自己的密码本，把字母变成独特符号。</p>
+                <a href="index.html" target="_blank" class="btn" style="display:inline-block; text-decoration:none;">开始挑战 →</a>
+            </div>
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <button class="btn" onclick="showMission(4)">返回任务4</button>
+            <button class="btn" onclick="showMission(1)">回到首页</button>
+        </div>
+    </section>
+    <footer><p>校园探秘 - 我是编码大师</p><p>破解编码线索，理解计算机中的编码知识</p></footer>
+</div>
+
+<script>
+    // ========== 重试计数变量 ==========
+    let retries = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    let taskCompleted = { 1: false, 2: false, 3: false, 4: false };
+
+    // ========== 积分与数据变量 ==========
+    let student = { name: '', class: '', id: '' };
+    let totalScore = 0;
+    let taskScoreAdded = { 1: false, 2: false, 3: false, 4: false };
+    let taskAnswers = {
+        task1Answer: "",
+        task1Correct: false,
+        task2Correct: false,
+        task3Correct: false,
+        task4Correct: false
+    };
+    let hasReported = false;
+
+    // 加分函数
+    function addScore(missionId) {
+        if (taskScoreAdded[missionId]) return;
+        taskScoreAdded[missionId] = true;
+        totalScore += 10;
+        document.getElementById('totalScore').innerText = totalScore;
+        let feedbackDiv = document.getElementById(`mission${missionId}Feedback`);
+        if (!feedbackDiv) {
+            if (missionId === 2) feedbackDiv = document.getElementById('pixelResult');
+            if (missionId === 4) feedbackDiv = document.getElementById('encodingResult');
+        }
+        if (feedbackDiv) {
+            const msg = document.createElement('div');
+            msg.className = 'success';
+            msg.style.marginTop = '10px';
+            msg.innerText = '🎉 +10分！';
+            feedbackDiv.appendChild(msg);
+            setTimeout(() => msg.remove(), 2000);
+        }
+        // 检查是否所有主线任务都完成
+        if (taskScoreAdded[1] && taskScoreAdded[2] && taskScoreAdded[3] && taskScoreAdded[4] && !hasReported) {
+            const resultDiv = document.getElementById('encodingResult');
+            if (resultDiv && !document.getElementById('showReportBtn')) {
+                const reportBtn = document.createElement('button');
+                reportBtn.id = 'showReportBtn';
+                reportBtn.className = 'btn';
+                reportBtn.innerHTML = '🎉 查看我的成绩报告 🎉';
+                reportBtn.style.marginTop = '15px';
+                reportBtn.onclick = () => showPerformanceReport();
+                resultDiv.appendChild(reportBtn);
+            }
+        }
+    }
+
+    // 登录
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        const name = document.getElementById('studentName').value.trim();
+        const classVal = document.getElementById('studentClass').value;
+        const id = document.getElementById('studentId').value.trim();
+        if (!name || !classVal || !id) {
+            document.getElementById('loginError').innerText = '请完整填写所有信息并选择班级';
+            return;
+        }
+        if (!/^\d{2}$/.test(id)) {
+            document.getElementById('loginError').innerText = '学号必须为2位数字';
+            return;
+        }
+        student = { name, class: classVal, id };
+        document.getElementById('studentInfoDisplay').innerHTML = `👤 ${name} · ${classVal} · 学号${id}`;
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        initPixelGrid();
+        updateProgress(1);
+    });
+
+    // ========== 任务逻辑（含重试计数） ==========
+    const completedMissions = { 1: false, 2: false, 3: false, 4: false, 5: false };
+    let currentPixelRow = 0;
+    const correctPattern = [
+        [0,0,0,1,1,0,0,0],
+        [0,0,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0]
+    ];
+
+    function initPixelGrid() {
+        const grid = document.getElementById('userPixelGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 8; j++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.dataset.row = i;
+                pixel.dataset.col = j;
+                pixel.dataset.value = '0';
+                pixel.addEventListener('click', togglePixel);
+                grid.appendChild(pixel);
+            }
+        }
+    }
+    function togglePixel(e) {
+        const pixel = e.target;
+        if (pixel.dataset.value === '0') {
+            pixel.dataset.value = '1';
+            pixel.classList.add('active');
+        } else {
+            pixel.dataset.value = '0';
+            pixel.classList.remove('active');
+        }
+    }
+
+    // 任务1：ASCII破译
+    function checkDecode() {
+        if (taskCompleted[1]) return;
+        const result = document.getElementById('decodeResult').value.trim().toLowerCase();
+        const feedback = document.getElementById('decodeFeedback');
+        const nextLocation = document.getElementById('nextLocation1');
+        const correct = 'jifang';
+        if (result === correct) {
+            taskCompleted[1] = true;
+            feedback.innerHTML = '<p class="success">🎉 正确！你成功破译了代码：“jifang”！这代表机房，干得漂亮！</p>';
+            feedback.classList.remove('hidden');
+            nextLocation.classList.remove('hidden');
+            if (!completedMissions[1]) {
+                completedMissions[1] = true;
+                taskAnswers.task1Correct = true;
+                taskAnswers.task1Answer = result;
+                addScore(1);
+                updateProgress();
+            }
+            return;
+        }
+        // 错误计数
+        retries[1]++;
+        if (!/^[a-z]*$/.test(result)) {
+            feedback.innerHTML = '<p class="error">🔤 只能输入小写字母哦（a~z），再试试吧。</p>';
+        } else if (result.length !== 6) {
+            feedback.innerHTML = `<p class="error">📏 长度不对，应该是6个字母。你输入了${result.length}个。</p>`;
+        } else {
+            let correctCount = 0;
+            for (let i = 0; i < 6; i++) if (result[i] === correct[i]) correctCount++;
+            if (correctCount === 5) feedback.innerHTML = '<p class="error">非常接近！只有1个字母错了，再对照ASCII表检查一下。</p>';
+            else feedback.innerHTML = '<p class="error">不正确，请仔细对照ASCII码表转换二进制。</p>';
+        }
+        feedback.classList.remove('hidden');
+        nextLocation.classList.add('hidden');
+    }
+
+    // 任务2：像素画
+    function checkPixelArt() {
+        if (taskCompleted[2]) return;
+        const pixels = document.querySelectorAll('#userPixelGrid .pixel');
+        const resultDiv = document.getElementById('pixelResult');
+        const hintDiv = document.getElementById('currentRowHint');
+        if (currentPixelRow >= 6) {
+            taskCompleted[2] = true;
+            resultDiv.innerHTML = '<p class="success">所有行都正确！你绘制出了正确的箭头图案，指向“桌面文件夹1”！</p><div class="mission-nav"><button class="btn" onclick="showMission(1)">返回任务1</button><button class="btn" onclick="showMission(3)">前往任务3</button></div>';
+            resultDiv.classList.remove('hidden');
+            if (!completedMissions[2]) {
+                completedMissions[2] = true;
+                taskAnswers.task2Correct = true;
+                addScore(2);
+                updateProgress();
+            }
+            return;
+        }
+        const row = currentPixelRow;
+        let rowCorrect = true;
+        let errors = [];
+        for (let col = 0; col < 8; col++) {
+            const index = row * 8 + col;
+            const userVal = parseInt(pixels[index].dataset.value);
+            const correctVal = correctPattern[row][col];
+            if (userVal !== correctVal) {
+                rowCorrect = false;
+                errors.push({col: col+1, user: userVal, correct: correctVal});
+            }
+        }
+        if (rowCorrect) {
+            currentPixelRow++;
+            if (currentPixelRow < 6) {
+                resultDiv.innerHTML = `<p class="success">第${row+1}行正确！请继续检查第${currentPixelRow+1}行。</p>`;
+                hintDiv.innerHTML = `当前正在检查第${currentPixelRow+1}行`;
+            } else {
+                taskCompleted[2] = true;
+                resultDiv.innerHTML = '<p class="success">所有行都正确！你绘制出了正确的箭头图案，指向“桌面文件夹1”！</p><div class="mission-nav"><button class="btn" onclick="showMission(1)">返回任务1</button><button class="btn" onclick="showMission(3)">前往任务3</button></div>';
+                if (!completedMissions[2]) {
+                    completedMissions[2] = true;
+                    taskAnswers.task2Correct = true;
+                    addScore(2);
+                    updateProgress();
+                }
+            }
+            resultDiv.classList.remove('hidden');
+        } else {
+            retries[2]++;  // 本次检查有错误，增加重试计数
+            let errorMsg = `第${row+1}行有错误，请修正以下格子：<br>`;
+            errors.forEach(e => errorMsg += `第${e.col}列：应为${e.correct}（${e.correct===1?'黑色':'白色'}），现在是${e.user}（${e.user===1?'黑色':'白色'}）。<br>`);
+            errorMsg += `该行正确的二进制是：${correctPattern[row].join('')}`;
+            resultDiv.innerHTML = `<p class="error">${errorMsg}</p>`;
+            resultDiv.classList.remove('hidden');
+            hintDiv.innerHTML = `当前正在检查第${row+1}行，请修正后再点击“检查当前行”。`;
+        }
+    }
+    function resetPixelArt() {
+        const pixels = document.querySelectorAll('#userPixelGrid .pixel');
+        pixels.forEach(p => { p.dataset.value = '0'; p.classList.remove('active'); });
+        currentPixelRow = 0;
+        document.getElementById('pixelResult').classList.add('hidden');
+        document.getElementById('currentRowHint').innerHTML = '当前正在检查第1行';
+    }
+
+    // 任务3：色彩实验
+    function checkImageAnswers() {
+        if (taskCompleted[3]) return;
+        const quality24 = document.getElementById('quality24').value;
+        const quality8 = document.getElementById('quality8').value;
+        const quality4 = document.getElementById('quality4').value;
+        const quality1 = document.getElementById('quality1').value;
+        const size24 = parseFloat(document.getElementById('size24').value);
+        const size8 = parseFloat(document.getElementById('size8').value);
+        const size4 = parseFloat(document.getElementById('size4').value);
+        const size1 = parseFloat(document.getElementById('size1').value);
+        const conclusion = document.getElementById('conclusion').value.trim();
+        const feedback = document.getElementById('imageFeedback');
+        const nextLocation = document.getElementById('nextLocation3');
+
+        let isValid = true;
+        if (!quality24 || !quality8 || !quality4 || !quality1 || isNaN(size24) || isNaN(size8) || isNaN(size4) || isNaN(size1) || !conclusion) {
+            isValid = false;
+        } else if (quality24 !== '丰富' || quality8 !== '良好' || quality4 !== '一般' || quality1 !== '差') {
+            isValid = false;
+        } else if (!(size24 > size8 && size8 > size4 && size4 > size1)) {
+            isValid = false;
+        } else if (conclusion !== '大') {
+            isValid = false;
+        }
+
+        if (isValid) {
+            taskCompleted[3] = true;
+            feedback.innerHTML = '<p class="success">实验记录正确！</p>';
+            feedback.classList.remove('hidden');
+            nextLocation.classList.remove('hidden');
+            if (!completedMissions[3]) {
+                completedMissions[3] = true;
+                taskAnswers.task3Correct = true;
+                addScore(3);
+                updateProgress();
+            }
+        } else {
+            retries[3]++;
+            feedback.innerHTML = '<p class="error">请完整填写所有字段并确保答案正确：24位→丰富，8位→良好，4位→一般，1位→差；文件大小 24位>8位>4位>1位；结论填“大”。</p>';
+            feedback.classList.remove('hidden');
+        }
+    }
+
+    // 任务4：乱码修复
+    function fixEncoding() {
+        if (taskCompleted[4]) return;
+        const encoding = document.getElementById('encodingSelect').value;
+        const resultDiv = document.getElementById('encodingResult');
+        const garbledElement = document.getElementById('garbledText');
+        if (encoding === 'UTF-8') {
+            taskCompleted[4] = true;
+            garbledElement.innerText = '德以明理，学以精工';
+            const currentTotal = totalScore;
+            resultDiv.innerHTML = `<p class="success">🎉 恭喜你完成了所有主线任务！ 🎉<br>📖 校训：“德以明理，学以精工”<br>🏆 你的总分为 <strong>${currentTotal}</strong> 分！<br>👏 太棒了！快去挑战拓展任务吧！</p>
+                                    <div class="mission-nav"><button class="btn" onclick="showMission(5)">🏆 挑战拓展任务</button></div>`;
+            if (!completedMissions[4]) {
+                completedMissions[4] = true;
+                taskAnswers.task4Correct = true;
+                addScore(4);
+                updateProgress();
+            }
+        } else if (encoding === 'ASCII') {
+            retries[4]++;
+            resultDiv.innerHTML = '<p class="error">ASCII无法显示中文，还是乱码。</p>';
+        } else if (encoding === 'GBK') {
+            retries[4]++;
+            resultDiv.innerHTML = '<p class="error">GBK解码不正确，试试UTF-8。</p>';
+        } else if (encoding === '') {
+            resultDiv.innerHTML = '<p class="error">请选择编码。</p>';
+        } else {
+            retries[4]++;
+            resultDiv.innerHTML = '<p class="error">编码无效，请重新选择。</p>';
+        }
+        resultDiv.classList.remove('hidden');
+    }
+
+    // 页面切换与进度更新
+    function showMission(missionNumber) {
+        for (let i = 1; i <= 5; i++) document.getElementById(`mission${i}`).classList.add('hidden');
+        document.getElementById(`mission${missionNumber}`).classList.remove('hidden');
+        if (missionNumber === 2) {
+            initPixelGrid();
+            currentPixelRow = 0;
+            document.getElementById('pixelResult').classList.add('hidden');
+            document.getElementById('currentRowHint').innerHTML = '当前正在检查第1行';
+        }
+        if (missionNumber === 4) {
+            document.getElementById('garbledText').innerText = 'åå­¦ åè¡';
+            document.getElementById('encodingSelect').value = '';
+            document.getElementById('encodingResult').classList.add('hidden');
+        }
+        updateProgress(missionNumber);
+        window.scrollTo(0, 0);
+    }
+
+    function updateProgress(currentMission) {
+        for (let i = 1; i <= 5; i++) {
+            const step = document.getElementById(`step${i}`);
+            if (step) {
+                step.classList.remove('active', 'completed');
+                if (completedMissions[i]) step.classList.add('completed');
+                else if (i === currentMission) step.classList.add('active');
+            }
+        }
+    }
+
+    // ========== 成绩上报与报告弹窗 ==========
+    async function submitScoreToAPI() {
+        if (!student.name) return;
+        const payload = {
+            name: student.name,
+            class: student.class,
+            id: student.id,
+            totalScore: totalScore,
+            task1Retries: retries[1],
+            task2Retries: retries[2],
+            task3Retries: retries[3],
+            task4Retries: retries[4],
+            submitTime: new Date().toISOString()
+        };
+        try {
+            await fetch('https://qf.kjxs.site/api/TR2T7uOoqYR', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            console.log('成绩上报成功');
+        } catch(e) { console.warn('上报失败', e); }
+    }
+
+    async function fetchAllScores() {
+        try {
+            const res = await fetch('https://qf.kjxs.site/api/TR2T7uOoqYR/all');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.submissions && Array.isArray(data.submissions)) return data.submissions;
+                if (Array.isArray(data)) return data;
+            }
+        } catch(e) { console.warn('获取排名数据失败', e); }
+        return [];
+    }
+
+    async function showPerformanceReport() {
+        if (!hasReported) {
+            await submitScoreToAPI();
+            hasReported = true;
+        }
+        const allRecords = await fetchAllScores();
+        let sorted = [...allRecords].sort((a,b) => (b.totalScore || 0) - (a.totalScore || 0));
+        let rank = sorted.findIndex(r => r.name === student.name && r.id === student.id) + 1;
+        if (rank === 0) rank = allRecords.length + 1;
+        const totalStudents = allRecords.length;
+        const percent = totalStudents ? Math.round(((totalStudents - rank) / totalStudents) * 100) : 0;
+
+        let encouragement = "";
+        if (totalScore >= 40) encouragement = "🎖️ 编码大师！你是真正的密码破译专家，太厉害了！继续探索更多编码奥秘吧！";
+        else if (totalScore >= 30) encouragement = "🌟 非常优秀！你已经掌握了编码的核心思想，再试试拓展任务会更棒！";
+        else if (totalScore >= 20) encouragement = "🌱 做得不错！再复习一下编码规则，下次争取满分哦！";
+        else encouragement = "💪 别灰心！编码就像拼图，多练习几次就能成为高手！老师相信你！";
+
+        const reportHTML = `
+            <div class="report-overlay" id="reportOverlay">
+                <div class="report-card">
+                    <div class="report-close" onclick="closeReport()">✖</div>
+                    <div class="report-title">📜 编码探险成绩单</div>
+                    <div class="student-badge">
+                        <span>🧑‍🎓 ${student.name}</span>
+                        <span>📚 ${student.class}</span>
+                        <span>🆔 学号 ${student.id}</span>
+                    </div>
+                    <div class="score-circle">
+                        <div class="score-number">${totalScore}</div>
+                        <div>总分 / 40</div>
+                    </div>
+                    <div class="rank-box">
+                        🏅 全班排名：第 ${rank} 名（共 ${totalStudents} 人）<br>
+                        📈 超过了 ${percent}% 的同学
+                    </div>
+                    <div class="task-review">
+                        <div class="task-item">
+                            <div class="task-question">🔍 任务1：ASCII码破译 <span class="correct-badge">✓ 正确</span></div>
+                            <div class="task-answer">你的答案：${taskAnswers.task1Answer || 'jifang'}</div>
+                            <div class="task-answer">📖 解析：二进制 1101010→j, 1101001→i, 1100110→f, 1100001→a, 1101110→n, 1100111→g，组合为“jifang”（机房）。</div>
+                            <div class="task-answer">🔁 尝试次数：${retries[1]} 次</div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-question">🎨 任务2：像素画编码 <span class="correct-badge">✓ 正确</span></div>
+                            <div class="task-answer">📖 解析：根据二进制代码绘制黑白像素，正确的图案是一个箭头，指向“桌面文件夹1”。</div>
+                            <div class="task-answer">🔁 尝试次数：${retries[2]} 次</div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-question">🎨 任务3：色彩深度实验 <span class="correct-badge">✓ 正确</span></div>
+                            <div class="task-answer">📖 解析：编码位数越高（24位>8位>4位>1位），色彩越丰富，文件体积越大。</div>
+                            <div class="task-answer">🔁 尝试次数：${retries[3]} 次</div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-question">🌐 任务4：乱码修复 <span class="correct-badge">✓ 正确</span></div>
+                            <div class="task-answer">📖 解析：使用UTF-8（万国码）才能正确显示中文，乱码是因为编码规则不一致。</div>
+                            <div class="task-answer">🔁 尝试次数：${retries[4]} 次</div>
+                        </div>
+                    </div>
+                    <div class="encourage-text">
+                        ✨ ${encouragement}
+                    </div>
+                    <button class="btn-report" onclick="closeReport()">关闭</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', reportHTML);
+    }
+
+    function closeReport() {
+        const overlay = document.getElementById('reportOverlay');
+        if (overlay) overlay.remove();
+    }
+
+    window.onload = function() {
+        initPixelGrid();
+        updateProgress(1);
+    };
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

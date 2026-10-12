@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":39,"key":"case-39","title":"防溺水智能警报卫士","category":"simulation","description":"安全算法任务图：围绕活动、得分、得分开展交互学习，在数据大屏中回看记录。","headline":"安全算法任务图","view":"flow","fields":[{"key":"活动","label":"活动"},{"key":"score","label":"得分"},{"key":"得分","label":"得分"},{"key":"answers","label":"代码答案"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"活动一"},{"file":"lesson-2.html","title":"活动二·任务1"},{"file":"lesson-3.html","title":"活动二·任务2"}],"tasks":{"records":"weioUf36OBW"},"mapping":{"1up27hd4qv":"weioUf36OBW"},"accent":"#3c697b","capture":false,"lesson":"活动一"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>防溺水智能警报卫士 · 活动一 | 小组协作平台</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #1a5276;
+  min-height: 100vh;
+  background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,.1) 2px, transparent 2px),
+                    radial-gradient(circle at 80% 70%, rgba(255,255,255,.08) 2px, transparent 2px);
+  background-size: 50px 50px;
+}
+
+/* 主工作台 */
+.workbench {
+  width: 100%;
+  min-height: 100vh;
+  background: #e8f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部区域 */
+.title-main {
+  background: linear-gradient(145deg, #1565C0, #0D47A1);
+  padding: 14px 30px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.3);
+  border-bottom: 3px solid #0D47A1;
+  box-shadow: inset 0 1px 5px rgba(255,255,255,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.title-main small {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #B3E5FC;
+  background: rgba(0,0,0,0.2);
+  padding: 4px 12px;
+  border-radius: 40px;
+}
+.activity-header {
+  background: linear-gradient(145deg, #42A5F5, #1E88E5);
+  padding: 12px 30px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 3px solid #1565C0;
+  box-shadow: inset 0 1px 6px rgba(255,255,255,.15);
+}
+.activity-header span {
+  background: rgba(255,255,255,.2);
+  color: #E3F2FD;
+  font-size: 1rem;
+  padding: 5px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.3);
+  box-shadow: inset 0 1px 4px rgba(255,255,255,.1), 0 3px 0 rgba(0,0,0,.15);
+}
+
+/* 主布局：活动在左，小组在右 */
+.main-panel {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  background: #d6eaf8;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+/* 左侧：活动区域 */
+.tasks-area {
+  flex: 3;
+  min-width: 480px;
+  background: #bbdefb;
+  border-radius: 32px;
+  padding: 20px 24px;
+  border: 2px solid #64b5f6;
+  box-shadow: inset 0 0 0 4px rgba(227,242,253,.6), 0 5px 12px rgba(0,0,0,.15);
+  background-image: linear-gradient(rgba(25,118,210,.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(25,118,210,.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 右侧：组别&得分面板 */
+.group-card {
+  flex: 1.2;
+  min-width: 320px;
+  background: linear-gradient(145deg, #5dade2, #2e86c1);
+  border-radius: 32px;
+  padding: 20px 18px;
+  border: 2px solid #2874a6;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.15), 0 8px 18px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.group-card h3 {
+  font-size: 1.8rem;
+  color: #fff;
+  text-align: center;
+  text-shadow: 2px 2px 0 #0D47A1;
+  margin-bottom: 4px;
+}
+.group-selector {
+  background: #0a2a52;
+  border-radius: 60px;
+  padding: 4px 12px;
+  border: 2px solid #90CAF9;
+}
+.group-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: #0a2a52;
+  color: #E3F2FD;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+}
+.group-select option {
+  background: #0a2a52;
+}
+.current-team {
+  background: #1565C0;
+  border-radius: 28px;
+  padding: 14px;
+  text-align: center;
+  border: 2px solid #42A5F5;
+  color: #fff;
+  font-weight: 600;
+}
+.current-team .team-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FFD966;
+  margin-top: 6px;
+}
+
+/* 当前小组得分卡片 */
+.score-board-current {
+  background: #0D47A1;
+  border-radius: 28px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,.2), 0 6px 0 #082249;
+}
+.score-board-current .score-label {
+  font-size: 1rem;
+  color: #B3E5FC;
+  letter-spacing: 2px;
+}
+.score-board-current .current-score {
+  font-size: 3.6rem;
+  font-weight: 800;
+  background: #071f3e;
+  display: inline-block;
+  padding: 6px 28px;
+  border-radius: 70px;
+  margin: 8px 0;
+  color: #FFE082;
+  border: 2px solid #42A5F5;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.4), 0 5px 0 #0D47A1;
+}
+.score-hint {
+  font-size: 0.7rem;
+  color: #C5E0FF;
+}
+
+.submit-group-btn {
+  background: linear-gradient(145deg, #43A047, #2E7D32);
+  border: none;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  padding: 14px;
+  border-radius: 60px;
+  box-shadow: 0 6px 0 #1B5E20;
+  cursor: pointer;
+  transition: 0.08s linear;
+  margin-top: 6px;
+  letter-spacing: 2px;
+}
+.submit-group-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #1B5E20;
+}
+.reset-tip {
+  font-size: 0.7rem;
+  text-align: center;
+  color: #B3E5FC;
+  margin-top: 4px;
+}
+
+/* 活动卡片样式 */
+.task-item {
+  background: rgba(255,255,255,0.96);
+  border-radius: 32px;
+  padding: 20px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-left: 8px solid #1565C0;
+}
+.task-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0D47A1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.task-badge {
+  background: #FFB74D;
+  padding: 6px 18px;
+  border-radius: 40px;
+  font-size: 1rem;
+  color: #3E2723;
+}
+.task-desc {
+  font-size: 1rem;
+  color: #1a237e;
+  background: #E3F2FD;
+  padding: 14px 18px;
+  border-radius: 28px;
+  margin: 16px 0;
+  line-height: 1.5;
+  border: 1px solid #90CAF9;
+}
+.sensor-demo {
+  background: #0a2f44;
+  border-radius: 28px;
+  padding: 12px 18px;
+  margin: 14px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sensor-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #C5E0FF;
+  font-weight: 500;
+}
+.alert-trigger-btn {
+  background: #D32F2F;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+.alert-trigger-btn:active {
+  transform: scale(0.97);
+}
+.question-box {
+  background: #FFF8E7;
+  padding: 20px;
+  border-radius: 36px;
+  margin: 18px 0 10px;
+  text-align: center;
+  box-shadow: inset 0 1px 3px #ffe6b3, 0 4px 12px rgba(0,0,0,0.05);
+}
+.question-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #BF360C;
+  margin-bottom: 20px;
+}
+.choice-buttons {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.choice-btn {
+  background: #E0E0E0;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px 30px;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: 0.08s linear;
+  box-shadow: 0 4px 0 #9E9E9E;
+  color: #1F2A44;
+  min-width: 130px;
+}
+.choice-btn.yes {
+  background: #4CAF50;
+  color: white;
+  box-shadow: 0 4px 0 #1B5E20;
+}
+.choice-btn.no {
+  background: #F44336;
+  color: white;
+  box-shadow: 0 4px 0 #B71C1C;
+}
+.choice-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #6D6D6D;
+}
+.choice-btn.active-choice {
+  outline: 4px solid #FFD966;
+  filter: brightness(1.05);
+  transform: scale(0.98);
+  box-shadow: 0 1px 0 #1B5E20;
+}
+.task-status {
+  margin-top: 18px;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px;
+  border-radius: 60px;
+  background: #F5F5F5;
+  color: #0D47A1;
+}
+@media (max-width: 850px) {
+  .main-panel { flex-direction: column; }
+  .tasks-area { min-width: auto; }
+  .task-title { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="workbench">
+  <div class="title-main">
+    🛟 防溺水智能警报卫士 · 活动一
+    <small>小组协作 · AI守护安全</small>
+  </div>
+  <div class="activity-header">
+    🧠 活动挑战 <span>完成活动一获得相应分数</span>
+  </div>
+
+  <div class="main-panel">
+    
+    <div class="tasks-area">
+      <div class="task-item" id="task1Card">
+        <div class="task-title">
+          📍 活动一：1.0版 红外触发本地警报
+          <span class="task-badge">30分</span>
+        </div>
+        <div class="task-desc">
+          💡 系统通过人体红外释热传感器感应有人靠近危险水域，立即触发语音警报：「水域危险，请远离」。
+        </div>
+        <div class="sensor-demo">
+          <div class="sensor-info">
+            <span style="font-size: 1.6rem;">🌡️🔊</span>
+            <span>人体红外释热感应 → 语音警报</span>
+          </div>
+          <button id="simulateAlertBtn" class="alert-trigger-btn">🔊 模拟触发警报</button>
+        </div>
+        <div class="question-box" id="task1Question">
+          <div class="question-text">⚠️ 你是否成功完成活动一？<br>（人体红外释热传感器感应有人 → 本地语音警报）</div>
+          <div class="choice-buttons">
+            <button class="choice-btn yes" data-choice="yes">✅ 是，完成！</button>
+            <button class="choice-btn no" data-choice="no">❌ 否，未完成</button>
+          </div>
+        </div>
+        <div class="task-status" id="task1StatusMsg">⚙️ 请先选择小组，再选择是否完成，最后提交成绩</div>
+      </div>
+    </div>
+
+    
+    <div class="group-card">
+      <h3>🏆 参赛小组</h3>
+      <div class="group-selector">
+        <select id="groupSelect" class="group-select">
+          <option value="">-- 请选择组别 --</option>
+          <option value="第一组">🔥 第一组</option>
+          <option value="第二组">📢 第二组</option>
+          <option value="第三组">🛡️ 第三组</option>
+          <option value="第四组">🌊 第四组</option>
+          <option value="第五组">🤖 第五组</option>
+          <option value="第六组">🏅 第六组</option>
+        </select>
+      </div>
+      <div class="current-team">
+        <div style="font-size:0.9rem;">当前作答小组</div>
+        <div class="team-name" id="teamNameDisplay">——</div>
+      </div>
+      
+      <div class="score-board-current">
+        <div class="score-label">🎯 当前小组 · 活动一得分</div>
+        <div class="current-score" id="previewScoreDisplay">——</div>
+        <div class="score-hint">※ 选择“是”得30分，“否”得0分，提交后生效</div>
+      </div>
+      
+      <button class="submit-group-btn" id="submitGroupFinalBtn">📤 提交小组成绩</button>
+      <div class="reset-tip">※ 先选择小组 → 点击“是/否” → 最后“提交成绩” 即可更新该小组活动一完成情况（支持再次修改覆盖）。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- 配置 ----------
+  const API_ENDPOINT = 'https://qf.kjxs.site/api/weioUf36OBW';
+  
+  // ---------- 数据结构 ----------
+  const GROUP_LIST = ["第一组", "第二组", "第三组", "第四组", "第五组", "第六组"];
+  let groupsData = {};
+  let currentGroup = null;
+  let tempChoice = null;
+  let isSubmitting = false;   // 防止重复提交
+
+  function initGroups() {
+    for (let g of GROUP_LIST) {
+      groupsData[g] = { completed: false, score: 0 };
+    }
+  }
+  initGroups();
+
+  function refreshUI() {
+    updateCurrentGroupPreviewAndMessage();
+  }
+
+  function updateCurrentGroupPreviewAndMessage() {
+    const teamNameSpan = document.getElementById('teamNameDisplay');
+    const previewSpan = document.getElementById('previewScoreDisplay');
+    const statusDiv = document.getElementById('task1StatusMsg');
+    
+    if (!currentGroup) {
+      if (teamNameSpan) teamNameSpan.innerText = '未选择小组';
+      if (previewSpan) previewSpan.innerText = '——';
+      if (statusDiv) statusDiv.innerHTML = '⚙️ 请从右侧选择小组，然后点击“是/否”并提交成绩';
+      clearActiveChoiceHighlight();
+      return;
+    }
+    
+    teamNameSpan.innerText = currentGroup;
+    const groupRecord = groupsData[currentGroup];
+    
+    let previewScore = null;
+    if (tempChoice !== null) {
+      previewScore = (tempChoice === 'yes') ? 30 : 0;
+    } else if (groupRecord && groupRecord.completed) {
+      previewScore = groupRecord.score;
+    } else {
+      previewScore = null;
+    }
+    
+    if (previewSpan) {
+      if (previewScore !== null) previewSpan.innerText = `${previewScore} 分`;
+      else previewSpan.innerText = '未选择';
+    }
+    
+    if (statusDiv) {
+      if (groupRecord.completed) {
+        const scoreText = groupRecord.score === 30 ? '已完成 ✓ 获得30分' : '未完成 得0分';
+        statusDiv.innerHTML = `📌 当前小组「${currentGroup}」已提交成绩：${scoreText}。如需修改，请重新选择“是/否”后再次提交。`;
+      } else {
+        if (tempChoice !== null) {
+          const hint = (tempChoice === 'yes') ? '已完成（待提交）将获得30分' : '未完成（待提交）将获得0分';
+          statusDiv.innerHTML = `✏️ 当前小组「${currentGroup}」已选择：${tempChoice === 'yes' ? '✅ 完成' : '❌ 未完成'}，${hint}。点击“提交小组成绩”生效。`;
+        } else {
+          statusDiv.innerHTML = `⚪ 当前小组「${currentGroup}」尚未提交成绩。请选择“是/否”并点击“提交小组成绩”。`;
+        }
+      }
+    }
+    
+    if (tempChoice) highlightChoiceButton(tempChoice);
+    else clearActiveChoiceHighlight();
+  }
+
+  function highlightChoiceButton(choice) {
+    const yesBtn = document.querySelector('.choice-btn.yes');
+    const noBtn = document.querySelector('.choice-btn.no');
+    if (yesBtn && noBtn) {
+      if (choice === 'yes') {
+        yesBtn.classList.add('active-choice');
+        noBtn.classList.remove('active-choice');
+      } else if (choice === 'no') {
+        noBtn.classList.add('active-choice');
+        yesBtn.classList.remove('active-choice');
+      }
+    }
+  }
+
+  function clearActiveChoiceHighlight() {
+    const yesBtn = document.querySelector('.choice-btn.yes');
+    const noBtn = document.querySelector('.choice-btn.no');
+    if (yesBtn) yesBtn.classList.remove('active-choice');
+    if (noBtn) noBtn.classList.remove('active-choice');
+  }
+
+  // 提交成绩：本地存储 + 发送到 API
+  async function commitGroupScore() {
+    if (isSubmitting) {
+      alert('正在提交中，请稍后...');
+      return false;
+    }
+    if (!currentGroup) {
+      alert('请先选择一个小组！');
+      return false;
+    }
+    if (tempChoice === null) {
+      alert(`请先为小组「${currentGroup}」选择是否完成活动一（点击“是，完成”或“否，未完成”按钮）。`);
+      return false;
+    }
+    
+    const isSuccess = (tempChoice === 'yes');
+    const newScore = isSuccess ? 30 : 0;
+    
+    // 先更新本地数据
+    groupsData[currentGroup] = {
+      completed: true,
+      score: newScore
+    };
+    refreshUI();  // 刷新界面（榜单已移除，但当前小组显示会更新）
+    
+    // 准备提交给 API 的数据
+    const payload = {
+      group: currentGroup,
+      completed: true,
+      score: newScore,
+      status: isSuccess ? "success" : "failed",
+      timestamp: new Date().toISOString(),
+      activity: "防溺水智能警报卫士1.0"
+    };
+    
+    // 开始提交，防止重复点击
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitGroupFinalBtn');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = '提交中...';
+    submitBtn.disabled = true;
+    
+    try {
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      
+      if (response.ok) {
+        const result = await response.json().catch(() => ({}));
+        alert(`✅ 小组「${currentGroup}」成绩提交成功！\n活动一得分：${newScore}分\n云端已记录。`);
+      } else {
+        // HTTP 错误状态，但本地已经保存
+        alert(`⚠️ 本地成绩已保存，但云端提交失败（HTTP ${response.status}）。\n小组「${currentGroup}」得分：${newScore}分\n请稍后重试或联系管理员。`);
+      }
+    } catch (err) {
+      console.error('提交出错:', err);
+      alert(`⚠️ 网络错误，成绩已保存在本地，但未能同步到云端。\n小组「${currentGroup}」得分：${newScore}分\n请检查网络后重试提交。`);
+    } finally {
+      isSubmitting = false;
+      submitBtn.innerText = originalText;
+      submitBtn.disabled = false;
+    }
+    
+    // 保持当前临时选择不变，可继续修改并覆盖
+    return true;
+  }
+
+  function handleTempChoice(choice) {
+    if (!currentGroup) {
+      alert('请先从右侧面板选择一个小组再来选择活动状态！');
+      return;
+    }
+    tempChoice = choice;
+    highlightChoiceButton(choice);
+    updateCurrentGroupPreviewAndMessage();
+  }
+
+  function playVoiceAlert() {
+    if ('speechSynthesis' in window) {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      const utterance = new SpeechSynthesisUtterance('水域危险，请远离');
+      utterance.lang = 'zh-CN';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+      const toastMsg = document.createElement('div');
+      toastMsg.innerText = '🔊 警报触发：「水域危险，请远离」';
+      toastMsg.style.position = 'fixed';
+      toastMsg.style.bottom = '30px';
+      toastMsg.style.left = '50%';
+      toastMsg.style.transform = 'translateX(-50%)';
+      toastMsg.style.backgroundColor = '#B71C1C';
+      toastMsg.style.color = 'white';
+      toastMsg.style.padding = '10px 24px';
+      toastMsg.style.borderRadius = '60px';
+      toastMsg.style.zIndex = '9999';
+      toastMsg.style.fontWeight = 'bold';
+      toastMsg.style.boxShadow = '0 4px 12px black';
+      document.body.appendChild(toastMsg);
+      setTimeout(() => toastMsg.remove(), 2000);
+    } else {
+      alert('⚠️ 语音合成不支持，但模拟感应触发！【水域危险，请远离】');
+    }
+  }
+
+  function onGroupChange() {
+    const selectEl = document.getElementById('groupSelect');
+    const selectedVal = selectEl.value;
+    if (!selectedVal) {
+      currentGroup = null;
+      tempChoice = null;
+      clearActiveChoiceHighlight();
+      refreshUI();
+      return;
+    }
+    currentGroup = selectedVal;
+    tempChoice = null;
+    clearActiveChoiceHighlight();
+    refreshUI();
+  }
+
+  function bindEvents() {
+    const groupSelect = document.getElementById('groupSelect');
+    if (groupSelect) groupSelect.addEventListener('change', onGroupChange);
+    
+    const yesBtn = document.querySelector('.choice-btn.yes');
+    const noBtn = document.querySelector('.choice-btn.no');
+    if (yesBtn) yesBtn.addEventListener('click', () => handleTempChoice('yes'));
+    if (noBtn) noBtn.addEventListener('click', () => handleTempChoice('no'));
+    
+    const submitBtn = document.getElementById('submitGroupFinalBtn');
+    if (submitBtn) submitBtn.addEventListener('click', commitGroupScore);
+    
+    const simulateBtn = document.getElementById('simulateAlertBtn');
+    if (simulateBtn) simulateBtn.addEventListener('click', playVoiceAlert);
+  }
+
+  function init() {
+    bindEvents();
+    refreshUI();
+  }
+  init();
+</script>
+</body>
+</html>

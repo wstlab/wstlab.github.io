@@ -1,0 +1,12 @@
+{
+  "id": "case-07",
+  "title": "巧算24点",
+  "category": "practice",
+  "description": "同一组数字尝试不同算式，记录正确、错误与跳过；在大屏比较每题尝试次数，也可切换竞赛练习。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 7,
+  "app": "ppt.html",
+  "dashboard": "ppt-dashboard.html"
+}

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":58,"key":"case-58","title":"班级分贝森林","category":"observation","description":"用麦克风观察相对音量与森林变化，只保存数值摘要和时长，不上传录音。","headline":"声音与森林","view":"trend","fields":[{"key":"volume","label":"相对音量"},{"key":"threshold","label":"阈值"},{"key":"quietTime","label":"安静秒数"},{"key":"noisyTime","label":"较响秒数"},{"key":"trees","label":"树木数"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"录音版（推荐）"}],"tasks":{"records":"JReJlMMltDF"},"mapping":{},"accent":"#527b43","capture":true,"lesson":"录音版（推荐）"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>🌱 班级分贝森林 · 录音砍树版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #d4eafe 0%, #b6d9f0 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            margin: 0;
+            touch-action: pan-y;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 40px rgba(0, 60, 100, 0.25), 0 4px 12px rgba(0, 40, 70, 0.15), inset 0 1px 2px rgba(255,255,255,0.6);
+            width: 100%;
+            max-width: 680px;
+            padding: 24px 22px 34px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: #0463a1;
+            text-align: center;
+            margin: 4px 0 8px 0;
+            text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        h1 span {
+            background: #b3dbf5;
+            padding: 0 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #015d9e;
+            border: 1px solid white;
+        }
+
+        .meter-section {
+            background: #e1f0fd;
+            border-radius: 80px;
+            padding: 24px 20px 20px;
+            margin: 10px 0 16px;
+            box-shadow: inset 0 4px 8px rgba(0,40,70,0.08), 0 8px 16px rgba(0,80,120,0.2);
+            border: 1px solid white;
+        }
+
+        .db-digital {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .db-value {
+            font-size: 5.2rem;
+            font-weight: 600;
+            line-height: 1;
+            color: #024d82;
+            text-shadow: 0 2px 5px #c0e2ff;
+            letter-spacing: 2px;
+            font-feature-settings: "tnum";
+        }
+        .db-unit {
+            font-size: 2rem;
+            color: #2c7cb0;
+            font-weight: 400;
+        }
+        .threshold-badge {
+            background: #7cb9e8;
+            border-radius: 60px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: 500;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,60,120,0.3);
+            border: 1px solid #bfe0ff;
+        }
+
+        .slider-container {
+            margin: 16px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .slider-label {
+            color: #046194;
+            font-weight: 500;
+            background: rgba(255,255,255,0.6);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            backdrop-filter: blur(2px);
+        }
+        input[type=range] {
+            flex: 2;
+            min-width: 240px;
+            height: 44px;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 14px;
+            background: linear-gradient(90deg, #aad0f5, #3d8ec9);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: inset 0 1px 4px #699ac7;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 34px;
+            width: 34px;
+            background: white;
+            border-radius: 50%;
+            margin-top: -11px;
+            box-shadow: 0 4px 8px #02659c;
+            border: 2px solid #b0dafc;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        input[type=range]::-moz-range-track {
+            height: 14px;
+            background: #aad0f5;
+            border-radius: 20px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 34px;
+            width: 34px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid #8fc5f0;
+            cursor: pointer;
+        }
+
+        .time-panel {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .time-card {
+            background: #f0faff;
+            border-radius: 40px;
+            padding: 18px 20px;
+            flex: 1 1 180px;
+            box-shadow: inset 0 1px 4px white, 0 6px 14px rgba(0, 90, 140, 0.2);
+            border: 1px solid #cbe4fe;
+            text-align: center;
+        }
+        .time-label {
+            font-size: 1.2rem;
+            color: #1273ac;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .time-number {
+            font-size: 2.8rem;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+            color: #014880;
+            letter-spacing: 4px;
+            background: #d3ebff;
+            border-radius: 30px;
+            padding: 4px 8px;
+            display: inline-block;
+            min-width: 140px;
+            border: 1px solid white;
+        }
+        .time-unit {
+            font-size: 1rem;
+            color: #3b7ea6;
+            margin-left: 4px;
+        }
+
+        .forest {
+            background: #c2def7;
+            border-radius: 60px 60px 30px 30px;
+            padding: 20px 18px 18px;
+            margin: 20px 0 20px;
+            border: 2px solid white;
+            box-shadow: 0 8px 0 #3f85b3;
+        }
+        .tree-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .tree-icon {
+            font-size: 3.4rem;
+            filter: drop-shadow(2px 8px 8px #2b789e);
+            background: rgba(255,255,240,0.4);
+            padding: 8px 24px;
+            border-radius: 80px;
+            line-height: 1;
+        }
+        .tree-number {
+            font-size: 4.2rem;
+            font-weight: 600;
+            color: #01502b;
+            background: #e3ffef;
+            padding: 0 28px;
+            border-radius: 80px;
+            border: 3px solid white;
+            box-shadow: inset 0 -3px 0 #9bc9a4;
+            font-family: 'Segoe UI', monospace;
+        }
+        .forest-hint {
+            text-align: center;
+            color: #046b9e;
+            margin-top: 12px;
+            font-weight: 500;
+            background: #dff0ff;
+            padding: 8px 20px;
+            border-radius: 60px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1rem;
+            border: 1px solid white;
+        }
+
+        .button-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0 5px;
+        }
+        .btn {
+            background: #ebf7ff;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 28px;
+            font-size: 1.25rem;
+            font-weight: 550;
+            color: #01578b;
+            box-shadow: 0 5px 0 #699ac2, 0 8px 14px rgba(0,70,110,0.2);
+            border: 1px solid white;
+            cursor: pointer;
+            transition: 0.1s ease;
+            flex: 1 0 auto;
+            min-width: 130px;
+            backdrop-filter: blur(2px);
+            touch-action: manipulation;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #699ac2, 0 8px 14px rgba(0,70,110,0.15);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            pointer-events: none;
+            box-shadow: 0 3px 0 #a0b8cc;
+        }
+        .reset-btn {
+            background: #daf1ff;
+            color: #026f9e;
+        }
+
+        .status-text {
+            text-align: center;
+            color: #0a6291;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.6);
+            border-radius: 60px;
+            padding: 8px 16px;
+            margin-top: 20px;
+        }
+
+        footer {
+            font-size: 0.9rem;
+            color: #2d6f96;
+            text-align: center;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>
+        🌿 班级分贝森林
+        <span>🎙️ 砍树自动录音</span>
+    </h1>
+
+    
+    <div class="meter-section">
+        <div class="db-digital">
+            <span class="db-value" id="dbDisplay">—</span>
+            <span class="db-unit">% 音量</span>
+            <span class="threshold-badge" id="thresholdTag">阈值 40%</span>
+        </div>
+
+        
+        <div class="slider-container">
+            <span class="slider-label">🔊 安静阈值</span>
+            <input type="range" id="thresholdSlider" min="0" max="100" value="42" step="1">
+        </div>
+    </div>
+
+    
+    <div class="time-panel">
+        <div class="time-card">
+            <div class="time-label">😴 安静时间</div>
+            <span class="time-number" id="quietTimeDisplay">00:00</span>
+        </div>
+        <div class="time-card">
+            <div class="time-label">🤯 吵闹时间</div>
+            <span class="time-number" id="noisyTimeDisplay">00:00</span>
+        </div>
+    </div>
+
+    
+    <div class="forest">
+        <div class="tree-counter">
+            <span class="tree-icon">🌲🌲</span>
+            <span class="tree-number" id="treeCountDisplay">10</span>
+            <span class="tree-icon">🌱🌳</span>
+        </div>
+        <div class="forest-hint" id="forestHint">达标安静 → 种树 🌲 | 超标吵闹 → 砍树 </div>
+    </div>
+
+    
+    <div class="button-bar">
+        <button class="btn" id="startBtn" autocomplete="off">🎤 开始监听</button>
+        <button class="btn" id="stopBtn" autocomplete="off" disabled>⏹️ 停止</button>
+        <button class="btn reset-btn" id="resetBtn" autocomplete="off">🔄 重置时间/森林</button>
+    </div>
+
+    
+    <div class="status-text" id="statusMessage">⏸️ 未开始，点击“开始监听”并允许麦克风</div>
+    <footer>🌱 每安静5秒种1棵树 · 每吵闹3秒砍1棵树 (自动保存3秒录音)</footer>
+</div>
+
+<script>
+(function() {
+    // ----- 常量与配置 -----
+    const PLANT_INTERVAL = 5;      // 每5秒安静 种1棵树
+    const CUT_INTERVAL = 3;        // 每3秒吵闹 砍1棵树
+    const INIT_TREES = 10;
+    const RING_BUFFER_SECONDS = 10; // 在内存中保留最近10秒音频 (用于砍树时提取)
+
+    // DOM 元素
+    const dbDisplay = document.getElementById('dbDisplay');
+    const thresholdTag = document.getElementById('thresholdTag');
+    const thresholdSlider = document.getElementById('thresholdSlider');
+    const quietTimeDisplay = document.getElementById('quietTimeDisplay');
+    const noisyTimeDisplay = document.getElementById('noisyTimeDisplay');
+    const treeCountDisplay = document.getElementById('treeCountDisplay');
+    const forestHint = document.getElementById('forestHint');
+    const statusMsg = document.getElementById('statusMessage');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // ----- 状态变量 -----
+    let isListening = false;             // 是否正在监听
+    let audioContext = null;
+    let analyser = null;
+    let mediaStream = null;
+    let source = null;
+    let animationFrame = null;
+    let processor = null;                // ScriptProcessorNode 用于获取原始音频
+    let gainNode = null;                 // 用于静音输出
+
+    // 环形缓冲区 (PCM Float32, 单声道)
+    let ringBuffer = null;               // Float32Array
+    let ringWriteIndex = 0;              // 当前写入位置
+    let ringBufferLength = 0;             // 总采样点数 (根据采样率计算)
+    let ringSampleRate = 48000;           // 默认, 实际会从 context 获取
+
+    // 时间累计 (秒)
+    let quietTime = 0;            // 安静累计
+    let noisyTime = 0;            // 吵闹累计
+
+    // 树的数量
+    let treeCount = INIT_TREES;
+
+    // 上次更新的时间戳 (用于计算delta)
+    let lastUpdateTimestamp = null;
+
+    // 上次触发种树/砍树的整数基点 (基于累计时间)
+    let lastQuietTrigger = 0;      // Math.floor(quietTime / PLANT_INTERVAL)
+    let lastNoisyTrigger = 0;      // Math.floor(noisyTime / CUT_INTERVAL)
+
+    // 当前阈值 (从滑块读取)
+    let currentThreshold = 42;      // 默认
+
+    // 音量映射 (0-100)
+    let currentVolume = 0;
+
+    // ----- 辅助函数  mm:ss 显示 -----
+    function formatTime(seconds) {
+        if (seconds < 0) seconds = 0;
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // 更新所有UI (时间、树木、分贝、阈值标签)
+    window.captureLesson=()=>({volume:currentVolume,threshold:currentThreshold,quietTime:Math.round(quietTime),noisyTime:Math.round(noisyTime),trees:treeCount});
+function refreshUI() {
+        quietTimeDisplay.textContent = formatTime(quietTime);
+        noisyTimeDisplay.textContent = formatTime(noisyTime);
+        treeCountDisplay.textContent = treeCount;
+        dbDisplay.textContent = currentVolume !== undefined && isListening ? Math.round(currentVolume) : '—';
+        thresholdTag.textContent = `阈值 ${currentThreshold}%`;
+    }
+
+    // 重置统计 (保留麦克风状态)
+    function resetStats() {
+        quietTime = 0;
+        noisyTime = 0;
+        treeCount = INIT_TREES;
+        lastQuietTrigger = 0;
+        lastNoisyTrigger = 0;
+
+        // 重置时间戳避免delta突变
+        if (isListening) {
+            lastUpdateTimestamp = performance.now() / 1000;  // 秒为单位
+        } else {
+            lastUpdateTimestamp = null;
+        }
+
+        refreshUI();
+        forestHint.innerText = '🌲 重置森林 · 重新开始计数';
+        setTimeout(() => {
+            forestHint.innerText = '达标安静 → 种树 🌲 | 超标吵闹 → 砍树 ';
+        }, 1500);
+    }
+
+    // ---------- 录音保存相关 ----------
+    // 获取当前时间字符串用于文件名: 砍树_2025-03-18_14-25-30.wav
+    function getDateTimeString() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+    }
+
+    // 将 Float32Array (值范围 -1 到 1) 编码为 WAV 格式的 ArrayBuffer (16-bit PCM)
+    function encodeWAV(samples, sampleRate) {
+        const buffer = new ArrayBuffer(44 + samples.length * 2);
+        const view = new DataView(buffer);
+
+        // RIFF chunk descriptor
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + samples.length * 2, true); // file size - 8
+        writeString(view, 8, 'WAVE');
+        // fmt subchunk
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true); // fmt chunk size
+        view.setUint16(20, 1, true); // audio format (1 = PCM)
+        view.setUint16(22, 1, true); // numChannels (1)
+        view.setUint32(24, sampleRate, true); // sampleRate
+        view.setUint32(28, sampleRate * 2, true); // byteRate (sampleRate * numChannels * bytesPerSample)
+        view.setUint16(32, 2, true); // blockAlign (numChannels * bytesPerSample)
+        view.setUint16(34, 16, true); // bitsPerSample
+        // data subchunk
+        writeString(view, 36, 'data');
+        view.setUint32(40, samples.length * 2, true); // data size
+
+        // Write PCM samples (16-bit little-endian)
+        let offset = 44;
+        for (let i = 0; i < samples.length; i++) {
+            let s = Math.max(-1, Math.min(1, samples[i]));
+            s = s < 0 ? s * 0x8000 : s * 0x7FFF; // convert to 16-bit int
+            view.setInt16(offset, s, true);
+            offset += 2;
+        }
+
+        return buffer;
+    }
+
+    function writeString(view, offset, str) {
+        for (let i = 0; i < str.length; i++) {
+            view.setUint8(offset + i, str.charCodeAt(i));
+        }
+    }
+
+    // 从环形缓冲区提取最近 N 秒音频，保存为 WAV 文件
+    function saveRecentAudio(seconds = 3) {
+        if (!ringBuffer || ringBufferLength === 0 || !isListening) {
+            console.warn('缓冲区未就绪或未在监听');
+            return;
+        }
+
+        const samplesNeeded = Math.floor(seconds * ringSampleRate);
+        const totalSamples = ringBufferLength; // 缓冲区总采样点数 (例如10秒)
+
+        // 实际可读取的采样数 (不能超过缓冲区总大小，也受已写入数据量限制，但环形始终有数据)
+        let samplesToRead = Math.min(samplesNeeded, totalSamples);
+        if (samplesToRead === 0) return;
+
+        // 准备输出数组
+        const outputSamples = new Float32Array(samplesToRead);
+
+        // 计算读取起始索引 (当前写入位置之前的 samplesToRead 个采样，注意环形回绕)
+        let startIndex = (ringWriteIndex - samplesToRead + totalSamples) % totalSamples;
+
+        if (startIndex + samplesToRead <= totalSamples) {
+            // 连续区间
+            outputSamples.set(ringBuffer.subarray(startIndex, startIndex + samplesToRead));
+        } else {
+            // 回绕，分两段
+            const firstPart = totalSamples - startIndex;
+            outputSamples.set(ringBuffer.subarray(startIndex, totalSamples), 0);
+            outputSamples.set(ringBuffer.subarray(0, samplesToRead - firstPart), firstPart);
+        }
+
+        // 编码 WAV
+        const wavBuffer = encodeWAV(outputSamples, ringSampleRate);
+        const blob = new Blob([wavBuffer], { type: 'audio/wav' });
+
+        // 生成文件名
+        const filename = `砍树_${getDateTimeString()}.wav`;
+
+        // 触发下载
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // 可选: 提示保存成功
+        forestHint.innerText = `📼 已保存录音: ${filename}`;
+        setTimeout(() => {
+            forestHint.innerText = '达标安静 → 种树 🌲 | 超标吵闹 → 砍树 ';
+        }, 2000);
+    }
+
+    // 更新树木基于安静/吵闹时间的增量 (并通过砍树事件触发录音保存)
+    function updateTreeByTime() {
+        // 当前安静时间的触发基数
+        const currentQuietTrigger = Math.floor(quietTime / PLANT_INTERVAL);
+        // 当前吵闹时间的触发基数
+        const currentNoisyTrigger = Math.floor(noisyTime / CUT_INTERVAL);
+
+        // 种树：安静时间每增加一个完整间隔
+        if (currentQuietTrigger > lastQuietTrigger) {
+            const increase = currentQuietTrigger - lastQuietTrigger;
+            treeCount += increase;
+            forestHint.innerText = `✅ 达标安静 +${increase} 棵树 🌱`;
+        }
+
+        // 砍树：吵闹时间每增加一个完整间隔 
+        if (currentNoisyTrigger > lastNoisyTrigger) {
+            const decrease = currentNoisyTrigger - lastNoisyTrigger;
+            treeCount = Math.max(0, treeCount - decrease);
+            forestHint.innerText = `⚠️ 超标吵闹 -${decrease} 棵树 🌲❌`;
+
+            // 每砍一棵树，保存一段录音（最近3秒）
+            // 如果一次减少了多棵，就保存多次（每个周期都保存）
+            for (let i = 0; i < decrease; i++) {
+                /* Only relative volume summaries are collected. */   // 每次砍树保存3秒片段
+            }
+        }
+
+        // 更新记录
+        lastQuietTrigger = currentQuietTrigger;
+        lastNoisyTrigger = currentNoisyTrigger;
+
+        // 确保树木不显示负数 (但上面已max)
+        treeCount = Math.max(0, treeCount);
+    }
+
+    // ----- 音量监测 & 时间累计 (requestAnimationFrame 循环) -----
+    function updateLoop() {
+        if (!isListening || !analyser) {
+            return;
+        }
+
+        const now = performance.now() / 1000; // 当前时间秒
+
+        // 1. 获取音量级 (0-100)
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);  // 频域能量
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+        }
+        let avg = sum / dataArray.length;          // 0 - 255
+        let volume = Math.min(100, Math.floor((avg / 255) * 120));
+        currentVolume = Math.min(100, Math.max(0, volume));
+
+        // 2. 与阈值比较，决定安静/吵闹
+        const isQuiet = currentVolume < currentThreshold;
+
+        // 3. 计算时间差
+        if (lastUpdateTimestamp === null) {
+            lastUpdateTimestamp = now;
+            animationFrame = requestAnimationFrame(updateLoop);
+            refreshUI();
+            return;
+        }
+
+        let delta = now - lastUpdateTimestamp;
+        if (delta > 0.3) delta = 0.3;
+        lastUpdateTimestamp = now;
+
+        // 4. 根据状态累计安静/吵闹时间
+        if (isQuiet) {
+            quietTime += delta;
+        } else {
+            noisyTime += delta;
+        }
+
+        // 5. 根据累计时间更新树木 (内部可能触发录音保存)
+        updateTreeByTime();
+
+        // 6. 刷新界面
+        refreshUI();
+
+        animationFrame = requestAnimationFrame(updateLoop);
+    }
+
+    // ----- 停止监听 (释放资源) -----
+    async function stopListening() {
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+            animationFrame = null;
+        }
+        if (processor) {
+            try { processor.disconnect(); } catch (e) {}
+            processor = null;
+        }
+        if (gainNode) {
+            try { gainNode.disconnect(); } catch (e) {}
+            gainNode = null;
+        }
+        if (source) {
+            try { source.disconnect(); } catch (e) {}
+            source = null;
+        }
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        if (audioContext) {
+            if (audioContext.state !== 'closed') {
+                await audioContext.close();
+            }
+            audioContext = null;
+        }
+        analyser = null;
+        isListening = false;
+        lastUpdateTimestamp = null;
+
+        // 清空环形缓冲区引用
+        ringBuffer = null;
+        ringWriteIndex = 0;
+        ringBufferLength = 0;
+
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusMsg.innerText = '⏸️ 已停止，可重新开始监听';
+        dbDisplay.textContent = '—';
+    }
+
+    // ----- 开始监听 (请求麦克风) -----
+    async function startListening() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            mediaStream = stream;
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+
+            source = audioContext.createMediaStreamSource(stream);
+
+            // 创建增益节点并设为0，避免听到自己声音 (但保留音频流)
+            gainNode = audioContext.createGain();
+            gainNode.gain.value = 0;
+
+            // 设置环形缓冲区 (根据实际采样率)
+            ringSampleRate = audioContext.sampleRate;
+            ringBufferLength = Math.floor(ringSampleRate * RING_BUFFER_SECONDS);
+            ringBuffer = new Float32Array(ringBufferLength);
+            ringWriteIndex = 0;
+
+            // 创建 ScriptProcessorNode 获取原始 PCM
+            processor = audioContext.createScriptProcessor(4096, 1, 1); // 输入单声道, 输出单声道
+            processor.onaudioprocess = (event) => {
+                const inputBuffer = event.inputBuffer;
+                const channelData = inputBuffer.getChannelData(0); // Float32Array, 范围 -1..1
+                // 写入环形缓冲区
+                for (let i = 0; i < channelData.length; i++) {
+                    ringBuffer[ringWriteIndex] = channelData[i];
+                    ringWriteIndex = (ringWriteIndex + 1) % ringBufferLength;
+                }
+            };
+
+            // 连接节点: source -> analyser -> processor -> gain(0) -> destination
+            source.connect(analyser);
+            analyser.connect(processor);
+            processor.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            lastUpdateTimestamp = performance.now() / 1000;
+            isListening = true;
+
+            lastQuietTrigger = Math.floor(quietTime / PLANT_INTERVAL);
+            lastNoisyTrigger = Math.floor(noisyTime / CUT_INTERVAL);
+
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusMsg.innerText = '🎤 监听中 · 砍树自动保存录音';
+
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            animationFrame = requestAnimationFrame(updateLoop);
+
+        } catch (err) {
+            console.error('麦克风错误:', err);
+            statusMsg.innerText = '❌ 无法访问麦克风，请检查权限';
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            isListening = false;
+        }
+    }
+
+    // ----- 事件绑定 -----
+    startBtn.addEventListener('click', startListening);
+    stopBtn.addEventListener('click', stopListening);
+    resetBtn.addEventListener('click', resetStats);
+
+    thresholdSlider.addEventListener('input', (e) => {
+        currentThreshold = parseInt(e.target.value, 10);
+        thresholdTag.textContent = `阈值 ${currentThreshold}%`;
+    });
+
+    currentThreshold = parseInt(thresholdSlider.value, 10);
+    thresholdTag.textContent = `阈值 ${currentThreshold}%`;
+    refreshUI();
+
+    window.addEventListener('beforeunload', () => {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+        }
+        if (audioContext && audioContext.state !== 'closed') {
+            audioContext.close();
+        }
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+    });
+
+})();
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

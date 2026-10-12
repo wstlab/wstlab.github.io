@@ -1,0 +1,12 @@
+{
+  "id": "case-52",
+  "title": "火烧云 · 七彩练习营",
+  "category": "assessment",
+  "description": "七彩阅读诊断：围绕综合正确率、模块结果、模块正确率开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 52,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "case-15",
+  "title": "智能植物生长器 · 向日葵数据大屏",
+  "category": "observation",
+  "description": "向日葵环境观测：围绕温度、湿度、光照开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "科学",
+    "信息科技"
+  ],
+  "order": 15,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

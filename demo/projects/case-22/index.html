@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":22,"key":"case-22","title":"地理 · 六大板块自由标注","category":"exploration","description":"六大板块标注展：围绕得分、标注、板块标记开展交互学习，在数据大屏中回看记录。","headline":"六大板块标注展","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"markers","label":"标注"},{"key":"labels","label":"板块标记"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"mgCv1lrCjMN"},"mapping":{"v26sy4tkie":"mgCv1lrCjMN"},"accent":"#327a72","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地理六大板块自由标注答题</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #e3f2fd);
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .title {
+            font-size: 26px;
+            color: #01579b;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .info-form {
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-item label {
+            font-weight: bold;
+            color: #333;
+        }
+        .info-item input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .tip {
+            color: #444;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .tip span {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        #canvasWrap {
+            background: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        canvas {
+            border-radius: 8px;
+            border: 2px solid #bbdefb;
+        }
+        .btn-group {
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 24px;
+            margin: 0 8px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        #clearBtn {
+            background: #ff7043;
+        }
+        #checkBtn {
+            background: #5c6bc0;
+        }
+        #submitBtn {
+            background: #26a69a;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        #feedbackBox {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .feedback-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .correct { color: #2e7d32; }
+        .wrong { color: #c62828; }
+        .result-list {
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🌍 六大板块自由标注答题</div>
+
+        <div class="info-form">
+            <div class="info-item">
+                <label for="stuName">姓名：</label>
+                <input type="text" id="stuName" placeholder="请输入演示称呼">
+            </div>
+            <div class="info-item">
+                <label for="stuId">学号：</label>
+                <input type="text" id="stuId" placeholder="请输入学号">
+            </div>
+        </div>
+
+        <div class="tip">
+            操作：点击地图任意位置 → 自行选择标注 A/B/C/D/E/F 任意板块
+        </div>
+        <div class="tip"><span>每个字母只能标注一次，全部标完即可判题提交</span></div>
+
+        <div id="canvasWrap">
+            <canvas id="plateCanvas"></canvas>
+        </div>
+
+        <div class="btn-group">
+            <button id="clearBtn">🔄 清空重标</button>
+            <button id="checkBtn">📝 检查答案</button>
+            <button id="submitBtn">✅ 提交作业</button>
+        </div>
+
+        <div id="feedbackBox">
+            <div class="feedback-title">📊 答题反馈</div>
+            <div class="result-list" id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const imgUrl = "https://ts1.tc.mm.bing.net/th/id/R-C.e3ee3e42a5ca4a39d4c153505d87bac4?rik=R6Paa4uWBM%2f%2b1Q&riu=http%3a%2f%2fimg.zxxk.com%2f2016-8%2fZXXKCOM201608171409558573516.png&ehk=3%2bJOeW4xocYFcygTkbPpMghM71uN0olOGigCwrr%2bFpk%3d&risl=&pid=ImgRaw&r=0";
+        const apiUrl = "https://qf.kjxs.site/api/mgCv1lrCjMN";
+
+        // 标准答案
+        const correctAnswers = {
+            A: "亚欧板块",
+            B: "非洲板块",
+            C: "美洲板块",
+            D: "印度洋板块",
+            E: "太平洋板块",
+            F: "南极洲板块"
+        };
+
+        const canvas = document.getElementById('plateCanvas');
+        const ctx = canvas.getContext('2d');
+        const feedbackBox = document.getElementById('feedbackBox');
+        const resultContent = document.getElementById('resultContent');
+        const stuNameInput = document.getElementById('stuName');
+        const stuIdInput = document.getElementById('stuId');
+
+        let img = new Image();
+        let markList = []; 
+        const allLetter = ['A','B','C','D','E','F'];
+        canvas.width = 800;
+        canvas.height = 520;
+
+        img.crossOrigin = "anonymous";
+        img.onload = draw;
+        img.src = imgUrl;
+
+        function draw(){
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.drawImage(img,0,0,canvas.width,canvas.height);
+            markList.forEach(item=>{
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, 7, 0, Math.PI*2);
+                ctx.fillStyle = '#e53e3e';
+                ctx.fill();
+                ctx.fillStyle = '#1a202c';
+                ctx.font = "15px 微软雅黑";
+                ctx.fillText(`${item.letter}:${item.label}`, item.x+12, item.y+5);
+            });
+        }
+
+        // 自由点击：自己选A-F，不限制顺序
+        canvas.addEventListener('click', e=>{
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.round(e.clientX - rect.left);
+            const y = Math.round(e.clientY - rect.top);
+
+            // 找出还没标注的字母
+            const used = markList.map(i=>i.letter);
+            const remain = allLetter.filter(l=>!used.includes(l));
+            if(remain.length === 0){
+                alert("A~F已全部标注完成！");
+                return;
+            }
+
+            // 让学生自己选字母
+            const chooseL = prompt(`请选择要标注的字母：\n剩余可选：${remain.join(',')}`,"");
+            if(!remain.includes(chooseL)){
+                alert("输入无效或该字母已标注，请重新选择！");
+                return;
+            }
+
+            // 输入板块名称
+            const name = prompt(`请输入【${chooseL}】对应的板块名称：`,"");
+            if(!name || !name.trim()) return;
+
+            markList.push({x,y,letter:chooseL,label:name.trim()});
+            draw();
+        });
+
+        // 清空
+        document.getElementById('clearBtn').onclick = ()=>{
+            if(confirm("确定清空所有标注？")){
+                markList = [];
+                feedbackBox.style.display = 'none';
+                draw();
+            }
+        };
+
+        // 检查答案
+        document.getElementById('checkBtn').onclick = ()=>{
+            if(markList.length < 6){
+                alert(`尚未标完！当前已标 ${markList.length}/6`);
+                return;
+            }
+            let score = 0;
+            let html = "";
+            markList.forEach(item=>{
+                const right = correctAnswers[item.letter];
+                const ok = item.label === right;
+                if(ok) score++;
+                html += `<div class="${ok?'correct':'wrong'}">
+                    ${item.letter}：你的答案【${item.label}】 ${ok?'✅正确':'❌错误 正确：'+right}
+                </div>`;
+            });
+            html += `<div style="margin-top:10px;font-weight:bold;font-size:16px;">总分：${score}/6</div>`;
+            resultContent.innerHTML = html;
+            feedbackBox.style.display = 'block';
+        };
+
+        // 提交POST
+        document.getElementById('submitBtn').onclick = async ()=>{
+            const name = stuNameInput.value.trim();
+            const id = stuIdInput.value.trim();
+            if(!name || !id){
+                alert("请先填写姓名和学号！");
+                return;
+            }
+            if(markList.length < 6){
+                alert("请先完成全部6个板块标注！");
+                return;
+            }
+            const score = markList.filter(item=>item.label === correctAnswers[item.letter]).length;
+            try{
+                await fetch(apiUrl,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({
+                        task:"六大板块自由标注作业",
+                        studentName:name,
+                        studentId:id,
+                        marks:markList,
+                        score:`${score}/6`,
+                        time:new Date().toLocaleString()
+                    })
+                });
+                alert(`🎉提交成功\n姓名：${name}\n学号：${id}\n得分：${score}/6`);
+            }catch{
+                alert(`🎉提交成功\n姓名：${name}\n学号：${id}\n得分：${score}/6`);
+            }
+        };
+    </script>
+</body>
+</html>

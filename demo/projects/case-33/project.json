@@ -1,0 +1,12 @@
+{
+  "id": "case-33",
+  "title": "阅读打卡与互评",
+  "category": "creation",
+  "description": "书页之间：围绕书名、阅读心得、书籍开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 33,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

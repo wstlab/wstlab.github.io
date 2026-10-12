@@ -1,0 +1,13 @@
+{
+  "id": "case-34",
+  "title": "丝绸之路 · 跨学科思维工坊",
+  "category": "creation",
+  "description": "丝路思想网络：围绕主题、导图节点、观点开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "历史",
+    "跨学科"
+  ],
+  "order": 34,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

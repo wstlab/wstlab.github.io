@@ -1,0 +1,12 @@
+{
+  "id": "case-22",
+  "title": "地理 · 六大板块自由标注",
+  "category": "exploration",
+  "description": "六大板块标注展：围绕得分、标注、板块标记开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "地理"
+  ],
+  "order": 22,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

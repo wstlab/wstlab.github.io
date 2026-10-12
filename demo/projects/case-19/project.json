@@ -1,0 +1,12 @@
+{
+  "id": "case-19",
+  "title": "学迹 · 笔记平台",
+  "category": "creation",
+  "description": "用演示身份记录笔记、回看自己的思考，在内容墙中汇集学习线索。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 19,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

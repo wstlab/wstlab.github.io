@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平行四边形的面积 - 课前小测</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --primary-dark: #3730a3;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f0f4ff;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 24px rgba(79, 70, 229, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      padding: 40px 20px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      animation: headerShine 8s ease-in-out infinite;
+    }
+    @keyframes headerShine {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(20%, 10%); }
+    }
+    .header h1 {
+      font-size: 2em;
+      font-weight: 700;
+      position: relative;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header p {
+      margin-top: 10px;
+      font-size: 1.05em;
+      opacity: 0.92;
+      position: relative;
+    }
+
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    /* Intro */
+    .intro-card {
+      background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+      border: 1px solid #c7d2fe;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 30px;
+      font-size: 1.02em;
+      line-height: 1.8;
+    }
+
+    /* Progress */
+    .progress-bar {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .progress-track {
+      flex: 1;
+      height: 10px;
+      background: var(--border);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 5px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+    .progress-text {
+      font-size: 0.9em;
+      color: var(--text-light);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    /* Question Card */
+    .question-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .question-card.correct {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+    .question-card.incorrect {
+      border-color: var(--error);
+      background: #fef2f2;
+    }
+    .question-card.answered {
+      border-color: var(--primary-light);
+    }
+
+    .question-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95em;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .question-tag {
+      display: inline-block;
+      font-size: 0.82em;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-left: 10px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+    .tag-warmup { background: #fef3c7; color: #92400e; }
+    .tag-core { background: #dbeafe; color: #1e40af; }
+    .tag-key { background: #fce7f3; color: #9d174d; }
+    .tag-open { background: #e0e7ff; color: #3730a3; }
+
+    .question-title {
+      font-size: 1.15em;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .question-desc {
+      color: var(--text-light);
+      margin-bottom: 20px;
+      font-size: 0.95em;
+    }
+
+    /* SVG Figure Container */
+    .figure-container {
+      background: #fafbff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .figure-container svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Options */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+      position: relative;
+    }
+    .option-item:hover {
+      border-color: var(--primary-light);
+      background: #f5f3ff;
+      transform: translateX(4px);
+    }
+    .option-item.selected {
+      border-color: var(--primary);
+      background: #eef2ff;
+      font-weight: 500;
+    }
+    .option-item.correct-answer {
+      border-color: var(--success) !important;
+      background: #ecfdf5 !important;
+    }
+    .option-item.wrong-answer {
+      border-color: var(--error) !important;
+      background: #fef2f2 !important;
+    }
+    .option-item.disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .option-letter {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 14px;
+      flex-shrink: 0;
+      background: #f1f5f9;
+      color: var(--text-light);
+      transition: all 0.25s ease;
+    }
+    .option-item.selected .option-letter {
+      background: var(--primary);
+      color: white;
+    }
+    .option-item.correct-answer .option-letter {
+      background: var(--success);
+      color: white;
+    }
+    .option-item.wrong-answer .option-letter {
+      background: var(--error);
+      color: white;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .result-icon {
+      font-size: 1.3em;
+      margin-left: 10px;
+      display: none;
+    }
+    .option-item.correct-answer .result-icon.show-correct,
+    .option-item.wrong-answer .result-icon.show-wrong {
+      display: inline;
+    }
+
+    /* Open question */
+    .open-answer {
+      width: 100%;
+      min-height: 120px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 1em;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.3s;
+      line-height: 1.7;
+    }
+    .open-answer:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Explanation */
+    .explanation {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 0.93em;
+      line-height: 1.7;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .explanation.show { display: block; }
+    .explanation.correct-exp {
+      background: #ecfdf5;
+      border-left: 4px solid var(--success);
+      color: #065f46;
+    }
+    .explanation.incorrect-exp {
+      background: #fef2f2;
+      border-left: 4px solid var(--error);
+      color: #991b1b;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Submit Button */
+    .submit-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 48px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+    }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal h2 {
+      font-size: 1.4em;
+      margin-bottom: 24px;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1em;
+      font-family: inherit;
+      transition: border-color 0.3s;
+      color: var(--text);
+    }
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .modal-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .modal-btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+    .modal-btn.primary:hover { background: var(--primary-dark); }
+    .modal-btn.secondary {
+      background: var(--border);
+      color: var(--text-light);
+    }
+    .modal-btn.secondary:hover { background: #cbd5e1; }
+    .form-error {
+      color: var(--error);
+      font-size: 0.85em;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+
+    /* Loading */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.9);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 1.1em; color: var(--text-light); font-weight: 500; }
+
+    /* Results Section */
+    .results-section {
+      display: none;
+      animation: fadeIn 0.6s ease;
+    }
+    .results-section.show { display: block; }
+
+    .score-card {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: white;
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(79, 70, 229, 0.3);
+    }
+    .score-label { font-size: 1.1em; opacity: 0.9; margin-bottom: 8px; }
+    .score-value {
+      font-size: 4em;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .score-total { font-size: 1.2em; opacity: 0.8; }
+
+    .eval-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border-left: 5px solid var(--primary-light);
+    }
+    .eval-card h3 {
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+    }
+    .eval-card p {
+      font-size: 0.98em;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .eval-card .encourage {
+      margin-top: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 12px;
+      font-size: 0.95em;
+      line-height: 1.7;
+      color: #92400e;
+    }
+
+    /* Ranking Table */
+    .ranking-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .ranking-card h3 {
+      font-size: 1.15em;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .ranking-table th {
+      background: #f1f5f9;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9em;
+      color: var(--text-light);
+    }
+    .ranking-table th:first-child { border-radius: 8px 0 0 8px; }
+    .ranking-table th:last-child { border-radius: 0 8px 8px 0; }
+    .ranking-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95em;
+    }
+    .ranking-table tr:last-child td { border-bottom: none; }
+    .ranking-table tr.me {
+      background: #eef2ff;
+      font-weight: 600;
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.85em;
+    }
+    .rank-1 { background: #fef3c7; color: #92400e; }
+    .rank-2 { background: #e5e7eb; color: #374151; }
+    .rank-3 { background: #fed7aa; color: #9a3412; }
+    .rank-other { background: #f1f5f9; color: var(--text-light); }
+
+    /* Question Detail Review */
+    .review-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .review-card h3 {
+      font-size: 1.15em;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+    .review-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95em;
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-icon { font-size: 1.3em; }
+    .review-status { font-weight: 600; }
+    .review-status.pass { color: var(--success); }
+    .review-status.fail { color: var(--error); }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.5em; }
+      .question-card { padding: 20px; }
+      .modal { padding: 24px; }
+      .score-value { font-size: 3em; }
+    }
+
+    /* Confetti animation */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 3000;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease-in forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .submit-warning {
+      color: var(--warning);
+      font-size: 0.9em;
+      margin-top: 12px;
+      display: none;
+    }
+    .submit-warning.show { display: block; }
+  </style>
+<link rel="stylesheet" href="sample.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <nav class="sample-nav"><a href="../../index.html">QuickForm作品集</a><a href="index.html" aria-current="page">应用展示</a><a href="dashboard.html">数据大屏</a><a data-qf-records="area" target="_blank" rel="noopener">QuickForm记录 ↗</a></nav>
+<header class="header"><div class="hero-copy"><span class="eyebrow">GEOMETRY FIELD NOTES / 01</span><h1>形状会变，<br>面积呢？</h1><p>《平行四边形的面积》课前小测</p><div class="hero-tags"><span>3 道选择题</span><span>1 道开放题</span><span>约 5 分钟</span></div><a class="start-link" href="#q1">开始探索 ↓</a></div><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 450 330"><defs><pattern id="heroGrid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" fill="none" stroke="#ccd9cd" stroke-width=".7"/></pattern></defs><rect width="450" height="330" fill="url(#heroGrid)"/><path d="M65 245H300L365 85H130Z" fill="#cadcbf" stroke="#26583e" stroke-width="3"/><path d="M130 85V245" stroke="#d57442" stroke-width="3" stroke-dasharray="8 7"/><path d="M130 228H147V245" fill="none" stroke="#d57442" stroke-width="2"/><text x="185" y="285" fill="#26583e" font-size="18">底 · base</text><text x="75" y="174" fill="#ac5027" font-size="18">高</text><circle cx="365" cy="85" r="7" fill="#26583e"/></svg><span class="art-note">先观察，再推理。</span></div></header>
+
+  <main class="container">
+    <!-- Intro -->
+    <div class="intro-card"><strong>这不是考试，是一次思维热身。</strong><p>按第一直觉作答，看看你对面积已有的理解。客观题共 30 分，开放题不计分。此页用于教学演示，请使用虚构身份，不填写真实个人信息。</p></div><div class="connection-note" id="connectionNote"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">0 / 4</div>
+    </div>
+
+    <!-- Questions Container -->
+    <div id="questionsContainer">
+      <!-- Question 1 -->
+      <div class="question-card" id="q1" data-answer="C">
+        <div class="question-title">
+          <span class="question-number">1</span>
+          <span>一个长方形，长7厘米，宽5厘米，它的面积是多少？</span>
+          <span class="question-tag tag-warmup">热身题</span>
+        </div>
+        <details class="question-desc teacher-note"><summary>教师观察点（作答后再看）</summary>是否掌握长方形面积公式 S=长×宽</details>
+        <div class="options-list">
+          <div class="option-item" data-value="A" onclick="selectOption(this, 'q1')">
+            <span class="option-letter">A</span>
+            <span class="option-text">12平方厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="B" onclick="selectOption(this, 'q1')">
+            <span class="option-letter">B</span>
+            <span class="option-text">24平方厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="C" onclick="selectOption(this, 'q1')">
+            <span class="option-letter">C</span>
+            <span class="option-text">35平方厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="D" onclick="selectOption(this, 'q1')">
+            <span class="option-letter">D</span>
+            <span class="option-text">35厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+        </div>
+        <div class="explanation correct-exp" id="q1-exp-correct">
+          💡 <strong>回答正确！</strong>长方形面积 = 长 × 宽 = 7 × 5 = 35平方厘米。注意D选项虽然数值是对的，但单位应该是面积单位"平方厘米"而不是长度单位"厘米"，你很细心地注意到了这点！
+        </div>
+        <div class="explanation incorrect-exp" id="q1-exp-incorrect">
+          💡 <strong>正确答案是 C（35平方厘米）</strong>。长方形面积 = 长 × 宽 = 7 × 5 = 35平方厘米。A选项是周长的一半，B选项是周长。注意面积的单位是"平方厘米"哦！
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="question-card" id="q2" data-answer="C">
+        <div class="question-title">
+          <span class="question-number">2</span>
+          <span>下面平行四边形和长方形的面积相比，结果是？</span>
+          <span class="question-tag tag-core">核心预判</span>
+        </div>
+        <details class="question-desc teacher-note"><summary>教师观察点（作答后再看）</summary>是否有"等积变形"的直觉。两个图形底相同(6cm)、高相同(4cm)，面积相等</details>
+
+        <div class="figure-container">
+          <svg width="620" height="280" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid2" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="620" height="280" fill="#fafbff"/>
+            <rect x="10" y="10" width="600" height="260" fill="url(#grid2)"/>
+
+            <!-- ========= 平行四边形 (左边) ========= -->
+            <polygon points="50,220 170,220 210,140 90,140"
+              fill="#eef2ff" fill-opacity="0.8" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- 高虚线 -->
+            <line x1="90" y1="140" x2="90" y2="220" stroke="#ef4444" stroke-width="2.2" stroke-dasharray="6,4"/>
+            <!-- 直角符号 -->
+            <polyline points="90,210 100,210 100,220" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+            <!-- 高标注 -->
+            <text x="72" y="185" font-size="14" fill="#ef4444" text-anchor="end" font-weight="700">高 = 4cm</text>
+            <!-- 底标注 -->
+            <text x="110" y="245" font-size="14" fill="#4f46e5" text-anchor="middle" font-weight="700">底 = 6cm</text>
+            <!-- 底边箭头 -->
+            <line x1="50" y1="235" x2="170" y2="235" stroke="#4f46e5" stroke-width="1.2"/>
+            <line x1="50" y1="231" x2="50" y2="239" stroke="#4f46e5" stroke-width="1.2"/>
+            <line x1="170" y1="231" x2="170" y2="239" stroke="#4f46e5" stroke-width="1.2"/>
+            <!-- 斜边标注 -->
+            <text x="200" y="162" font-size="12" fill="#64748b" font-weight="500" transform="rotate(-63, 200, 162)">斜边(示意)</text>
+            <!-- 图形标题 -->
+            <text x="130" y="110" font-size="16" fill="#4f46e5" text-anchor="middle" font-weight="700">平行四边形</text>
+
+            <!-- 分隔线 VS -->
+            <line x1="300" y1="40" x2="300" y2="250" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8,4"/>
+            <text x="300" y="270" font-size="20" fill="#94a3b8" text-anchor="middle" font-weight="700">VS</text>
+
+            <!-- ========= 长方形 (右边) ========= -->
+            <rect x="360" y="140" width="120" height="80" fill="#fef3c7" fill-opacity="0.8" stroke="#f59e0b" stroke-width="2.5" rx="2"/>
+            <!-- 长标注 -->
+            <text x="420" y="245" font-size="14" fill="#f59e0b" text-anchor="middle" font-weight="700">长 = 6cm</text>
+            <line x1="360" y1="235" x2="480" y2="235" stroke="#f59e0b" stroke-width="1.2"/>
+            <line x1="360" y1="231" x2="360" y2="239" stroke="#f59e0b" stroke-width="1.2"/>
+            <line x1="480" y1="231" x2="480" y2="239" stroke="#f59e0b" stroke-width="1.2"/>
+            <!-- 宽标注 -->
+            <text x="515" y="185" font-size="14" fill="#f59e0b" text-anchor="start" font-weight="700">宽 = 4cm</text>
+            <line x1="495" y1="140" x2="495" y2="220" stroke="#f59e0b" stroke-width="1.2"/>
+            <line x1="491" y1="140" x2="499" y2="140" stroke="#f59e0b" stroke-width="1.2"/>
+            <line x1="491" y1="220" x2="499" y2="220" stroke="#f59e0b" stroke-width="1.2"/>
+            <!-- 图形标题 -->
+            <text x="420" y="110" font-size="16" fill="#f59e0b" text-anchor="middle" font-weight="700">长方形</text>
+          </svg>
+        </div>
+
+        <div class="options-list">
+          <div class="option-item" data-value="A" onclick="selectOption(this, 'q2')">
+            <span class="option-letter">A</span>
+            <span class="option-text">平行四边形的面积大</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="B" onclick="selectOption(this, 'q2')">
+            <span class="option-letter">B</span>
+            <span class="option-text">长方形的面积大</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="C" onclick="selectOption(this, 'q2')">
+            <span class="option-letter">C</span>
+            <span class="option-text">两个面积一样大</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="D" onclick="selectOption(this, 'q2')">
+            <span class="option-letter">D</span>
+            <span class="option-text">无法比较</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+        </div>
+        <div class="explanation correct-exp" id="q2-exp-correct">
+          💡 <strong>太棒了！</strong>你的直觉非常准确！两个图形底相同（6cm）、高相同（4cm），所以面积都是 6×4=24平方厘米。这就是"等积变形"——图形变了，面积不变。你已经掌握了平行四边形面积的核心思想！
+        </div>
+        <div class="explanation incorrect-exp" id="q2-exp-incorrect">
+          💡 <strong>正确答案是 C（两个面积一样大）</strong>。虽然它们形状不同，但底都是6cm，高都是4cm，所以面积相等，都是 6×4=24平方厘米。这叫做"等积变形"——把平行四边形"推"一下就变成了长方形，面积不变！是不是很神奇？
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="question-card" id="q3" data-answer="C">
+        <div class="question-title">
+          <span class="question-number">3</span>
+          <span>一个平行四边形，底是6厘米，一条斜边是5厘米，这个平行四边形的面积是多少？</span>
+          <span class="question-tag tag-key">关键题 ⚡</span>
+        </div>
+        <details class="question-desc teacher-note"><summary>教师观察点（作答后再看）</summary>是否会犯"底×邻边"的经典错误</details>
+
+        <div class="figure-container">
+          <svg width="440" height="240" viewBox="0 0 440 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid3" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="440" height="240" fill="#fafbff"/>
+            <rect x="10" y="10" width="420" height="220" fill="url(#grid3)"/>
+
+            <!-- Parallelogram -->
+            <polygon points="60,200 260,200 320,60 120,60" fill="#fce7f3" stroke="#ec4899" stroke-width="2.5" stroke-linejoin="round"/>
+
+            <!-- Base label (bottom) -->
+            <text x="160" y="225" font-size="15" fill="#ec4899" text-anchor="middle" font-weight="700">底 = 6cm</text>
+
+            <!-- Slant side label -->
+            <text x="305" y="130" font-size="14" fill="#64748b" font-weight="600" transform="rotate(-63, 305, 130)">斜边 = 5cm</text>
+
+            <!-- Dashed height line (保留虚线，无文字标注) -->
+            <line x1="120" y1="60" x2="120" y2="200" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4"/>
+            <!-- 高度箭头指示 -->
+            <polygon points="120,65 116,75 124,75" fill="#ef4444"/>
+            <polygon points="120,195 116,185 124,185" fill="#ef4444"/>
+
+            <!-- 直角符号 -->
+            <rect x="120" y="190" width="10" height="10" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+          </svg>
+        </div>
+
+        <div class="options-list">
+          <div class="option-item" data-value="A" onclick="selectOption(this, 'q3')">
+            <span class="option-letter">A</span>
+            <span class="option-text">30平方厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="B" onclick="selectOption(this, 'q3')">
+            <span class="option-letter">B</span>
+            <span class="option-text">11平方厘米</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="C" onclick="selectOption(this, 'q3')">
+            <span class="option-letter">C</span>
+            <span class="option-text">需要知道高才能算</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+          <div class="option-item" data-value="D" onclick="selectOption(this, 'q3')">
+            <span class="option-letter">D</span>
+            <span class="option-text">需要知道另一条边才能算</span>
+            <span class="result-icon show-correct">✅</span>
+            <span class="result-icon show-wrong">❌</span>
+          </div>
+        </div>
+        <div class="explanation correct-exp" id="q3-exp-correct">
+          💡 <strong>非常棒！你的数学思维很严谨！</strong>平行四边形的面积 = 底 × 高（不是底 × 斜边！）。只知道底和斜边是算不出面积的，必须知道高。如果选A（6×5=30）就掉入了"底×邻边"的经典陷阱。你的数学直觉帮你避开了这个陷阱，真厉害！
+        </div>
+        <div class="explanation incorrect-exp" id="q3-exp-incorrect">
+          💡 <strong>正确答案是 C（需要知道高才能算）</strong>。这是一个非常经典的"陷阱"题！平行四边形的面积 = 底 × 高（不是底 × 斜边）。如果选A，就是用了 6×5=30，这是很多人容易犯的错误。斜边不是高哦！看看图中那条红色的虚线——那才是高。这节课我们就会学习为什么是这样！
+        </div>
+      </div>
+
+      <!-- Question 4 (Open) -->
+      <div class="question-card" id="q4">
+        <div class="question-title">
+          <span class="question-number">4</span>
+          <span>关于平行四边形，你已经知道了什么？有什么想问的？</span>
+          <span class="question-tag tag-open">开放题</span>
+        </div>
+        <div class="question-desc">选填：了解你的已有知识和好奇心 💭</div>
+        <textarea class="open-answer" id="q4-answer" maxlength="2000" placeholder="写下你知道的，或者你想了解的……" oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+
+    <!-- Submit Warning -->
+    <div class="submit-warning" id="submitWarning">⚠️ 你还有题目未作答，确定要提交吗？</div>
+
+    <!-- Submit Button -->
+    <div class="submit-section">
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+        📩 提交问卷
+      </button>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="resultsSection">
+      <div class="score-card">
+        <div class="score-label">你的成绩</div>
+        <div class="score-value" id="scoreValue">0</div>
+        <div class="score-total" id="scoreTotal">/ 30分</div>
+      </div>
+
+      <div class="eval-card" id="evalCard">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="ranking-card" id="rankingCard"><h3>这次提交去了哪里？</h3><p id="deliveryStatus" role="status"></p><p class="muted">没有预置排名，没有混入旧记录。老师可在 QuickForm 教师版中查看本次提交。</p><div class="result-actions"><a href="https://qf.kjxs.site/showcase/6qzzwNKGDOU">打开 QuickForm 教师版 →</a><button type="button" onclick="downloadSubmission()">下载本次 JSON</button></div></div>
+
+      <div class="review-card">
+        <h3>📝 答题回顾</h3>
+        <div id="reviewList">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Submit Modal -->
+  <div class="modal-overlay" id="submitModal">
+    <div class="modal">
+      <h2>📝 提交问卷</h2>
+      <div class="form-group">
+        <label for="classSelect">选择演示小组</label>
+        <select id="classSelect">
+          <option value="">-- 请选择演示小组 --</option>
+          <option value="演示A组">演示 A 组</option>
+          <option value="演示B组">演示 B 组</option>
+        </select>
+        <div class="form-error" id="classError">请选择演示小组</div>
+      </div>
+      <div class="form-group">
+        <label for="studentId">填写体验编号</label>
+        <input type="text" id="studentId" maxlength="40" placeholder="例如：体验者01" maxlength="20">
+        <div class="form-error" id="idError">请填写虚构体验编号</div>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn secondary" onclick="closeModal()">取消</button>
+        <button class="modal-btn primary" onclick="confirmSubmit()">确认提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">正在提交中，请稍候...</div>
+  </div>
+
+  <script src="../shared/qf.js"></script>
+<script>
+    const QF_API=QF.api('area');
+    const submissionId=crypto.randomUUID();
+    document.getElementById('connectionNote').textContent='演示作答将保存到QuickForm，可在数据大屏和记录页核对。';
+    // State
+    const answers = {};
+    const totalQuestions = 4;
+    const totalScore = 30; // Q1=10, Q2=10, Q3=10
+    let submitted = false;
+
+    // Simulated ranking data (will merge with server data)
+    const simulatedRanking = [];
+
+    function selectOption(el, qId) {
+      if (submitted || answers[qId]) return;
+
+      const card = document.getElementById(qId);
+      const options = card.querySelectorAll('.option-item');
+      const value = el.dataset.value;
+
+      // Deselect all
+      options.forEach(opt => opt.classList.remove('selected'));
+      // Select this one
+      el.classList.add('selected');
+
+      // Store answer
+      answers[qId] = value;
+
+      // Mark card as answered
+      card.classList.add('answered');
+
+      updateProgress();
+
+      // Auto-check after selection
+      checkAnswer(qId, value);
+    }
+
+    function checkAnswer(qId, selectedValue) {
+      const card = document.getElementById(qId);
+      const correctAnswer = card.dataset.answer;
+      const options = card.querySelectorAll('.option-item');
+      const isCorrect = selectedValue === correctAnswer;
+
+      // Disable all options
+      options.forEach(opt => {
+        opt.classList.add('disabled');
+        opt.classList.remove('selected');
+        const val = opt.dataset.value;
+        if (val === correctAnswer) {
+          opt.classList.add('correct-answer');
+        } else if (val === selectedValue && !isCorrect) {
+          opt.classList.add('wrong-answer');
+        }
+      });
+
+      // Show explanation
+      const expCorrect = document.getElementById(qId + '-exp-correct');
+      const expIncorrect = document.getElementById(qId + '-exp-incorrect');
+      if (isCorrect) {
+        card.classList.add('correct');
+        card.classList.remove('answered');
+        if (expCorrect) expCorrect.classList.add('show');
+      } else {
+        card.classList.add('incorrect');
+        card.classList.remove('answered');
+        if (expIncorrect) expIncorrect.classList.add('show');
+      }
+    }
+
+    function updateProgress() {
+      let answered = 0;
+      if (answers.q1) answered++;
+      if (answers.q2) answered++;
+      if (answers.q3) answered++;
+
+      const openAnswer = document.getElementById('q4-answer').value.trim();
+      if (openAnswer.length > 0) answered++;
+
+      const pct = (answered / totalQuestions) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = answered + ' / ' + totalQuestions;
+
+      // Show warning if not all answered
+      const warning = document.getElementById('submitWarning');
+      if (answered < totalQuestions && answered > 0) {
+        warning.classList.add('show');
+      } else {
+        warning.classList.remove('show');
+      }
+    }
+
+    function handleSubmit() {
+      if (submitted) return;
+      if (!answers.q1 && !answers.q2 && !answers.q3) {
+        alert('请至少回答一道选择题后再提交！');
+        return;
+      }
+      document.getElementById('submitModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('submitModal').classList.remove('show');
+    }
+
+    function calcScore() {
+      let score = 0;
+      if (answers.q1 === 'C') score += 10;
+      if (answers.q2 === 'C') score += 10;
+      if (answers.q3 === 'C') score += 10;
+      return score;
+    }
+
+    let sending=false, lastPayload=null;
+    async function confirmSubmit() {
+      if (sending || submitted) return;
+      const classVal=document.getElementById('classSelect').value;
+      const studentId=document.getElementById('studentId').value.trim();
+      document.getElementById('classError').classList.toggle('show',!classVal);
+      document.getElementById('idError').classList.toggle('show',!studentId);
+      if(!classVal || !studentId)return;
+      if(!QF_API){alert('先在QuickForm 教师版中配置你自己的 QuickForm 接口。');return;}
+      sending=true;
+      closeModal();
+      document.getElementById('loadingOverlay').classList.add('show');
+      const score=calcScore();
+      lastPayload={submission_id:submissionId,className:classVal,studentId,q1:answers.q1||'',q1_correct:answers.q1==='C'?1:0,q2:answers.q2||'',q2_correct:answers.q2==='C'?1:0,q3:answers.q3||'',q3_correct:answers.q3==='C'?1:0,q4_open:document.getElementById('q4-answer').value.trim(),score,totalScore,submitTime:new Date().toISOString(),demo:true};
+      try{
+        const response=await fetch(QF_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lastPayload),signal:AbortSignal.timeout(15000)});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const result=await response.json();
+        if(result.error || result.status==='error')throw new Error(result.error||'服务器未接受提交');
+        submitted=true;
+        document.getElementById('q4-answer').readOnly=true;
+        document.getElementById('deliveryStatus').textContent='已收到 QuickForm 成功响应 · '+new Date().toLocaleTimeString()+' · 记录标记：'+submissionId;
+        showResults(score,classVal,studentId);
+      }catch(error){
+        alert('尚未确认提交成功：'+error.message+'。答案仍保留。若连接超时，请先在教师版检查是否已收到，再决定重试，避免重复提交。');
+      }finally{
+        sending=false;document.getElementById('loadingOverlay').classList.remove('show');
+      }
+    }
+    function downloadSubmission(){
+      if(!lastPayload)return;
+      const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([JSON.stringify(lastPayload,null,2)],{type:'application/json'}));link.download='area-submission.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+    }
+
+    function showResults(score, className, studentId) {
+      // Confetti for high scores
+      if (score >= 20) {
+        showConfetti();
+      }
+
+      // Score display
+      const scoreEl = document.getElementById('scoreValue');
+      let current = 0;
+      const step = Math.max(1, Math.floor(score / 20));
+      const counter = setInterval(() => {
+        current += step;
+        if (current >= score) {
+          current = score;
+          clearInterval(counter);
+        }
+        scoreEl.textContent = current;
+      }, 50);
+
+      // Hide questions, show results
+      document.getElementById('submitBtn').style.display = 'none';
+      document.getElementById('submitWarning').style.display = 'none';
+
+      // Evaluation
+      const evalCard = document.getElementById('evalCard');
+      evalCard.innerHTML = getEvaluation(score);
+
+      // Ranking
+      updateRanking(score, className, studentId);
+
+      // Review
+      showReview();
+
+      // Show results section
+      const resultsSection = document.getElementById('resultsSection');
+      resultsSection.classList.add('show');
+
+      // Scroll to results
+      setTimeout(() => {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+
+    function getEvaluation(score) {
+      let title, detail, encourage;
+
+      if (score === 30) {
+        title = '🌟 满分达人！';
+        detail = `你获得了 <strong>30/30</strong> 分！三道选择题全部正确，说明你对面积计算的基础知识掌握得非常扎实，而且具备了"等积变形"的直觉思维。你对平行四边形面积的理解已经领先一步了！`;
+        encourage = '🎉 你太厉害了！带着这份自信进入课堂，相信你会有更多收获。课堂上的知识对你来说将是锦上添花，期待看到你更精彩的表现！';
+      } else if (score === 20) {
+        title = '👏 表现优秀！';
+        detail = `你获得了 <strong>20/30</strong> 分！两道题回答正确，说明你对面积计算有很好的基础。即使有做错的题目也不必担心，这正是这节课要帮助你理解的地方。`;
+        encourage = '💪 你已经具备了很好的起点！做错的题目恰恰说明你对知识的思考很深入。课堂上认真听讲，你会发现自己进步神速，很快就能完全掌握！加油！';
+      } else if (score === 10) {
+        title = '🌱 潜力无限！';
+        detail = `你获得了 <strong>10/30</strong> 分！答对了一道题，说明你对面积有一定的了解。不过不用担心，这正是课前小测的意义——了解起点，然后一起进步！`;
+        encourage = '🌟 每个数学达人都是从"不太确定"开始的！你已经迈出了很重要的一步。课堂上我们会从基础开始，一步步探索平行四边形的面积奥秘。相信我，等到下课时，你会惊讶于自己的进步！';
+      } else {
+        title = '📚 新的旅程开始！';
+        detail = `你获得了 <strong>0/30</strong> 分。不过请记住：这是课前小测，不是考试！它的目的是帮助老师了解大家的学习起点，以便更好地准备课程。现在不了解完全没关系！`;
+        encourage = '🌈 别担心，你正处于最激动人心的阶段——学习新知识的起点！这节课会带从零开始探索平行四边形的面积，会用非常有趣的方式帮助你理解。保持好奇心，大胆提问，你一定会学得很开心！';
+      }
+
+      return `
+        <h3>${title}</h3>
+        <p>${detail}</p>
+        <div class="encourage">${encourage}</div>
+      `;
+    }
+
+    function updateRanking() {}
+
+    function showReview() {
+      const reviewList = document.getElementById('reviewList');
+      const questions = [
+        { id: 'q1', name: '第1题：面积计算基础', answer: 'C' },
+        { id: 'q2', name: '第2题：图形转化意识', answer: 'C' },
+        { id: 'q3', name: '第3题：迷思概念暴露', answer: 'C' },
+      ];
+
+      let html = '';
+      questions.forEach(q => {
+        const userAnswer = answers[q.id];
+        const isCorrect = userAnswer === q.answer;
+        html += `
+          <div class="review-item">
+            <span class="review-icon">${isCorrect ? '✅' : '❌'}</span>
+            <span style="flex:1">${q.name}</span>
+            ${userAnswer ? `<span>你的答案：${userAnswer}</span>` : '<span style="color:#94a3b8">未作答</span>'}
+            <span class="review-status ${isCorrect ? 'pass' : 'fail'}">${isCorrect ? '+10分' : '+0分'}</span>
+          </div>
+        `;
+      });
+
+      const openAnswer = document.getElementById('q4-answer').value.trim();
+      html += `
+        <div class="review-item">
+          <span class="review-icon">💬</span>
+          <span style="flex:1">第4题：开放题</span>
+          ${openAnswer ? '<span class="review-status pass">已填写</span>' : '<span style="color:#94a3b8">未填写</span>'}
+        </div>
+      `;
+
+      reviewList.innerHTML = html;
+    }
+
+    function showConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+
+      const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 1.5 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(piece);
+      }
+
+      setTimeout(() => container.remove(), 4000);
+    }
+
+    document.querySelectorAll('.option-item').forEach(el=>{
+      el.tabIndex=0;el.setAttribute('role','button');
+      el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click();}});
+    });
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+    document.getElementById('classSelect').innerHTML='<option value="">选择演示组</option><option value="探索A组">探索A组</option><option value="探索B组">探索B组</option>';
+    document.getElementById('studentId').placeholder='填写虚构代号，例如探索者01';
+    // Initialize progress
+    updateProgress();
+  </script>
+</body>
+</html>

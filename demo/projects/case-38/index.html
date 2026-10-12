@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":38,"key":"case-38","title":"第20课 反馈控制有算法（5 课时）","category":"simulation","description":"经历算法诊断、阈值判断、自主仿真和反思，比较反馈控制的设计思路。","headline":"反馈算法实验簿","view":"flow","fields":[{"key":"threshold","label":"阈值"},{"key":"algorithm","label":"算法"},{"key":"result","label":"仿真结果"},{"key":"reflection","label":"反思"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"任务一 · 算法诊断"},{"file":"lesson-2.html","title":"任务二 · 八闽阈值速答"},{"file":"lesson-3.html","title":"任务三 · 自主设计与仿真"},{"file":"lesson-4.html","title":"任务四 · 对比反思"},{"file":"lesson-5.html","title":"微作业0 · 节水感知"}],"tasks":{"records":"cMr2KhdUMRE"},"mapping":{},"accent":"#3c697b","capture":true,"lesson":"任务一 · 算法诊断"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务一 · 算法诊断</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Quicksand', system-ui, sans-serif; }
+        body { background: linear-gradient(145deg, #eaf7e1, #d4e8c8); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { max-width: 720px; width: 100%; background: #fcfef9; border-radius: 48px; padding: 28px 24px 30px; box-shadow: 0 20px 40px rgba(60,90,40,0.16); border: 2px solid #c3d7b0; position: relative; }
+        .card::before { content: "🔬🧪"; position: absolute; font-size: 60px; opacity: 0.06; top: 0; right: 0; pointer-events: none; }
+        .header { display: flex; align-items: center; gap: 12px; border-bottom: 3px dashed #a7c494; padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+        .avatar { background: #d4e8c4; border-radius: 100px; padding: 6px 18px 6px 14px; display: flex; align-items: center; gap: 10px; font-size: 1.4rem; font-weight: 600; color: #1f3f10; border: 2px solid #5f7a4b; box-shadow: 0 4px 0 #8aaa78; }
+        .avatar span { font-size: 2rem; }
+        .title { font-size: 1.5rem; font-weight: 700; color: #1f3b12; background: #e6f0da; padding: 4px 20px; border-radius: 60px; border: 2px solid #b1cb9a; }
+        .badge { background: #f5b342; color: #2d401a; font-weight: 700; font-size: 0.75rem; padding: 4px 14px; border-radius: 60px; border: 2px solid #c4882a; margin-left: auto; }
+        .chat { background: #f4fae8; border-radius: 28px 28px 28px 6px; padding: 16px 20px; border: 2px solid #b8d0a3; margin: 10px 0 18px; position: relative; }
+        .chat::before { content: "👨‍⚕️"; position: absolute; font-size: 28px; left: -10px; top: -10px; background: #f4fae8; border-radius: 50%; padding: 2px; border: 2px solid #b8d0a3; }
+        .chat p { font-size: 1rem; line-height: 1.8; color: #1d3313; }
+        .chat strong { color: #2a6a1a; }
+        .code-inline { background: #1e2d1a; color: #b5e09a; font-family: 'Courier New', monospace; padding: 2px 12px; border-radius: 12px; font-weight: 700; display: inline-block; font-size: 0.9rem; }
+        .mission { background: #eef6e4; border-radius: 32px; padding: 20px 18px; border: 2px solid #b6cf9e; }
+        .mission h3 { font-size: 1.1rem; color: #1b3c0d; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .mission h3 .num { background: #4f8a3a; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+        .code-box { background: #1a2a16; border-radius: 16px; padding: 14px 18px; border: 3px solid #4d7a3a; margin: 8px 0 14px; }
+        .code-box .code { color: #b5e09a; font-family: 'Courier New', monospace; font-size: 1rem; line-height: 1.8; }
+        .code-box .code .kw { color: #f7c948; }
+        .code-box .code .var { color: #7fc9ff; }
+        .code-box .code .num { color: #f9a8a8; }
+        .bug-tag { display: inline-block; background: #e74c3c; color: white; font-size: 0.7rem; font-weight: 700; padding: 2px 14px; border-radius: 60px; border: 2px solid #c0392b; margin-bottom: 6px; }
+        .factor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 14px; }
+        .factor-item { background: white; border-radius: 60px; padding: 8px 14px; border: 2px solid #c6dbb2; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.1s; }
+        .factor-item:hover { border-color: #7fad66; background: #f6ffe8; }
+        .factor-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #4f8a3a; cursor: pointer; flex-shrink: 0; }
+        .factor-item .icon { font-size: 1.2rem; }
+        .factor-item .name { font-weight: 600; color: #1f3f10; font-size: 0.95rem; }
+        .summary { background: white; border-radius: 60px; padding: 12px 18px; border: 2px solid #b6cd9d; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 10px 0 12px; }
+        .summary .label { font-weight: 700; color: #1f3f10; font-size: 0.95rem; }
+        .summary .blank { border-bottom: 4px solid #7fad66; min-width: 80px; }
+        .summary .blank input { border: none; border-bottom: 4px solid #7fad66; background: transparent; font-size: 0.95rem; font-weight: 600; color: #1d4a0d; width: 100%; min-width: 70px; outline: none; padding: 2px 4px; }
+        .summary .blank input:focus { border-bottom-color: #3f7a2a; }
+        .self-eval { background: #f6ffe8; border-radius: 32px; padding: 12px 16px; border: 2px solid #b6cf9e; margin: 12px 0 6px; }
+        .self-eval .title-sm { font-weight: 700; color: #1f3f10; font-size: 0.9rem; display: block; margin-bottom: 6px; }
+        .self-eval .options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .self-eval .options label { display: flex; align-items: center; gap: 4px; background: white; padding: 4px 14px; border-radius: 60px; border: 2px solid #c6dbb2; font-size: 0.85rem; cursor: pointer; }
+        .self-eval .options label:hover { border-color: #7fad66; }
+        .self-eval .options input[type="radio"] { accent-color: #4f8a3a; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: center; }
+        .btn { border-radius: 80px; padding: 10px 28px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.06s linear; border: 3px solid #92af7a; background: #e3f2d4; color: #1d3a0d; box-shadow: 0 4px 0 #7f9d67; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #7f9d67; }
+        .btn-primary { background: #79b85e; border-color: #3f7a2a; color: white; box-shadow: 0 4px 0 #2a5f1a; }
+        .btn-primary:active { box-shadow: 0 1px 0 #2a5f1a; }
+        .btn-outline { background: transparent; border-color: #7f9d67; color: #1d3a0d; box-shadow: 0 4px 0 #7f9d67; }
+        .feedback { text-align: center; font-size: 0.9rem; color: #2a5f1a; margin-top: 12px; min-height: 24px; }
+        .footer { margin-top: 16px; text-align: center; font-size: 0.8rem; color: #427031; border-top: 2px dotted #b3cd9b; padding-top: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
+        .footer span { background: #e2efd3; padding: 2px 14px; border-radius: 60px; border: 1px solid #aac092; }
+        @media (max-width: 520px) { .factor-grid { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: stretch; } .badge { margin-left: 0; text-align: center; } .self-eval .options { flex-direction: column; } }
+    </style>
+<style>@media(max-width:640px){.container{width:100%!important;min-width:0!important}.input-row,.form-row{flex-wrap:wrap!important}}</style></head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="avatar"><span>👨‍⚕️</span> Dr.Algorithm</div>
+        <div class="title">🔬 算法诊断</div>
+        <div class="badge">⏱ 3分钟</div>
+    </div>
+    <div class="chat">
+        <p><strong>“你看小林这算法，就一行 <span class="code-inline">IF</span> —— 就像医生只量体温就开药！”</strong><br>
+        “你今天发烧38℃，医生不看你嗓子、不问你咳嗽，直接说‘吃退烧药5天’，你敢吃吗？<br>
+        <strong style="color:#2a6a1a;">你先告诉我，你觉得他漏了啥？</strong>”</p>
+    </div>
+    <div class="mission">
+        <h3><span class="num">1</span> 诊断“小林的问题算法”</h3>
+        <div class="code-box">
+            <span class="bug-tag">🐛 问题算法</span>
+            <div class="code"><span class="kw">IF</span> <span class="var">土壤湿度</span> <span class="kw"><</span> <span class="num">50%</span> <span class="kw">THEN</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">启动水泵</span></div>
+        </div>
+        <p style="font-weight:600; color:#1f3f10; font-size:0.95rem; margin:4px 0 2px;">🔍 勾选你发现的“缺失因素”（多选）：</p>
+        <div class="factor-grid">
+            <label class="factor-item"><input type="checkbox" value="天气预报"> <span class="icon">🌤</span> <span class="name">天气预报</span></label>
+            <label class="factor-item"><input type="checkbox" value="光照强度"> <span class="icon">☀️</span> <span class="name">光照强度</span></label>
+            <label class="factor-item"><input type="checkbox" value="温度"> <span class="icon">🌡️</span> <span class="name">温度</span></label>
+            <label class="factor-item"><input type="checkbox" value="作物生长阶段"> <span class="icon">🌱</span> <span class="name">作物生长阶段</span></label>
+            <label class="factor-item"><input type="checkbox" value="季节变化"> <span class="icon">🍂</span> <span class="name">季节变化</span></label>
+        </div>
+        <div class="summary">
+            <span class="label">📝 一句话总结：</span>
+            <span class="blank">好算法 =</span>
+            <span class="blank"><input type="text" placeholder="条件" id="condInput"></span>
+            <span class="blank">+</span>
+            <span class="blank"><input type="text" placeholder="阈值" id="threshInput"></span>
+        </div>
+        <div class="self-eval">
+            <span class="title-sm">🧠 我与 Dr.Algorithm 的对话深度：</span>
+            <div class="options">
+                <label><input type="radio" name="depth" value="A"> 🌟🌟🌟 追问 ≥2轮，能举例</label>
+                <label><input type="radio" name="depth" value="B"> 🌟🌟 追问 1轮，听懂建议</label>
+                <label><input type="radio" name="depth" value="C" checked> 🌟 仅基础对话</label>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn btn-primary" id="submitBtn">📤 提交诊断</button>
+            <button class="btn btn-outline" id="resetBtn">🔄 重置</button>
+        </div>
+        <div class="feedback" id="feedbackMsg">💬 勾选因素 → 填写总结 → 自评 → 提交</div>
+    </div>
+    <div class="footer"><span>🌿 任务一 · 算法诊断</span><span>👨‍⚕️ 与 Dr.Algorithm 对话</span><span>📖 教材 P95 表20.1</span></div>
+</div>
+<script>
+    (function() {
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedback = document.getElementById('feedbackMsg');
+        const condInput = document.getElementById('condInput');
+        const threshInput = document.getElementById('threshInput');
+        const checkboxes = document.querySelectorAll('.factor-item input[type="checkbox"]');
+        function getChecked() { const names = []; checkboxes.forEach(cb => { if (cb.checked) names.push(cb.value); }); return names; }
+        function getDepthLabel() { const radios = document.querySelectorAll('input[name="depth"]'); for (let r of radios) { if (r.checked) return r.parentElement.textContent.trim(); } return '未选择'; }
+        function handleSubmit() {
+            const checked = getChecked();
+            const cond = condInput.value.trim();
+            const thresh = threshInput.value.trim();
+            const depth = getDepthLabel();
+            let msg = `✅ 你勾选了 ${checked.length} 个因素`;
+            if (checked.length > 0) msg += `：${checked.join('、')}`;
+            if (cond || thresh) msg += `；总结：条件“${cond || '未填'}” + 阈值“${thresh || '未填'}”`;
+            msg += `；自评：${depth}`;
+            if (checked.length < 3) msg += ' 💡 再想想，还有哪些环境因素会影响灌溉？';
+            else if (checked.length >= 4) msg += ' 👏 分析很全面！带着这些思考去说服“小固执”吧！';
+            else msg += ' 🌱 不错，继续深入！';
+            feedback.textContent = msg;
+            feedback.style.color = '#1d4a0d';
+        }
+        function resetAll() { checkboxes.forEach(cb => cb.checked = false); condInput.value = ''; threshInput.value = ''; document.querySelector('input[name="depth"][value="C"]').checked = true; feedback.textContent = '🔄 已重置，重新开始诊断吧！'; feedback.style.color = '#3d6b2a'; }
+        submitBtn.addEventListener('click', handleSubmit);
+        resetBtn.addEventListener('click', resetAll);
+        condInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+        threshInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+    })();
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

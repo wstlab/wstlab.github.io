@@ -1,0 +1,12 @@
+{
+  "id": "case-54",
+  "title": "AI课堂互动评价与自主学习平台",
+  "category": "assessment",
+  "description": "围绕分数问题开展课堂互动、自评与反馈，从记录中发现概念误区。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 54,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

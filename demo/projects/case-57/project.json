@@ -1,0 +1,12 @@
+{
+  "id": "case-57",
+  "title": "信息科技综合测评",
+  "category": "assessment",
+  "description": "信息科技学情图谱：围绕总分、客观题得分、操作题得分开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 57,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

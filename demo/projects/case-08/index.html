@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":8,"key":"case-08","title":"小小音乐家 · 音符唱名挑战赛","category":"practice","description":"唱名成长谱：围绕得分、识别正确数、尝试次数开展交互学习，在数据大屏中回看记录。","headline":"唱名成长谱","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"correctCount","label":"识别正确数"},{"key":"attempts","label":"尝试次数"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"qVjHCXsCoEJ"},"mapping":{"2e31h915ew":"qVjHCXsCoEJ"},"accent":"#4468ab","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>小小音乐家 - 音符唱名挑战赛 | 音乐大通关</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9e7b3 0%, #f5cda0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Comic Neue', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', 'Apple Color Emoji', cursive, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            background: #fffef7;
+            border-radius: 80px 80px 70px 70px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), inset 0 1px 4px rgba(255,255,200,0.8);
+            overflow: hidden;
+            padding: 20px 25px 35px;
+            transition: all 0.2s ease;
+            border: 3px solid #ffcd94;
+            position: relative;
+        }
+
+        /* 头部计分栏 */
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffe3b5;
+            padding: 12px 20px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 1px 4px rgba(97, 57, 21, 0.1), 0 6px 0 #d49c44;
+        }
+
+        .score-box {
+            background: #5e2e0e;
+            border-radius: 50px;
+            padding: 8px 18px;
+            color: #ffefb9;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-align: center;
+            box-shadow: inset 0 -2px 0 #2f1806, 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .score-box span {
+            font-size: 1.8rem;
+            margin-right: 5px;
+            color: #ffd966;
+        }
+
+        .reset-btn {
+            background: #ff8c42;
+            border: none;
+            font-size: 1.5rem;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.1s linear;
+            box-shadow: 0 5px 0 #b4621a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b4621a;
+        }
+
+        /* 音符主角区域 */
+        .note-area {
+            background: #fffaec;
+            border-radius: 70px;
+            padding: 15px 15px 25px;
+            margin: 15px 0 10px;
+            text-align: center;
+            border: 2px dashed #ffbc6e;
+            box-shadow: 0 8px 0 #ebc28e;
+        }
+
+        .big-number {
+            background: #ffe0a3;
+            width: 180px;
+            height: 180px;
+            margin: 10px auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            font-weight: bold;
+            color: #c3510c;
+            text-shadow: 4px 4px 0 #ffc48a;
+            box-shadow: 0 12px 0 #c28a4b, inset 0 -3px 0 rgba(0,0,0,0.05);
+            transition: 0.2s;
+            font-family: monospace;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            background: #fbd598;
+            display: inline-block;
+            padding: 8px 30px;
+            border-radius: 50px;
+            color: #4d280b;
+            font-weight: bold;
+            margin-top: 5px;
+            box-shadow: inset 0 1px 4px #ffe3aa, 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 选项按钮区 */
+        .options-area {
+            margin: 30px 0 20px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .music-btn {
+            background: #f4bc6e;
+            border: none;
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: inherit;
+            padding: 16px 30px;
+            min-width: 130px;
+            border-radius: 60px;
+            color: #2d1b0c;
+            cursor: pointer;
+            transition: 0.08s linear;
+            box-shadow: 0 7px 0 #9b5e2c;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .music-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #9b5e2c;
+        }
+
+        .music-btn.disabled-btn, .music-btn:disabled {
+            opacity: 0.6;
+            transform: translateY(0);
+            cursor: default;
+            filter: grayscale(0.1);
+        }
+
+        /* 反馈消息 */
+        .feedback {
+            background: #fff0d4;
+            border-radius: 50px;
+            padding: 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0 15px;
+            border-left: 12px solid #ffb347;
+            transition: 0.1s;
+        }
+
+        .correct-feedback {
+            background: #d9ffcf;
+            border-left-color: #3cad2e;
+            color: #256f1a;
+        }
+
+        .wrong-feedback {
+            background: #ffe0dd;
+            border-left-color: #e55c3c;
+            color: #a12f0f;
+        }
+
+        /* 小助手对照表 */
+        .help-table {
+            background: #fef0dd;
+            border-radius: 48px;
+            padding: 12px 10px;
+            margin-top: 15px;
+            box-shadow: inset 0 0 0 2px white, 0 5px 12px rgba(0,0,0,0.1);
+        }
+
+        .help-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            background: #ffd89a;
+            display: inline-block;
+            width: 100%;
+            padding: 5px;
+            border-radius: 40px;
+            color: #78481a;
+        }
+
+        .table-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .table-card {
+            background: #fffaee;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            border: 1px solid #ffcf8a;
+        }
+
+        .table-num {
+            background: #ffb463;
+            border-radius: 30px;
+            padding: 3px 12px;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .table-syllable {
+            color: #b45a1c;
+            font-size: 1.3rem;
+        }
+
+        /* 通关表单区域 */
+        .pass-form-container {
+            background: linear-gradient(135deg, #fff7e8, #ffefda);
+            border-radius: 60px;
+            margin-top: 20px;
+            padding: 15px 20px 20px;
+            border: 3px solid #ffbc6e;
+            box-shadow: 0 8px 0 #d9a15c;
+            transition: all 0.3s ease;
+        }
+
+        .pass-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            background: #ffd966;
+            display: inline-block;
+            width: 100%;
+            padding: 8px;
+            border-radius: 50px;
+            color: #4a2a0a;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: #ffedc9;
+            padding: 6px 15px;
+            border-radius: 40px;
+            color: #9b5a2a;
+            min-width: 70px;
+        }
+
+        .form-input {
+            flex: 2;
+            min-width: 180px;
+            background: white;
+            border: 2px solid #ffbc6e;
+            border-radius: 50px;
+            padding: 10px 18px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.1s;
+        }
+
+        .form-input:focus {
+            border-color: #ff9142;
+            box-shadow: 0 0 0 3px rgba(255, 145, 66, 0.2);
+        }
+
+        .submit-report-btn {
+            background: #e58c2e;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 5px 0 #a45f1e;
+            transition: 0.05s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .submit-report-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #a45f1e;
+        }
+
+        .submit-report-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .submit-message {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            text-align: center;
+            font-weight: bold;
+            background: #f1e5d2;
+        }
+
+        .success-msg {
+            background: #c8e6b5;
+            color: #2c6e2c;
+            border-left: 6px solid #4caf50;
+        }
+
+        .error-msg {
+            background: #ffddcc;
+            color: #b33f1a;
+            border-left: 6px solid #ff6b4a;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 20px;
+            color: #cb8b42;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 15px;
+            }
+            .big-number {
+                width: 130px;
+                height: 130px;
+                font-size: 4.5rem;
+            }
+            .music-btn {
+                font-size: 1.4rem;
+                padding: 12px 18px;
+                min-width: 100px;
+            }
+            .pass-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameApp">
+    
+    <div class="score-header">
+        <div class="score-box">
+            🎵 得分 <span id="scoreValue">0</span>
+        </div>
+        <div class="score-box">
+            🎯 满分 <span id="maxScoreValue">7</span>
+        </div>
+        <button class="reset-btn" id="resetGameBtn">🔄 新的一轮</button>
+    </div>
+
+    
+    <div class="note-area">
+        <div class="question-icon">🎶 🎵 🎶</div>
+        <div class="big-number" id="currentNoteNumber">1</div>
+        <div class="question-text">
+            🤔 这个简谱数字对应的唱名是？
+        </div>
+    </div>
+
+    
+    <div class="options-area">
+        <div class="options-grid" id="optionsContainer"></div>
+    </div>
+
+    
+    <div class="feedback" id="feedbackMsg">
+        🌟 点击上面的唱名按钮，开始挑战吧！
+    </div>
+
+    
+    <div class="help-table">
+        <div class="help-title">📖 音乐小词典 &nbsp; 🎼</div>
+        <div class="table-grid" id="helpGrid"></div>
+    </div>
+
+    
+    <div id="passFormContainer" style="display: none;">
+        <div class="pass-form-container">
+            <div class="pass-title">🎉 恭喜通关！音乐小英雄 🎉</div>
+            <div class="form-group">
+                <label>📛 姓名：</label>
+                <input type="text" id="studentName" class="form-input" placeholder="请输入演示称呼" maxlength="20">
+            </div>
+            <div class="form-group">
+                <label>🏫 班级：</label>
+                <input type="text" id="studentClass" class="form-input" placeholder="例如：三(2)班 / 音乐社团" maxlength="30">
+            </div>
+            <button id="submitReportBtn" class="submit-report-btn">📤 提交战报 & 领取荣耀</button>
+            <div id="submitMessage" class="submit-message"></div>
+        </div>
+    </div>
+
+    <footer>✨ 挑战全部7个音符，答对7题即可通关！ ✨</footer>
+</div>
+
+<script>
+    // ---------- 音乐知识库 ----------
+    const NOTE_MAP = {
+        1: "Do",
+        2: "Re",
+        3: "Mi",
+        4: "Fa",
+        5: "Sol",
+        6: "La",
+        7: "Si"
+    };
+    const ALL_SYLLABLES = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
+    const FULL_SCORE = 7;        // 满分7分（对应7个音符各答对一次才能通关）
+    
+    // ---------- 游戏状态 ----------
+    let currentNumber = 1;
+    let currentCorrectName = "Do";
+    let score = 0;                // 当前得分（答对累计）
+    let totalAttempts = 0;        // 总答题次数
+    let isProcessing = false;
+    let nextTimer = null;
+    let gameCompleted = false;     // 是否已经通关（防止重复通关弹表单/重复提交）
+    let submissionInProgress = false; // 防止重复提交战报
+    
+    // DOM 元素
+    const currentNoteNumberDiv = document.getElementById("currentNoteNumber");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const feedbackMsgDiv = document.getElementById("feedbackMsg");
+    const scoreSpan = document.getElementById("scoreValue");
+    const maxScoreSpan = document.getElementById("maxScoreValue");
+    const resetBtn = document.getElementById("resetGameBtn");
+    const passFormContainer = document.getElementById("passFormContainer");
+    const studentNameInput = document.getElementById("studentName");
+    const studentClassInput = document.getElementById("studentClass");
+    const submitReportBtn = document.getElementById("submitReportBtn");
+    const submitMessageDiv = document.getElementById("submitMessage");
+    
+    // ---------- 辅助函数 ----------
+    function updateStatsUI() {
+        scoreSpan.textContent = score;
+        if (maxScoreSpan) maxScoreSpan.textContent = FULL_SCORE;
+    }
+    
+    function setFeedbackMessage(msg, isError = false, isSuccess = false) {
+        feedbackMsgDiv.textContent = msg;
+        feedbackMsgDiv.classList.remove("correct-feedback", "wrong-feedback");
+        if (isSuccess) {
+            feedbackMsgDiv.classList.add("correct-feedback");
+        } else if (isError) {
+            feedbackMsgDiv.classList.add("wrong-feedback");
+        } else {
+            feedbackMsgDiv.style.background = "#fff0d4";
+        }
+    }
+    
+    function clearTimer() {
+        if (nextTimer) {
+            clearTimeout(nextTimer);
+            nextTimer = null;
+        }
+    }
+    
+    function setButtonsEnabled(enabled) {
+        const btns = document.querySelectorAll(".music-btn");
+        btns.forEach(btn => {
+            if (enabled) {
+                btn.disabled = false;
+                btn.classList.remove("disabled-btn");
+            } else {
+                btn.disabled = true;
+                btn.classList.add("disabled-btn");
+            }
+        });
+    }
+    
+    // 获取干扰项
+    function getDistractors(correctSyllable, count = 2) {
+        const candidates = ALL_SYLLABLES.filter(s => s !== correctSyllable);
+        for (let i = candidates.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+        }
+        return candidates.slice(0, count);
+    }
+    
+    function generateOptions(correctSyllable) {
+        const dists = getDistractors(correctSyllable, 2);
+        let opts = [correctSyllable, ...dists];
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+        return opts;
+    }
+    
+    function renderOptions(optionsArray) {
+        optionsContainer.innerHTML = "";
+        optionsArray.forEach(optionName => {
+            const btn = document.createElement("button");
+            btn.className = "music-btn";
+            btn.innerHTML = `<span>🎵</span> ${optionName} <span>🎶</span>`;
+            btn.setAttribute("data-syllable", optionName);
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (!gameCompleted && !isProcessing) {
+                    handleAnswer(optionName);
+                }
+            });
+            optionsContainer.appendChild(btn);
+        });
+        if (!gameCompleted) setButtonsEnabled(true);
+    }
+    
+    // 刷新题目（通关后不能再刷新新题目）
+    function refreshQuestion() {
+        if (gameCompleted) return;
+        const newNumber = Math.floor(Math.random() * 7) + 1;
+        currentNumber = newNumber;
+        currentCorrectName = NOTE_MAP[currentNumber];
+        currentNoteNumberDiv.textContent = currentNumber;
+        const newOptions = generateOptions(currentCorrectName);
+        renderOptions(newOptions);
+        setFeedbackMessage("✨ 选一选，哪个唱名是正确的呢？✨");
+        isProcessing = false;
+    }
+    
+    function nextQuestion() {
+        if (gameCompleted) return;
+        clearTimer();
+        isProcessing = false;
+        refreshQuestion();
+    }
+    
+    // 检查通关
+    function checkGameCompletion() {
+        if (!gameCompleted && score >= FULL_SCORE) {
+            // 达成满分通关！
+            gameCompleted = true;
+            setButtonsEnabled(false);   // 禁止再答题
+            clearTimer();               // 清除任何待处理的跳题
+            if (nextTimer) clearTimeout(nextTimer);
+            isProcessing = true;        // 防止任何后续答题
+            
+            // 显示通关表单区域
+            passFormContainer.style.display = "block";
+            setFeedbackMessage("🎉🎉🎉 太厉害了！你答对了全部7个音符，成为音乐小英雄！请填写信息提交战报 🎉🎉🎉", false, true);
+            // 将当前音符区域稍微庆祝动画
+            const bigDiv = document.querySelector(".big-number");
+            if (bigDiv) {
+                bigDiv.style.animation = "none";
+                bigDiv.offsetHeight;
+                bigDiv.style.transition = "0.2s";
+                bigDiv.style.transform = "scale(1.1)";
+                setTimeout(() => { if(bigDiv) bigDiv.style.transform = ""; }, 400);
+            }
+        }
+    }
+    
+    // 处理答题
+    function handleAnswer(selectedSyllable) {
+        if (isProcessing || gameCompleted) return;
+        isProcessing = true;
+        setButtonsEnabled(false);
+        
+        const isCorrect = (selectedSyllable === currentCorrectName);
+        totalAttempts++;
+        if (isCorrect) {
+            score++;
+            updateStatsUI();
+            setFeedbackMessage(`🎉 太棒了！ ${currentNumber} 的唱名是 ${currentCorrectName}！ +1分 🎉`, false, true);
+            const bigNumDiv = document.querySelector(".big-number");
+            if (bigNumDiv) {
+                bigNumDiv.style.transform = "scale(1.08)";
+                setTimeout(() => { if(bigNumDiv) bigNumDiv.style.transform = ""; }, 150);
+            }
+        } else {
+            setFeedbackMessage(`😢 噢不！ ${currentNumber} 的正确唱名是 ${currentCorrectName}，再试试下一题吧~ 😢`, true, false);
+            // 高亮正确按钮效果
+            const options = document.querySelectorAll(".music-btn");
+            options.forEach(btn => {
+                if(btn.innerText.includes(currentCorrectName)) {
+                    btn.style.backgroundColor = "#a5d6a5";
+                    setTimeout(() => { btn.style.backgroundColor = ""; }, 500);
+                }
+            });
+        }
+        
+        // 更新UI显示分数
+        updateStatsUI();
+        
+        // 重要: 先检查是否通关 (根据最新score)
+        checkGameCompletion();
+        
+        // 如果已经通关，不再进入下一题，并且不清除禁用按钮
+        if (gameCompleted) {
+            // 已经通关，停止后续动作，并且确保不能再继续答题
+            setButtonsEnabled(false);
+            return;
+        }
+        
+        // 未通关时正常进入下一题
+        clearTimer();
+        nextTimer = setTimeout(() => {
+            nextQuestion();
+            nextTimer = null;
+        }, 1200);
+    }
+    
+    // 重置游戏（完全重置所有状态，隐藏通关表单）
+    function resetGame() {
+        // 清除通关标志
+        gameCompleted = false;
+        submissionInProgress = false;
+        clearTimer();
+        score = 0;
+        totalAttempts = 0;
+        updateStatsUI();
+        isProcessing = false;
+        
+        // 重置随机题目
+        const newNumber = Math.floor(Math.random() * 7) + 1;
+        currentNumber = newNumber;
+        currentCorrectName = NOTE_MAP[currentNumber];
+        currentNoteNumberDiv.textContent = currentNumber;
+        const newOptions = generateOptions(currentCorrectName);
+        renderOptions(newOptions);
+        setFeedbackMessage("🎵 游戏已重置！努力答对7道题，即可通关！ 🎵");
+        setButtonsEnabled(true);
+        
+        // 隐藏通关表单区域并清空表单内容和消息
+        passFormContainer.style.display = "none";
+        if (studentNameInput) studentNameInput.value = "";
+        if (studentClassInput) studentClassInput.value = "";
+        if (submitMessageDiv) {
+            submitMessageDiv.innerHTML = "";
+            submitMessageDiv.className = "submit-message";
+        }
+        // 重新启用所有游戏机制
+    }
+    
+    // ---------- 战报提交功能 (使用新的API地址) ----------
+    async function submitBattleReport() {
+        if (submissionInProgress) {
+            if (submitMessageDiv) submitMessageDiv.innerHTML = "⏳ 提交中，请稍后...";
+            return;
+        }
+        // 获取姓名、班级
+        let studentName = studentNameInput ? studentNameInput.value.trim() : "";
+        let studentClass = studentClassInput ? studentClassInput.value.trim() : "";
+        
+        if (studentName === "") {
+            if (submitMessageDiv) {
+                submitMessageDiv.innerHTML = "📛 请填写你的姓名再提交战报～";
+                submitMessageDiv.classList.add("error-msg");
+                submitMessageDiv.classList.remove("success-msg");
+            }
+            return;
+        }
+        if (studentClass === "") {
+            if (submitMessageDiv) {
+                submitMessageDiv.innerHTML = "🏫 请填写你的班级（例如三(2)班）～";
+                submitMessageDiv.classList.add("error-msg");
+                submitMessageDiv.classList.remove("success-msg");
+            }
+            return;
+        }
+        
+        // 构建提交数据
+        const gameName = "小小音乐家·音符唱名挑战赛";
+        const currentScore = score;
+        const fullMark = FULL_SCORE;
+        const timestamp = new Date().toISOString();
+        const completionStatus = "已通关";
+        
+        const payload = {
+            game_name: gameName,
+            student_name: studentName,
+            student_class: studentClass,
+            score: currentScore,
+            full_score: fullMark,
+            timestamp: timestamp,
+            completion: completionStatus,
+            // 额外保留原始字段方便后端映射
+            game: gameName,
+            name: studentName,
+            class: studentClass,
+            points: currentScore,
+            max_points: fullMark,
+            submitted_at: timestamp,
+            result: completionStatus
+        };
+        
+        submissionInProgress = true;
+        if (submitReportBtn) submitReportBtn.disabled = true;
+        if (submitMessageDiv) {
+            submitMessageDiv.innerHTML = "📡 正在提交荣耀战报，请稍候...";
+            submitMessageDiv.classList.remove("error-msg", "success-msg");
+        }
+        
+        try {
+            // 使用新的API地址
+            const response = await fetch("https://qf.kjxs.site/api/qVjHCXsCoEJ", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            let responseData = null;
+            let ok = false;
+            if (response.ok) {
+                ok = true;
+                try {
+                    responseData = await response.json();
+                } catch(e) { responseData = { message: "提交成功但响应解析非JSON" }; }
+            } else {
+                let errorText = "";
+                try {
+                    errorText = await response.text();
+                } catch(e) {}
+                throw new Error(`服务器响应: ${response.status} ${errorText}`);
+            }
+            
+            if (ok) {
+                if (submitMessageDiv) {
+                    submitMessageDiv.innerHTML = "✅ 战报提交成功！🎉 老师已经收到你的音乐成就啦！继续练习成为音乐大师吧～ ✅";
+                    submitMessageDiv.classList.add("success-msg");
+                    submitMessageDiv.classList.remove("error-msg");
+                }
+                setFeedbackMessage("🎖️ 战报已提交！你是优秀的小音乐家！ 🎖️", false, true);
+                // 可选：保持通关表单可见但禁用提交按钮防止重复
+                if (submitReportBtn) submitReportBtn.disabled = true;
+                // 可保持界面
+            } else {
+                throw new Error("提交失败，请稍后重试");
+            }
+        } catch (error) {
+            console.error("提交战报出错:", error);
+            if (submitMessageDiv) {
+                submitMessageDiv.innerHTML = "⚠️ 提交失败，请检查网络后重试。如果多次失败可以告诉老师～ ⚠️";
+                submitMessageDiv.classList.add("error-msg");
+                submitMessageDiv.classList.remove("success-msg");
+            }
+            setFeedbackMessage("📡 网络开小差，战报未成功。可以稍后点击按钮重试。", true, false);
+            if (submitReportBtn) submitReportBtn.disabled = false;
+        } finally {
+            submissionInProgress = false;
+            if (submitReportBtn && !submitReportBtn.disabled) {
+                // 如果之前没有禁用成功就不做额外操作
+            }
+            // 如果已经成功，保持禁用；如果失败，重新启用按钮
+            if (submitReportBtn && submitMessageDiv && submitMessageDiv.innerHTML.includes("成功")) {
+                submitReportBtn.disabled = true;
+            } else if (submitReportBtn && !submitMessageDiv?.innerHTML.includes("成功")) {
+                submitReportBtn.disabled = false;
+            }
+        }
+    }
+    
+    // 构建帮助表格
+    function buildHelperTable() {
+        const helpGrid = document.getElementById("helpGrid");
+        if (!helpGrid) return;
+        helpGrid.innerHTML = "";
+        const entries = Object.entries(NOTE_MAP);
+        for (let [num, syllable] of entries) {
+            const card = document.createElement("div");
+            card.className = "table-card";
+            card.innerHTML = `
+                <span class="table-num">${num}</span>
+                <span class="table-syllable"> ➡ ${syllable}</span>
+                <span style="font-size:1rem;">🎵</span>
+            `;
+            helpGrid.appendChild(card);
+        }
+    }
+    
+    // 初始化游戏
+    function initGame() {
+        buildHelperTable();
+        const initNumber = Math.floor(Math.random() * 7) + 1;
+        currentNumber = initNumber;
+        currentCorrectName = NOTE_MAP[currentNumber];
+        currentNoteNumberDiv.textContent = currentNumber;
+        const initOptions = generateOptions(currentCorrectName);
+        renderOptions(initOptions);
+        score = 0;
+        totalAttempts = 0;
+        gameCompleted = false;
+        submissionInProgress = false;
+        updateStatsUI();
+        setFeedbackMessage("🎶 答对7道不同音符的题目即可通关！点击唱名按钮开始～ 🎶");
+        isProcessing = false;
+        clearTimer();
+        setButtonsEnabled(true);
+        passFormContainer.style.display = "none";
+        if (studentNameInput) studentNameInput.value = "";
+        if (studentClassInput) studentClassInput.value = "";
+        if (submitMessageDiv) submitMessageDiv.innerHTML = "";
+    }
+    
+    // 绑定事件
+    resetBtn.addEventListener("click", () => {
+        if (nextTimer) clearTimeout(nextTimer);
+        resetGame();
+    });
+    
+    if (submitReportBtn) {
+        submitReportBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!gameCompleted) {
+                setFeedbackMessage("只有通关（获得7分）后才能提交战报哟！继续挑战吧！", true, false);
+                return;
+            }
+            submitBattleReport();
+        });
+    }
+    
+    // 启动游戏
+    initGame();
+</script>
+</body>
+</html>

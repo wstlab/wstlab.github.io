@@ -1,0 +1,12 @@
+{
+  "id": "case-45",
+  "title": "算法填空 · 栈实现十进制转二进制",
+  "category": "programming",
+  "description": "栈算法步骤诊断：围绕填空一、填空二、填空三开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 45,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

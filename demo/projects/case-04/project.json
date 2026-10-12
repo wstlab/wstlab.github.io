@@ -1,0 +1,13 @@
+{
+  "id": "case-04",
+  "title": "AI密铺实验室",
+  "category": "creation",
+  "description": "拖动顶点、复制拼搭、为图形着色，把密铺画布保存成图片，在作品墙上比较不同方案。",
+  "subjects": [
+    "数学",
+    "美术"
+  ],
+  "order": 4,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

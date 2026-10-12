@@ -1,0 +1,12 @@
+{
+  "id": "case-09",
+  "title": "春 · 细读 在线批注",
+  "category": "creation",
+  "description": "春日批注墙：围绕段落、批注、批注开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 9,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":6,"key":"case-06","title":"谣言风暴眼 · 抢盐风波","category":"creation","description":"证据与观点：围绕调查角色、责任判断、观点开展交互学习，在数据大屏中回看记录。","headline":"证据与观点","view":"wall","fields":[{"key":"角色","label":"调查角色"},{"key":"责任","label":"责任判断"},{"key":"观点","label":"观点"},{"key":"证据","label":"证据"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"vcoaVbWxiDS"},"mapping":{"14g7gszkxt":"vcoaVbWxiDS"},"accent":"#916749","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谣言风暴眼 - 抢盐风波</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a192f 0%, #172a45 100%);
+            color: #e6f1ff;
+            overflow-x: hidden;
+        }
+        
+        /* 主容器 */
+        .container {
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        /* 任务提示 */
+        .task提示 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 800px;
+            background: rgba(10, 25, 47, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 255, 255, 0.2);
+        }
+        
+        /* 网络节点图 */
+        .network图 {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+        }
+        
+        /* 中心节点 */
+        .中心节点 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #ff4757 0%, #c0392b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 71, 87, 0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        /* 连接线 */
+        .连接线 {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(100, 255, 255, 0.8), rgba(100, 255, 255, 0.2));
+            height: 2px;
+            transform-origin: left center;
+        }
+        
+        /* 角色节点 */
+        .角色节点 {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(100, 255, 255, 0.5);
+            overflow: hidden;
+        }
+        
+        .角色节点 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .角色节点:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(100, 255, 255, 0.8);
+        }
+        
+        /* 角色标签 */
+        .角色标签 {
+            position: absolute;
+            font-size: 14px;
+            white-space: nowrap;
+            background: rgba(10, 25, 47, 0.8);
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            margin-top: 10px;
+        }
+        
+        /* 角色调查面板 */
+        .调查面板 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 25, 47, 0.95);
+            display: none;
+            flex-direction: column;
+            padding: 40px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(17, 34, 64, 0.6);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 255, 255, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 255, 255, 0.8);
+        }
+        
+        .调查面板.active {
+            display: flex;
+        }
+        
+        .面板内容 {
+            display: flex;
+            flex: 1;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .左侧内容 {
+            flex: 6;
+            background: rgba(17, 34, 64, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 255, 255, 0.2);
+            overflow-y: auto;
+        }
+        
+        .右侧内容 {
+            flex: 3.5;
+            background: rgba(17, 34, 64, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 255, 255, 0.2);
+            display: auto;
+            flex-direction: column;
+        }
+        
+        .角色标题 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #64ffda;
+        }
+        
+        .独白内容 {
+            font-size: 16px;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+            background: rgba(10, 25, 47, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #64ffda;
+        }
+        
+        .问题标题 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 15px;
+            color: #64ffda;
+        }
+        
+        .问题列表 {
+            margin-bottom: 20px;
+        }
+        
+        .问题列表 li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .笔记标题 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            color: #64ffda;
+        }
+        
+        .笔记文本框 {
+            flex: 1;
+            width: 100%;
+            padding: 15px;
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #e6f1ff;
+            font-size: 14px;
+            resize: none;
+        }
+        
+        .建议文本框组 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .建议项 {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .建议项 label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #64ffda;
+        }
+        
+        .建议项 .笔记文本框 {
+            flex: 0 0 80px;
+        }
+        
+        .help-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: rgba(100, 255, 255, 0.3);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 5px;
+            color: #64ffda;
+        }
+        
+        .help-text {
+            display: none;
+            margin-top: 5px;
+            padding: 10px;
+            background: rgba(10, 25, 47, 0.6);
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.4;
+            border-left: 3px solid #64ffda;
+        }
+        
+        .help-text.show {
+            display: block;
+        }
+        
+        .structured-question {
+            margin: 15px 0;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(17, 34, 64, 0.6);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-group label:hover {
+            background: rgba(17, 34, 64, 0.8);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(17, 34, 64, 0.6);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-group label:hover {
+            background: rgba(17, 34, 64, 0.8);
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ffffff;
+            outline: none;
+            -webkit-appearance: none;
+            color: #ffffff;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #64ffda;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #64ffda;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .slider-value {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #64ffda;
+        }
+        
+        .面板底部 {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+        
+        .按钮 {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .返回按钮 {
+            background: rgba(100, 255, 255, 0.2);
+            color: #64ffda;
+            border: 1px solid #64ffda;
+        }
+        
+        .返回按钮:hover {
+            background: rgba(100, 255, 255, 0.3);
+        }
+        
+        .法律按钮 {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+        
+        .法律按钮:hover {
+            background: rgba(255, 71, 87, 0.3);
+        }
+        
+        .提交按钮 {
+            background: rgba(255, 206, 86, 0.2);
+            color: #ffce56;
+            border: 1px solid #ffce56;
+        }
+        
+        .提交按钮:hover {
+            background: rgba(255, 206, 86, 0.3);
+        }
+        
+        .结论卡片 {
+            position: absolute;
+            background: rgba(17, 34, 64, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 255, 255, 0.3);
+            max-width: 200px;
+            font-size: 12px;
+            z-index: 800;
+            display: none;
+        }
+        
+        .结论卡片.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 法律依据弹窗 */
+        .法律弹窗 {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 25, 47, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(100, 255, 255, 0.5);
+            max-width: 800px;
+            width: 90%;
+            z-index: 1100;
+            display: none;
+        }
+        
+        .法律弹窗.active {
+            display: block;
+        }
+        
+        .法律弹窗 h3 {
+            color: #64ffda;
+            margin-bottom: 20px;
+        }
+        
+        .法律弹窗 p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .关闭按钮 {
+            background: rgba(100, 255, 255, 0.2);
+            color: #64ffda;
+            border: 1px solid #64ffda;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .关闭按钮:hover {
+            background: rgba(100, 255, 255, 0.3);
+        }
+        
+        /* 欢迎页面 */
+        .欢迎页面 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a192f 0%, #172a45 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .欢迎页面.hidden {
+            display: none;
+        }
+        
+        .欢迎标题 {
+            font-size: 36px;
+            color: #64ffda;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .欢迎表单 {
+            background: rgba(17, 34, 64, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(100, 255, 255, 0.2);
+            width: 400px;
+            max-width: 90%;
+        }
+        
+        .表单组 {
+            margin-bottom: 25px;
+        }
+        
+        .表单组 label {
+            display: block;
+            margin-bottom: 10px;
+            color: #64ffda;
+            font-size: 16px;
+        }
+        
+        .表单组 select,
+        .表单组 input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid rgba(100, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #e6f1ff;
+            font-size: 16px;
+        }
+        
+        .表单组 select:focus,
+        .表单组 input:focus {
+            outline: none;
+            border-color: #64ffda;
+            box-shadow: 0 0 10px rgba(100, 255, 255, 0.3);
+        }
+        
+        .开始按钮 {
+            width: 100%;
+            padding: 15px;
+            background: rgba(100, 255, 255, 0.2);
+            color: #64ffda;
+            border: 1px solid #64ffda;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .开始按钮:hover {
+            background: rgba(100, 255, 255, 0.3);
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 30px rgba(255, 71, 87, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 71, 87, 1);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(255, 71, 87, 0.8);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .network图 {
+                width: 600px;
+                height: 450px;
+            }
+            
+            .中心节点 {
+                width: 100px;
+                height: 100px;
+                font-size: 14px;
+            }
+            
+            .角色节点 {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .角色标签 {
+                font-size: 12px;
+            }
+            
+            .面板内容 {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .network图 {
+                width: 400px;
+                height: 300px;
+            }
+            
+            .中心节点 {
+                width: 80px;
+                height: 80px;
+                font-size: 12px;
+            }
+            
+            .角色节点 {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .角色标签 {
+                font-size: 10px;
+            }
+            
+            .调查面板 {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="欢迎页面" id="欢迎页面">
+        <h1 class="欢迎标题">谣言风暴眼</h1>
+        <div class="欢迎表单">
+            <div class="表单组">
+                <label for="班级选择">选择班级：</label>
+                <select id="班级选择" name="班级">
+                    <option value="">请选择班级</option>
+                    <option value="七年1班">七年1班</option>
+                    <option value="七年2班">七年2班</option>
+                    <option value="七年3班">七年3班</option>
+                    <option value="七年4班">七年4班</option>
+                    <option value="七年5班">七年5班</option>
+                    <option value="七年6班">七年6班</option>
+                </select>
+            </div>
+            <div class="表单组">
+                <label for="姓名输入">输入姓名：</label>
+                <input type="text" id="姓名输入" name="姓名" placeholder="请输入演示称呼">
+            </div>
+            <button class="开始按钮" id="开始按钮">开始学习</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        
+        <div class="task提示">
+            <h2>案件：抢盐风波</h2>
+            <h3>任务：点击光点，探查不同节点在事件中的角色与责任。</h3>
+            <p>近日，一段声称“化工厂泄漏将污染本地水源，食盐能抗辐射需囤积”的模糊视频，在本地微信群和某短视频平台迅速传播。该消息引发了部分市民的恐慌，导致多家超市出现食盐抢购潮和短暂缺货现象，甚至因拥挤发生了口角与秩序混乱。随后，市监局、网信办、公安局等相关部门迅速介入调查并发布辟谣通告，依法查处了造谣传谣者。这起事件不仅扰乱了市场秩序，也浪费了大量的公共资源和社会信任。</p>
+        </div>
+        
+        
+        <div class="network图">
+            
+            <div class="中心节点">抢盐风波</div>
+            
+            
+            <div class="连接线" style="width: 200px; top: 50%; left: 50%; transform: translate(0, -50%) rotate(0deg);"></div>
+            <div class="连接线" style="width: 200px; top: 50%; left: 50%; transform: translate(0, -50%) rotate(90deg);"></div>
+            <div class="连接线" style="width: 200px; top: 50%; left: 50%; transform: translate(0, -50%) rotate(180deg);"></div>
+            <div class="连接线" style="width: 200px; top: 50%; left: 50%; transform: translate(0, -50%) rotate(270deg);"></div>
+            
+            
+            <div class="角色节点" data-role="小诚" style="top: 50%; right: 100px; transform: translateY(-50%);">
+                <img src="img/小诚.svg" alt="小诚">
+                <div class="角色标签">好心转发者-小诚</div>
+            </div>
+            
+            <div class="角色节点" data-role="李姐" style="bottom: 100px; left: 50%; transform: translateX(-50%);">
+                <img src="img/李姐.svg" alt="李姐">
+                <div class="角色标签">无意助推者-李姐</div>
+            </div>
+            
+            <div class="角色节点" data-role="流量王" style="top: 50%; left: 100px; transform: translateY(-50%);">
+                <img src="img/流量王.svg" alt="流量王">
+                <div class="角色标签">恶意营销者-流量王</div>
+            </div>
+            
+            <div class="角色节点" data-role="王警官" style="top: 100px; left: 50%; transform: translateX(-50%);">
+                <img src="img/王警官.svg" alt="王警官">
+                <div class="角色标签">秩序调解者-王警官</div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="调查面板" id="调查面板">
+        <h2 class="角色标题" id="角色标题">【角色名】调查笔录</h2>
+        <div class="面板内容">
+            <div class="左侧内容">
+                <div class="独白内容" id="独白内容">
+                    
+                </div>
+            </div>
+            <div class="右侧内容">
+                <h3 class="问题标题">责任鉴定问题</h3>
+                <ul class="问题列表">
+                    <li>a) 动机剖析：请分析该角色行为的“初衷”或动机是什么？（例如：小诚和李姐的动机，与“流量王”的动机有本质区别吗？教材中提到“不能因为动机是好的，就认为行为是正确的”，你如何理解？）</li>
+                    <li>b) 后果评估：他/她的行为直接导致了什么后果？在从“谣言产生”到“引发抢购”的整个传播链中，你所扮演的角色起到了什么作用？（是源头、放大器，还是无意中的推动者？）</li>
+                    <li>c) 责任界定：他/她应该为这个后果负责吗？为什么？（请尝试从道德或法律角度分析，并可引用教材中提到的“转发超500次”等法律概念进行思考。“我不知道这是谣言”或“我是好心”，可以作为免责的正当理由吗？）</li>
+                    <li>d) 行为重构：如果时光可以倒流，结合教材知识，当他们再遇到类似的疑似“谣言”信息时，怎样做才是负责任的行为？（提示：思考教材中给出的行动指南——是立即行动，还是先个人判断？正确的步骤是什么？）</li>
+                </ul>
+                <h4 class="笔记标题">我的责任鉴定笔记</h4>
+                <textarea class="笔记文本框" placeholder="请在此输入你的思考和分析..."></textarea>
+            </div>
+        </div>
+        <div class="面板底部">
+            <button class="按钮 返回按钮" id="返回按钮">返回案件全景</button>
+            <button class="按钮 法律按钮" id="法律按钮">查看法律依据</button>
+            <button class="按钮 提交按钮" id="提交按钮">提交本角色鉴定报告</button>
+        </div>
+    </div>
+    
+    
+    <div class="法律弹窗" id="法律弹窗">
+        <h3>教材依据提示</h3>
+        <p>网络信息纷繁复杂，需加辨别。根据教材P142-143内容，网络谣言是指通过网络介质（如邮箱、聊天软件、社交网站、网络论坛等）而传播的没有事实依据的信息。对于网络谣言，我们应当：</p>
+        <p>1. 提高辨别能力，不轻易相信未经证实的信息</p>
+        <p>2. 不随意转发和传播未经核实的信息</p>
+        <p>3. 发现谣言及时向有关部门举报</p>
+        <p>4. 遵守网络法律法规，做负责任的网络公民</p>
+        <button class="关闭按钮" id="关闭按钮">关闭</button>
+    </div>
+    
+    
+    <div class="结论卡片" id="小诚结论"></div>
+    <div class="结论卡片" id="李姐结论"></div>
+    <div class="结论卡片" id="流量王结论"></div>
+    <div class="结论卡片" id="王警官结论"></div>
+    
+    <script>
+        // 角色独白数据
+        const 角色独白 = {
+            小诚: "我当时真的吓坏了！在家族群里看到那个化工厂泄漏的视频，说盐能防辐射，我第一个想到的就是天天在家做饭的奶奶。我完全是出于好心，想提醒家人，马上就转发到了‘相亲相爱一家人’的群里，还特意发了条语音让大姑大姨快去囤点。我哪知道那是假消息啊！现在想想，我连视频是哪儿来的都没核实就转发出去了。我虽然动机是好的，但没有核实就传播，实际上成了谣言的‘二传手’，给社会添了乱。我真的很后悔，以后看到这种吓人的消息，我一定先去官方平台查证，或者问老师家长，再也不能闭着眼睛乱转了。",
+            李姐: "哎呀，那天可把我累坏了！一大早上班，就看见货架上的盐被抢得精光。我纯粹是觉得这场面太夸张、太离谱了，出于一种惊讶和跟风的心态，就拿出手机拍了张空货架的照片发到短视频平台上，还配了句‘疯了，盐都被抢光了！’。我发誓，我真没想制造恐慌！可结果呢，我的视频一下子有好几万播放量，反而让更多不明真相的人跑到我们超市来抢，引发了更大的混乱。直到警察来了我才知道事情闹这么大。我真是好心办了坏事，作为一个有影响力的发布者（虽然粉丝不多），我不该不经思考就发布这种容易引发误解和情绪的内容。",
+            流量王: "干我们这行的，流量就是生命！当时一看到有抢盐的苗头，我鼻子一闻就知道热点来了。我立刻把几个群里模糊的聊天截图和超市抢购的零碎视频拼凑起来，添油加醋，取了个爆炸性标题——《突发！XX地陷入抢盐潮，真相触目惊心！》。果不其然，视频一发，播放量和转发量蹭蹭往上涨！你问我知不知道这是假的？哼，这种耸人听闻的消息，十有八九有水分，但我哪管得了那么多？有关注、有流量才能变现啊。现在好了，账号被封，还要被查处，真是搬起石头砸自己的脚。为了这点蝇头小利当‘流量猎人’，不值当！",
+            王警官: "案件处理结果：经过调查，我们锁定了恶意编造和传播谣言的主要责任人，并依法进行了处理。同时，我们也对参与转发的群众进行了教育引导。法律依据：根据《中华人民共和国治安管理处罚法》第二十五条规定，散布谣言，谎报险情、疫情、警情或者以其他方法故意扰乱公共秩序的，处五日以上十日以下拘留，可以并处五百元以下罚款；情节较轻的，处五日以下拘留或者五百元以下罚款。根据《最高人民法院、最高人民检察院关于办理利用信息网络实施诽谤等刑事案件适用法律若干问题的解释》，同一诽谤信息实际被点击、浏览次数达到五千次以上，或者被转发次数达到五百次以上的，应当认定为刑法第二百四十六条第一款规定的‘情节严重’。反谣行动指南：1. 核实信息来源：优先选择官方媒体、政府网站等权威渠道；2. 冷静分析：对夸张、耸人听闻的信息保持警惕；3. 不随意转发：未经核实的信息不要转发；4. 积极举报：发现谣言及时向有关部门举报。" 
+        };
+        
+        // 角色标签映射
+        const 角色标签 = {
+            小诚: "好心转发者-小诚",
+            李姐: "无意助推者-李姐",
+            流量王: "恶意营销者-流量王",
+            王警官: "秩序调解者-王警官"
+        };
+        
+        // 获取DOM元素
+        const 角色节点 = document.querySelectorAll('.角色节点');
+        const 调查面板 = document.getElementById('调查面板');
+        const 角色标题 = document.getElementById('角色标题');
+        const 独白内容 = document.getElementById('独白内容');
+        const 返回按钮 = document.getElementById('返回按钮');
+        const 法律按钮 = document.getElementById('法律按钮');
+        const 法律弹窗 = document.getElementById('法律弹窗');
+        const 关闭按钮 = document.getElementById('关闭按钮');
+        
+        // 点击角色节点事件
+        角色节点.forEach(节点 => {
+            节点.addEventListener('click', function() {
+                const 角色名 = this.getAttribute('data-role');
+                if (角色名 === '王警官') {
+                    角色标题.textContent = "案件卷宗与法律工具箱";
+                    独白内容.textContent = 角色独白[角色名];
+                    // 修改右侧内容为综合鉴定台
+                    document.querySelector('.右侧内容 h3').textContent = "综合鉴定台";
+                    document.querySelector('.问题列表').innerHTML = `
+                        <li>请你作为'清朗小卫士'，为小诚、李姐、流量王分别设计一句'防谣口诀'或一个关键行动建议。</li>
+                    `;
+                    // 移除现有的笔记标题和文本框或建议文本框组
+                    const 现有笔记标题 = document.querySelector('.右侧内容 .笔记标题');
+                    if (现有笔记标题) {
+                        现有笔记标题.remove();
+                    }
+                    const 现有笔记文本框 = document.querySelector('.右侧内容 .笔记文本框');
+                    if (现有笔记文本框) {
+                        现有笔记文本框.remove();
+                    }
+                    const 现有建议文本框组 = document.querySelector('.右侧内容 .建议文本框组');
+                    if (现有建议文本框组) {
+                        现有建议文本框组.remove();
+                    }
+                    // 添加新的建议文本框组
+                    document.querySelector('.右侧内容').insertAdjacentHTML('beforeend', `
+                        <h4 class="笔记标题">防谣口诀/行动建议</h4>
+                        <div class="建议文本框组">
+                            <div class="建议项">
+                                <label>小诚：</label>
+                                <textarea class="笔记文本框" placeholder="请输入对小诚的防谣口诀或行动建议..."></textarea>
+                            </div>
+                            <div class="建议项">
+                                <label>李姐：</label>
+                                <textarea class="笔记文本框" placeholder="请输入对李姐的防谣口诀或行动建议..."></textarea>
+                            </div>
+                            <div class="建议项">
+                                <label>流量王：</label>
+                                <textarea class="笔记文本框" placeholder="请输入对流量王的防谣口诀或行动建议..."></textarea>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    角色标题.textContent = `【${角色标签[角色名]}】调查笔录`;
+                    独白内容.textContent = 角色独白[角色名];
+                    // 恢复右侧内容为责任鉴定问题
+                    document.querySelector('.右侧内容 h3').textContent = "责任鉴定问题";
+                    document.querySelector('.问题列表').innerHTML = `
+                        <li class="structured-question">a) 动机剖析：请分析你所扮演角色行为的“初衷”或动机是什么？<span class="help-icon">?</span>
+                            <div class="help-text">例如：小诚和李姐的动机，与“流量王”的动机有本质区别吗？教材中提到“不能因为动机是好的，就认为行为是正确的”，你如何理解？</div>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="动机" value="关心则乱的好心">
+                                    关心则乱的好心
+                                </label>
+                                <label>
+                                    <input type="radio" name="动机" value="从众与猎奇">
+                                    从众与猎奇
+                                </label>
+                                <label>
+                                    <input type="radio" name="动机" value="恶意牟利">
+                                    恶意牟利
+                                </label>
+                                <label>
+                                    <input type="radio" name="动机" value="其他">
+                                    其他
+                                </label>
+                            </div>
+                            <input type="text" class="其他动机" placeholder="请简述其他动机" style="display: none; width: 100%; padding: 8px; margin-top: 10px; background: rgba(10, 25, 47, 0.6); border: 1px solid rgba(100, 255, 255, 0.3); border-radius: 5px; color: #e6f1ff;">
+                        </li>
+                        <li class="structured-question">b) 后果评估：他/她的行为直接导致了什么后果？在从“谣言产生”到“引发抢购”的整个传播链中，你所扮演的角色起到了什么作用？<span class="help-icon">?</span>
+                            <div class="help-text">是源头、放大器，还是无意中的推动者？</div>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" name="后果" value="谣言源头">
+                                    谣言源头
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="后果" value="主要放大器">
+                                    主要放大器
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="后果" value="无意助推者">
+                                    无意助推者
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="后果" value="秩序破坏者">
+                                    秩序破坏者
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="后果" value="其他">
+                                    其他
+                                </label>
+                            </div>
+                            <input type="text" class="其他后果" placeholder="请简述其他后果" style="display: none; width: 100%; padding: 8px; margin-top: 10px; background: rgba(10, 25, 47, 0.6); border: 1px solid rgba(100, 255, 255, 0.3); border-radius: 5px; color: #e6f1ff;">
+                        </li>
+                        <li class="structured-question">c) 责任界定：他/她应该为这个后果负责吗？为什么？<span class="help-icon">?</span>
+                            <div class="help-text">请尝试从道德或法律角度分析，并可引用教材中提到的“转发超500次”等法律概念进行思考。“我不知道这是谣言”或“我是好心”，可以作为免责的正当理由吗？</div>
+                            <div class="slider-container">
+                                <input type="range" class="slider" min="0" max="100" value="50" name="责任度">
+                                <div class="slider-value">责任度：50%</div>
+                            </div>
+                            <textarea class="责任理由" placeholder="请简述理由，可引用法律" style="width: 100%; padding: 8px; margin-top: 10px; background: rgba(10, 25, 47, 0.6); border: 1px solid rgba(100, 255, 255, 0.3); border-radius: 5px; color: #e6f1ff; resize: none; height: 80px;"></textarea>
+                        </li>
+                        <li class="structured-question">d) 行为重构：如果时光可以倒流，结合教材知识，当他们再遇到类似的疑似“谣言”信息时，怎样做才是负责任的行为？<span class="help-icon">?</span>
+                            <div class="help-text">思考教材中给出的行动指南——是立即行动，还是先个人判断？正确的步骤是什么？</div>
+                        </li>
+                    `;
+                    // 移除现有的笔记标题和文本框或建议文本框组
+                    const 现有笔记标题 = document.querySelector('.右侧内容 .笔记标题');
+                    if (现有笔记标题) {
+                        现有笔记标题.remove();
+                    }
+                    const 现有笔记文本框 = document.querySelector('.右侧内容 .笔记文本框');
+                    if (现有笔记文本框) {
+                        现有笔记文本框.remove();
+                    }
+                    const 现有建议文本框组 = document.querySelector('.右侧内容 .建议文本框组');
+                    if (现有建议文本框组) {
+                        现有建议文本框组.remove();
+                    }
+                    // 添加新的笔记标题和文本框
+                    document.querySelector('.右侧内容').insertAdjacentHTML('beforeend', `
+                        <h4 class="笔记标题">我的责任鉴定笔记</h4>
+                        <textarea class="笔记文本框" placeholder="请在此输入你的思考和分析..."></textarea>
+                    `);
+                }
+                调查面板.classList.add('active');
+            });
+        });
+        
+        // 返回按钮事件
+        返回按钮.addEventListener('click', function() {
+            调查面板.classList.remove('active');
+        });
+        
+        // 法律按钮事件
+        法律按钮.addEventListener('click', function() {
+            法律弹窗.classList.add('active');
+        });
+        
+        // 关闭按钮事件
+        关闭按钮.addEventListener('click', function() {
+            法律弹窗.classList.remove('active');
+        });
+        
+        // 点击弹窗外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target === 法律弹窗) {
+                法律弹窗.classList.remove('active');
+            }
+        });
+        
+        // 帮助图标点击事件
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('help-icon')) {
+                const helpText = e.target.nextElementSibling;
+                if (helpText && helpText.classList.contains('help-text')) {
+                    helpText.classList.toggle('show');
+                }
+            }
+        });
+        
+        // 其他选项点击事件
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'radio' && e.target.name === '动机' && e.target.value === '其他') {
+                e.target.closest('.structured-question').querySelector('.其他动机').style.display = 'block';
+            } else if (e.target.type === 'radio' && e.target.name === '动机' && e.target.value !== '其他') {
+                e.target.closest('.structured-question').querySelector('.其他动机').style.display = 'none';
+            }
+            
+            if (e.target.type === 'checkbox' && e.target.name === '后果' && e.target.value === '其他') {
+                e.target.closest('.structured-question').querySelector('.其他后果').style.display = e.target.checked ? 'block' : 'none';
+            }
+        });
+        
+        // 滑动条值更新事件
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('slider')) {
+                const value = e.target.value;
+                e.target.nextElementSibling.textContent = `责任度：${value}%`;
+            }
+        });
+        
+        // 欢迎页面功能
+        const 欢迎页面 = document.getElementById('欢迎页面');
+        const 班级选择 = document.getElementById('班级选择');
+        const 姓名输入 = document.getElementById('姓名输入');
+        const 开始按钮 = document.getElementById('开始按钮');
+        const 欢迎表单 = document.querySelector('.欢迎表单');
+        
+        // 用户信息存储
+        let 用户信息 = {
+            班级: '',
+            姓名: ''
+        };
+        
+        // 检查cookie
+        function 检查Cookie() {
+            const cookie = document.cookie;
+            if (cookie.includes('class=') && cookie.includes('name=')) {
+                // 有cookie，显示登录状态
+                const 班级 = cookie.split('class=')[1].split(';')[0];
+                const 姓名 = cookie.split('name=')[1].split(';')[0];
+                用户信息.班级 = 班级;
+                用户信息.姓名 = 姓名;
+                
+                欢迎表单.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h3 style="color: #64ffda; margin-bottom: 20px;">当前登录：${班级}-${姓名}</h3>
+                    </div>
+                    <button class="开始按钮" id="退出登录按钮">退出登录</button>
+                `;
+                
+                // 添加退出登录事件
+                document.getElementById('退出登录按钮').addEventListener('click', function() {
+                    // 删除cookie
+                    document.cookie = "class=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    // 刷新页面
+                    location.reload();
+                });
+            } else {
+                // 没有cookie，显示登录表单
+                欢迎表单.innerHTML = `
+                    <div class="表单组">
+                        <label for="班级选择">选择班级：</label>
+                        <select id="班级选择" name="班级">
+                            <option value="">请选择班级</option>
+                            <option value="七年1班">七年1班</option>
+                            <option value="七年2班">七年2班</option>
+                            <option value="七年3班">七年3班</option>
+                            <option value="七年4班">七年4班</option>
+                            <option value="七年5班">七年5班</option>
+                            <option value="七年6班">七年6班</option>
+                        </select>
+                    </div>
+                    <div class="表单组">
+                        <label for="姓名输入">输入姓名：</label>
+                        <input type="text" id="姓名输入" name="姓名" placeholder="请输入演示称呼">
+                    </div>
+                    <button class="开始按钮" id="开始按钮">开始学习</button>
+                `;
+                
+                // 重新获取元素并添加事件
+                const 新班级选择 = document.getElementById('班级选择');
+                const 新姓名输入 = document.getElementById('姓名输入');
+                const 新开始按钮 = document.getElementById('开始按钮');
+                
+                新开始按钮.addEventListener('click', function() {
+                    if (!新班级选择.value) {
+                        alert('请选择班级！');
+                        return;
+                    }
+                    if (!新姓名输入.value.trim()) {
+                        alert('请输入演示称呼！');
+                        return;
+                    }
+                    
+                    用户信息.班级 = 新班级选择.value;
+                    用户信息.姓名 = 新姓名输入.value.trim();
+                    
+                    // 设置cookie，有效期1天
+                    const 过期时间 = new Date();
+                    过期时间.setDate(过期时间.getDate() + 1);
+                    document.cookie = `class=${用户信息.班级}; expires=${过期时间.toUTCString()}; path=/`;
+                    document.cookie = `name=${用户信息.姓名}; expires=${过期时间.toUTCString()}; path=/`;
+                    
+                    欢迎页面.classList.add('hidden');
+                });
+            }
+        }
+        
+        // 初始化检查cookie
+        检查Cookie();
+        
+        // 提交按钮事件
+        const 提交按钮 = document.getElementById('提交按钮');
+        let 当前角色 = '';
+        
+        // 存储提交的报告
+        const 提交的报告 = {
+            小诚: null,
+            李姐: null,
+            流量王: null,
+            王警官: null
+        };
+        
+        // 监听角色节点点击，记录当前角色
+        角色节点.forEach(节点 => {
+            节点.addEventListener('click', function() {
+                当前角色 = this.getAttribute('data-role');
+            });
+        });
+        
+        提交按钮.addEventListener('click', function() {
+            if (!当前角色) return;
+            
+            // 生成符合要求的结构化数据
+            let 数据 = {
+                class: 用户信息.班级,
+                name: 用户信息.姓名,
+                topic: '',
+                content: ''
+            };
+            
+            // 根据角色设置topic和content
+            if (当前角色 === '王警官') {
+                // 王警官页面的提交内容
+                const 小诚建议 = document.querySelector('.建议项:nth-child(1) textarea')?.value || '';
+                const 李姐建议 = document.querySelector('.建议项:nth-child(2) textarea')?.value || '';
+                const 流量王建议 = document.querySelector('.建议项:nth-child(3) textarea')?.value || '';
+                
+                数据.topic = '秩序调解者-王警官';
+                数据.content = `小诚建议：${小诚建议}。李姐建议：${李姐建议}。流量王建议：${流量王建议}`;
+            } else {
+                // 其他角色页面的提交内容
+                // 获取动机选择
+                const 动机选择 = document.querySelector('input[name="动机"]:checked')?.value || '';
+                const 其他动机 = document.querySelector('.其他动机')?.value || '';
+                const 最终动机 = 动机选择 === '其他' ? 其他动机 : 动机选择;
+                
+                // 获取后果选择
+                const 后果选择 = Array.from(document.querySelectorAll('input[name="后果"]:checked')).map(input => input.value);
+                const 其他后果 = document.querySelector('.其他后果')?.value || '';
+                if (后果选择.includes('其他') && 其他后果) {
+                    后果选择[后果选择.indexOf('其他')] = 其他后果;
+                }
+                
+                // 获取责任度
+                const 责任度 = document.querySelector('input[name="责任度"]')?.value || '50';
+                const 责任理由 = document.querySelector('.责任理由')?.value || '';
+                
+                // 获取行为重构建议
+                const 行为重构 = document.querySelector('.笔记文本框')?.value || '';
+                
+                // 设置topic
+                if (当前角色 === '小诚') {
+                    数据.topic = '好心转发者-小诚';
+                } else if (当前角色 === '李姐') {
+                    数据.topic = '无意助推者-李姐';
+                } else if (当前角色 === '流量王') {
+                    数据.topic = '恶意营销者-流量王';
+                }
+                
+                数据.content = `动机：${最终动机}。作用：${后果选择.join(', ')}。责任度：${责任度}%。建议：${行为重构}。理由：${责任理由}`;
+            }
+            
+            // 存储报告
+            提交的报告[当前角色] = 数据;
+            
+            // 显示结构化摘要
+            console.log('结构化摘要：', JSON.stringify(数据, null, 2));
+            
+            // 发送POST请求
+            fetch('https://qf.kjxs.site/api/vcoaVbWxiDS', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(数据)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('POST请求成功：', data);
+                alert('提交成功！\n\n数据已发送到云端。');
+                // 关闭面板
+                调查面板.classList.remove('active');
+            })
+            .catch(error => {
+                console.error('POST请求失败：', error);
+                alert('提交失败，数据尚未保存。\n\n请检查网络连接后重试。');
+                // 关闭面板
+                调查面板.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

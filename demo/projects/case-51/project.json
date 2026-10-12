@@ -1,0 +1,12 @@
+{
+  "id": "case-51",
+  "title": "草船借箭 · 神机妙算闯关赛",
+  "category": "practice",
+  "description": "草船借箭战报：围绕得分、关卡、回答开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 51,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

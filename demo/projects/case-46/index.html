@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":46,"key":"case-46","title":"智能控制分类挑战（连续量 vs 开关量）","category":"programming","description":"控制量分类图：围绕得分、正确率、分类结果开展交互学习，在数据大屏中回看记录。","headline":"控制量分类图","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"percentage","label":"正确率"},{"key":"classifications","label":"分类结果"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"yJ75pdgorCW"},"mapping":{"0xfysvg4lp":"yJ75pdgorCW"},"accent":"#416d89","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>智能控制分类挑战 | 连续量 vs 开关量</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #d4eaff 0%, #b8dcff 100%);
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 主卡片容器 */
+        .challenge-container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 3rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            transition: all 0.2s;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 0.3rem 0;
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #1F6392, #0A3B55);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        .sub {
+            text-align: center;
+            color: #2c5a7a;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            border-bottom: 1px dashed #6e9fc7;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 8px;
+        }
+
+        /* 两列布局 */
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+        }
+
+        /* 左侧: 数据池 */
+        .data-pool {
+            flex: 1.2;
+            min-width: 260px;
+            background: #eef5fcdf;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(80, 140, 180, 0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #115277;
+            border-left: 5px solid #2f8bcb;
+            padding-left: 15px;
+        }
+
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 可拖拽卡片 - 无类别徽章 */
+        .drag-item {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: grab;
+            transition: all 0.2s ease;
+            border: 1px solid #bdd8f0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .drag-item:active {
+            cursor: grabbing;
+        }
+        .drag-item.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+        .drag-item:hover {
+            transform: translateY(-3px);
+            background: #f9ffff;
+            border-color: #2f8bcb;
+            box-shadow: 0 12px 18px rgba(0,0,0,0.1);
+        }
+
+        .item-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+            width: 48px;
+            text-align: center;
+        }
+        .item-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #154e74;
+            letter-spacing: 0.3px;
+            flex: 1;
+        }
+
+        /* 右侧区域: 两个分类槽 */
+        .categories {
+            flex: 2;
+            min-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        .category-card {
+            background: #ffffffc9;
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(47, 139, 203, 0.4);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 8px;
+            border-bottom: 2px dotted #8db9dd;
+        }
+        .category-header span:first-child {
+            font-size: 2rem;
+        }
+        .category-header .cat-title {
+            font-size: 1.4rem;
+            color: #115277;
+        }
+        .score-area {
+            margin-left: auto;
+            background: #c2e0ff;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #0a4c72;
+        }
+
+        .drop-zone {
+            min-height: 200px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            transition: background 0.2s, border 0.2s;
+            border: 2px dashed #6aaad0;
+        }
+        .drop-zone.drag-over {
+            background: #cde5ffcc;
+            border-color: #ffb347;
+            border-style: solid;
+        }
+
+        .category-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 放置在分类中的条目卡片 */
+        .placed-item {
+            background: #ffffffdb;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem 0.5rem 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #8dbde0;
+            font-size: 0.9rem;
+            transition: all 0.1s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .placed-item .p-icon {
+            font-size: 1.4rem;
+        }
+        .placed-item .p-text {
+            color: #115277;
+            font-weight: 500;
+        }
+        .placed-item .remove-btn {
+            margin-left: 6px;
+            background: #d98880aa;
+            border-radius: 30px;
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            transition: 0.1s;
+        }
+        .placed-item .remove-btn:hover {
+            background: #c7453e;
+            transform: scale(1.05);
+        }
+
+        .empty-hint {
+            color: #5588aa;
+            font-style: italic;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* 控制栏 */
+        .action-bar {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #3083b6;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover {
+            background: #1f6a99;
+            transform: scale(1.02);
+        }
+        button.reset-btn {
+            background: #5f7f9e;
+        }
+        button.reset-btn:hover {
+            background: #3e6082;
+        }
+        .feedback {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-weight: 500;
+            color: #1a4b6e;
+            background: #e5f2ffd9;
+            padding: 10px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+        }
+
+        /* 对话框覆盖层 (提交学号弹窗) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
+            border: 1px solid #bfddf5;
+        }
+        .modal-card h3 {
+            margin-top: 0;
+            color: #115277;
+        }
+        .modal-card select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 2rem;
+            border: 1px solid #8db9dd;
+            margin: 15px 0;
+            background: #f5fbff;
+        }
+        .modal-card button {
+            margin: 5px;
+            background: #3083b6;
+        }
+
+        @media (max-width: 780px) {
+            .item-text { font-size: 0.9rem; }
+            .item-icon { font-size: 1.8rem; width: 40px; }
+            .category-header .cat-title { font-size: 1.2rem; }
+        }
+    </style>
+<style>@media(max-width:640px){.dashboard{flex-direction:column!important}.dashboard>*{flex:none!important;width:100%!important;min-width:0!important;box-sizing:border-box}}</style></head>
+<body>
+
+<div class="challenge-container">
+    <h1>⚡ 连续量 vs 开关量 ⚙️</h1>
+    <div style="text-align: center; margin-bottom: 12px;">
+        <div class="sub">智能控制分类挑战 — 将数据卡片拖拽到正确区域</div>
+    </div>
+
+    <div class="dashboard">
+        
+        <div class="data-pool">
+            <div class="section-title">
+                <span>📦</span> 待分类数据池
+            </div>
+            <div class="items-grid" id="dataPoolContainer"></div>
+            <div style="margin-top: 16px; font-size: 0.75rem; text-align: center; color:#2c6a92;">
+                💡 拖拽卡片到右侧“连续量”或“开关量”区域
+            </div>
+        </div>
+
+        
+        <div class="categories">
+            
+            <div class="category-card">
+                <div class="category-header">
+                    <span>📈</span>
+                    <span class="cat-title">连续量</span>
+                    <div class="score-area" id="continuousScore">0</div>
+                </div>
+                <div class="drop-zone" id="dropZoneContinuous" data-category="continuous">
+                    <div class="category-items" id="continuousItems"></div>
+                    <div id="continuousEmptyHint" class="empty-hint">✨ 拖放连续型数据至此</div>
+                </div>
+            </div>
+
+            
+            <div class="category-card">
+                <div class="category-header">
+                    <span>🔘</span>
+                    <span class="cat-title">开关量</span>
+                    <div class="score-area" id="discreteScore">0</div>
+                </div>
+                <div class="drop-zone" id="dropZoneDiscrete" data-category="discrete">
+                    <div class="category-items" id="discreteItems"></div>
+                    <div id="discreteEmptyHint" class="empty-hint">🔌 拖放开/关状态数据至此</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button id="resetBtn" class="reset-btn">⟳ 重置挑战</button>
+        <button id="submitBtn">📤 提交成绩</button>
+    </div>
+    <div id="feedbackMsg" class="feedback">👉 将数据卡片拖拽至对应分类区，全部正确分类后提交获得成绩与鼓励！</div>
+</div>
+
+<script>
+    // ======================= 原始数据集（已按照用户要求修改文本）=======================
+    const MASTER_DATA = [
+        { id: 'fan_speed', label: '风扇转速', icon: '🌀', category: 'continuous' },
+        { id: 'fan_onoff', label: '风扇是否转动', icon: '💨', category: 'discrete' },
+        { id: 'mute_btn', label: '静音按钮的状态', icon: '🔇', category: 'discrete' },
+        { id: 'volume', label: '控制音量大小的数据', icon: '🔊', category: 'continuous' },
+        { id: 'temperature', label: '室内温度', icon: '🌡️', category: 'continuous' },
+        { id: 'ac_power', label: '空调开启停止状态', icon: '❄️', category: 'discrete' }
+    ];
+
+    // 状态存储
+    let unclassifiedItems = [];
+    let continuousItems = [];
+    let discreteItems = [];
+
+    // DOM 元素
+    const dataPoolContainer = document.getElementById('dataPoolContainer');
+    const continuousContainer = document.getElementById('continuousItems');
+    const discreteContainer = document.getElementById('discreteItems');
+    const continuousEmptyHint = document.getElementById('continuousEmptyHint');
+    const discreteEmptyHint = document.getElementById('discreteEmptyHint');
+    const continuousScoreSpan = document.getElementById('continuousScore');
+    const discreteScoreSpan = document.getElementById('discreteScore');
+    const resetBtn = document.getElementById('resetBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const feedbackDiv = document.getElementById('feedbackMsg');
+
+    let dragSourceData = null;
+
+    // ---------- 辅助函数 ----------
+    function renderAll() {
+        renderDataPool();
+        renderContinuousZone();
+        renderDiscreteZone();
+        updateScoreDisplay();
+        toggleEmptyHints();
+    }
+
+    function renderDataPool() {
+        dataPoolContainer.innerHTML = '';
+        if (unclassifiedItems.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'empty-hint';
+            emptyDiv.style.background = '#d9ecffaa';
+            emptyDiv.style.borderRadius = '1.5rem';
+            emptyDiv.style.padding = '2rem';
+            emptyDiv.innerText = '🎯 所有数据已分类！点击提交查看成绩与鼓励。';
+            dataPoolContainer.appendChild(emptyDiv);
+            return;
+        }
+        unclassifiedItems.forEach((item) => {
+            const dragItem = document.createElement('div');
+            dragItem.className = 'drag-item';
+            dragItem.setAttribute('draggable', 'true');
+            dragItem.setAttribute('data-id', item.id);
+            dragItem.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-text">${item.label}</div>
+            `;
+            dragItem.addEventListener('dragstart', (e) => {
+                dragSourceData = { ...item };
+                e.dataTransfer.setData('text/plain', item.id);
+                e.dataTransfer.effectAllowed = 'move';
+                dragItem.classList.add('dragging');
+            });
+            dragItem.addEventListener('dragend', (e) => {
+                dragItem.classList.remove('dragging');
+                dragSourceData = null;
+            });
+            dataPoolContainer.appendChild(dragItem);
+        });
+    }
+
+    function createPlacedItemElement(item, targetCat) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'placed-item';
+        wrapper.setAttribute('data-id', item.id);
+        wrapper.innerHTML = `
+            <span class="p-icon">${item.icon}</span>
+            <span class="p-text">${item.label}</span>
+            <span class="remove-btn" title="移回数据池">✖</span>
+        `;
+        const removeBtn = wrapper.querySelector('.remove-btn');
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (targetCat === 'continuous') {
+                const idx = continuousItems.findIndex(i => i.id === item.id);
+                if (idx !== -1) continuousItems.splice(idx, 1);
+            } else {
+                const idx = discreteItems.findIndex(i => i.id === item.id);
+                if (idx !== -1) discreteItems.splice(idx, 1);
+            }
+            if (!unclassifiedItems.some(i => i.id === item.id)) {
+                unclassifiedItems.push({ ...item });
+            }
+            renderAll();
+            showFeedback(`已将“${item.label}”移回数据池，可以重新分类`, '#cfe3ff');
+        });
+        return wrapper;
+    }
+
+    function renderContinuousZone() {
+        continuousContainer.innerHTML = '';
+        if (continuousItems.length === 0) {
+            continuousEmptyHint.style.display = 'block';
+        } else {
+            continuousEmptyHint.style.display = 'none';
+            continuousItems.forEach(item => {
+                continuousContainer.appendChild(createPlacedItemElement(item, 'continuous'));
+            });
+        }
+    }
+
+    function renderDiscreteZone() {
+        discreteContainer.innerHTML = '';
+        if (discreteItems.length === 0) {
+            discreteEmptyHint.style.display = 'block';
+        } else {
+            discreteEmptyHint.style.display = 'none';
+            discreteItems.forEach(item => {
+                discreteContainer.appendChild(createPlacedItemElement(item, 'discrete'));
+            });
+        }
+    }
+
+    function updateScoreDisplay() {
+        let continuousCorrect = continuousItems.filter(i => i.category === 'continuous').length;
+        let discreteCorrect = discreteItems.filter(i => i.category === 'discrete').length;
+        continuousScoreSpan.innerText = `${continuousCorrect}/${continuousItems.length}`;
+        discreteScoreSpan.innerText = `${discreteCorrect}/${discreteItems.length}`;
+    }
+
+    function toggleEmptyHints() {
+        continuousEmptyHint.style.display = continuousItems.length ? 'none' : 'block';
+        discreteEmptyHint.style.display = discreteItems.length ? 'none' : 'block';
+    }
+
+    function setupDropZones() {
+        const continuousZone = document.getElementById('dropZoneContinuous');
+        const discreteZone = document.getElementById('dropZoneDiscrete');
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        function handleDrop(e, targetCategory) {
+            e.preventDefault();
+            continuousZone.classList.remove('drag-over');
+            discreteZone.classList.remove('drag-over');
+            if (!dragSourceData) {
+                const id = e.dataTransfer.getData('text/plain');
+                if (id) {
+                    const found = unclassifiedItems.find(item => item.id === id);
+                    if (found) dragSourceData = { ...found };
+                    else return;
+                } else return;
+            }
+            const draggedItem = dragSourceData;
+            const stillInPool = unclassifiedItems.some(i => i.id === draggedItem.id);
+            if (!stillInPool) {
+                showFeedback('⚠️ 该项已被分类，如需调整请点击卡片上的✖移回', '#ffddb0');
+                return;
+            }
+            const indexInPool = unclassifiedItems.findIndex(i => i.id === draggedItem.id);
+            if (indexInPool === -1) return;
+            unclassifiedItems.splice(indexInPool, 1);
+            const newItem = { ...draggedItem };
+            if (targetCategory === 'continuous') {
+                continuousItems.push(newItem);
+                showFeedback(`✅ 已将「${newItem.label}」放入连续量区域`, '#c6f0d0');
+            } else {
+                discreteItems.push(newItem);
+                showFeedback(`✅ 已将「${newItem.label}」放入开关量区域`, '#ffe0a3');
+            }
+            dragSourceData = null;
+            renderAll();
+        }
+        continuousZone.addEventListener('dragover', handleDragOver);
+        discreteZone.addEventListener('dragover', handleDragOver);
+        continuousZone.addEventListener('drop', (e) => handleDrop(e, 'continuous'));
+        discreteZone.addEventListener('drop', (e) => handleDrop(e, 'discrete'));
+        [continuousZone, discreteZone].forEach(zone => {
+            zone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', (e) => {
+                zone.classList.remove('drag-over');
+            });
+        });
+    }
+
+    function resetSystem() {
+        unclassifiedItems = MASTER_DATA.map(item => ({ ...item }));
+        continuousItems = [];
+        discreteItems = [];
+        dragSourceData = null;
+        renderAll();
+        showFeedback('🔄 系统已重置，所有数据回到待分类池，继续挑战吧！', '#cfe9ff');
+    }
+
+    // 计算当前用户得分（正确分类数量）
+    function computeUserScore() {
+        let correct = 0;
+        continuousItems.forEach(item => { if (item.category === 'continuous') correct++; });
+        discreteItems.forEach(item => { if (item.category === 'discrete') correct++; });
+        return correct;
+    }
+
+    // 提交成绩 (不带排名)
+    async function handleSubmitWithoutRank() {
+        const totalItems = MASTER_DATA.length;
+        const classifiedTotal = continuousItems.length + discreteItems.length;
+        if (classifiedTotal !== totalItems) {
+            showFeedback(`⚠️ 还有 ${totalItems - classifiedTotal} 项未分类，请将所有卡片拖拽完成后再提交！`, '#ffd9b5');
+            return;
+        }
+        showStudentIdModal();
+    }
+
+    function showStudentIdModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-card">
+                <h3>📋 提交成绩</h3>
+                <p>选择你的学号 (1-44)</p>
+                <select id="studentIdSelect">
+                    ${Array.from({ length: 44 }, (_, i) => `<option value="${i+1}">${i+1}号同学</option>`).join('')}
+                </select>
+                <div style="display:flex; gap:12px; justify-content:center;">
+                    <button id="confirmSubmitBtn">确认提交</button>
+                    <button id="cancelModalBtn" style="background:#8faaaf;">取消</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        const confirmBtn = modal.querySelector('#confirmSubmitBtn');
+        const cancelBtn = modal.querySelector('#cancelModalBtn');
+        const selectEl = modal.querySelector('#studentIdSelect');
+        confirmBtn.addEventListener('click', async () => {
+            const studentId = selectEl.value;
+            modal.remove();
+            await submitScoreOnly(studentId);
+        });
+        cancelBtn.addEventListener('click', () => modal.remove());
+    }
+
+    async function submitScoreOnly(studentId) {
+        const userScore = computeUserScore();
+        const maxPossible = MASTER_DATA.length;
+        const percentage = (userScore / maxPossible) * 100;
+        
+        const submissionData = {
+            student_id: parseInt(studentId),
+            score: userScore,
+            max_score: maxPossible,
+            correct_rate: percentage,
+            details: {
+                continuous_items: continuousItems.map(i => ({ label: i.label, correct: i.category === 'continuous' })),
+                discrete_items: discreteItems.map(i => ({ label: i.label, correct: i.category === 'discrete' }))
+            },
+            timestamp: new Date().toISOString()
+        };
+        
+        showFeedback(`⏳ 正在提交学号 ${studentId} 的成绩，请稍后...`, '#d9f0ff');
+        
+        try {
+            // 仅 POST 到 API，不获取排名
+            await fetch('https://qf.kjxs.site/api/yJ75pdgorCW', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submissionData)
+            });
+            
+            // 生成鼓励评价（无排名）
+            let encouragementMsg = '';
+            if (userScore === maxPossible) {
+                encouragementMsg = '🎉 太棒了！完美分类！你对连续量和开关量的理解非常透彻，继续保持这种敏锐度！👏';
+            } else if (userScore >= 5) {
+                encouragementMsg = '🌟 优秀！绝大部分概念都掌握得很扎实，再留意一下个别易混淆数据，你就是专家！继续加油！';
+            } else if (userScore >= 4) {
+                encouragementMsg = '📈 不错哟！基本概念清晰，只需要再分辨一下类似“静音按钮的状态”和“风扇转速”的差异，很快就能全对！相信你！';
+            } else if (userScore >= 3) {
+                encouragementMsg = '💪 有潜力的挑战者！分类思维已经成型，多观察生活中设备状态（启停 vs 调速），下次一定满分！老师看好你！';
+            } else {
+                encouragementMsg = '🌱 勇敢尝试就是胜利！连续量就像可调节旋钮，开关量就像点灯开关，再练一次你会进步神速！加油小能手！✨';
+            }
+            
+            const successMsg = `✨ 提交成功 ✨\n\n学号：${studentId}\n得分：${userScore}/${maxPossible} (${percentage.toFixed(0)}分)\n\n${encouragementMsg}`;
+            showFeedback(`✅ 成绩已记录！得分：${userScore}/${maxPossible}。\n\n🎓 ${encouragementMsg}`, '#c6f0d0');
+            alert(successMsg);
+            
+        } catch (error) {
+            console.error('提交失败:', error);
+            // 网络失败时依然展示本地成绩和鼓励
+            let encouragementMsg = '';
+            if (userScore === maxPossible) encouragementMsg = '🎉 太棒了！完美分类！继续保持！👏';
+            else if (userScore >= 5) encouragementMsg = '🌟 优秀！再留意一下细节就能全对！继续加油！';
+            else if (userScore >= 4) encouragementMsg = '📈 不错哟！基本概念清晰，很快就能全对！相信你！';
+            else if (userScore >= 3) encouragementMsg = '💪 有潜力的挑战者！下次一定更好！老师看好你！';
+            else encouragementMsg = '🌱 勇敢尝试就是胜利！再练一次你会进步神速！加油！✨';
+            
+            showFeedback(`⚠️ 网络波动，但本地已记录你的成绩！得分 ${userScore}/${maxPossible}。\n\n${encouragementMsg}`, '#ffe0cc');
+            alert(`🎈 提交失败，数据尚未保存。\n\n学号：${studentId}\n得分：${userScore}/${maxPossible}\n\n${encouragementMsg}\n(由于网络原因，成绩可能未同步到服务器，可稍后重试)`);
+        }
+    }
+
+    function showFeedback(msg, bgHint = null) {
+        feedbackDiv.innerHTML = msg;
+        if (bgHint) {
+            feedbackDiv.style.background = bgHint;
+        } else {
+            feedbackDiv.style.background = '#e5f2ffd9';
+        }
+    }
+
+    function init() {
+        resetSystem();
+        setupDropZones();
+        resetBtn.addEventListener('click', resetSystem);
+        submitBtn.addEventListener('click', handleSubmitWithoutRank);
+    }
+    init();
+</script>
+</body>
+</html>

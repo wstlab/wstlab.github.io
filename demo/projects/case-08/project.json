@@ -1,0 +1,12 @@
+{
+  "id": "case-08",
+  "title": "小小音乐家 · 音符唱名挑战赛",
+  "category": "practice",
+  "description": "唱名成长谱：围绕得分、识别正确数、尝试次数开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "音乐"
+  ],
+  "order": 8,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":5,"key":"case-05","title":"在线打字练习","category":"practice","description":"选择教师发布的文章开展打字练习，回看速度、准确率与练习时长。","headline":"指尖练习室","view":"scatter","fields":[{"key":"speed","label":"每分钟字数"},{"key":"accuracy","label":"准确率"},{"key":"durationSec","label":"练习秒数"},{"key":"articleTitle","label":"文章"}],"upload":"","rebuilt":false,"configIds":["5084cinvha"],"pages":[{"file":"index.html","title":"应用展示"}],"tasks":{"records":"TDbY8rh6fMP","config-5084cinvha":"5znOqMk6OZZ"},"mapping":{"5084cinvha":"5znOqMk6OZZ","ax8c38gpxt":"TDbY8rh6fMP"},"accent":"#4468ab","capture":false,"lesson":"应用展示"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生端 - 在线打字练习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+        
+        .header p {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.3s;
+        }
+        
+        .back-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .setup-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .setup-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        
+        .stats-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .stat-item .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .stat-item .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-item .unit {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .practice-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .practice-area h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .original-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            min-height: 150px;
+        }
+        
+        .original-text .char {
+            display: inline;
+            padding: 2px 0;
+        }
+        
+        .original-text .char.correct {
+            color: #28a745;
+            background: #d4edda;
+        }
+        
+        .original-text .char.incorrect {
+            color: #dc3545;
+            background: #f8d7da;
+            text-decoration: underline;
+        }
+        
+        .original-text .char.current {
+            border-left: 2px solid #f5576c;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-left-color: #f5576c; }
+            51%, 100% { border-left-color: transparent; }
+        }
+        
+        .input-area {
+            margin-bottom: 20px;
+        }
+        
+        .input-area textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            line-height: 1.8;
+            min-height: 150px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .input-area textarea:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        
+        .input-area textarea:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .setup-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1>⌨️ 学生端</h1>
+                    <p>选择文章进行打字练习</p>
+                </div>
+                <a href="index.html" class="back-btn">← 返回首页</a>
+            </div>
+        </div>
+        
+        <div class="setup-panel">
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="studentName">学生姓名 *</label>
+                    <input type="text" id="studentName" placeholder="请输入演示称呼" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="articleSelect">选择文章 *</label>
+                    <select id="articleSelect">
+                        <option value="">请选择文章</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-panel" id="statsPanel" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="label">练习时间</div>
+                    <div class="value" id="timeDisplay">0:00</div>
+                    <div class="unit">分:秒</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">打字速度</div>
+                    <div class="value" id="speedDisplay">0</div>
+                    <div class="unit">字/分钟</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">准确率</div>
+                    <div class="value" id="accuracyDisplay">0.0</div>
+                    <div class="unit">%</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="practice-area" id="practiceArea" style="display: none;">
+            <h2>打字练习</h2>
+            <div class="original-text" id="originalText"></div>
+            <div class="input-area">
+                <textarea id="inputText" placeholder="在此输入文章内容..." disabled></textarea>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="resetPractice()">重置</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitRecord()" disabled>提交记录</button>
+            </div>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
+    
+    <script>
+        // API 端点
+        const API_BASE = '/qf/api';
+        const ARTICLE_API = `${API_BASE}/5znOqMk6OZZ`;
+        const RECORD_API = `${API_BASE}/TDbY8rh6fMP`;
+        
+        let articles = [];
+        let currentArticle = null;
+        let startTime = null;
+        let timerInterval = null;
+        let isPracticeStarted = false;
+        
+        // 页面加载时获取文章列表
+        window.addEventListener('DOMContentLoaded', () => {
+            loadArticles();
+        });
+        
+        // 加载文章列表
+        async function loadArticles() {
+            try {
+                const response = await fetch(`${ARTICLE_API}/all`);
+                const data = await response.json();
+                
+                if (data && Array.isArray(data.submissions)) {
+                    articles = data.submissions;
+                    renderArticleOptions(articles);
+                } else {
+                    articles = [];
+                    document.getElementById('articleSelect').innerHTML = 
+                        '<option value="">暂无文章</option>';
+                }
+            } catch (error) {
+                console.error('加载文章失败:', error);
+                document.getElementById('articleSelect').innerHTML = 
+                    '<option value="">加载失败</option>';
+            }
+        }
+        
+        // 渲染文章选项
+        function renderArticleOptions(articles) {
+            const select = document.getElementById('articleSelect');
+            select.innerHTML = '<option value="">请选择文章</option>';
+            
+            articles.forEach(article => {
+                const option = document.createElement('option');
+                option.value = article._id || article.id || JSON.stringify(article);
+                option.textContent = article.title;
+                option.dataset.article = JSON.stringify(article);
+                select.appendChild(option);
+            });
+        }
+        
+        // 监听文章选择
+        document.getElementById('articleSelect').addEventListener('change', function(e) {
+            const selectedOption = e.target.selectedOptions[0];
+            const studentName = document.getElementById('studentName').value.trim();
+            
+            if (e.target.value && selectedOption.dataset.article && studentName) {
+                currentArticle = JSON.parse(selectedOption.dataset.article);
+                startPractice();
+            } else {
+                resetPractice();
+            }
+        });
+        
+        // 监听学生姓名输入
+        document.getElementById('studentName').addEventListener('input', function(e) {
+            const articleSelect = document.getElementById('articleSelect');
+            const studentName = e.target.value.trim();
+            
+            if (articleSelect.value && studentName) {
+                const selectedOption = articleSelect.selectedOptions[0];
+                if (selectedOption && selectedOption.dataset.article) {
+                    currentArticle = JSON.parse(selectedOption.dataset.article);
+                    startPractice();
+                }
+            } else {
+                resetPractice();
+            }
+        });
+        
+        // 开始练习
+        function startPractice() {
+            if (!currentArticle) return;
+            
+            // 显示练习区域
+            document.getElementById('statsPanel').style.display = 'block';
+            document.getElementById('practiceArea').style.display = 'block';
+            
+            // 渲染原文
+            renderOriginalText();
+            
+            // 启用输入框
+            document.getElementById('inputText').disabled = false;
+            document.getElementById('submitBtn').disabled = false;
+            
+            // 开始计时
+            startTimer();
+            
+            isPracticeStarted = true;
+        }
+        
+        // 渲染原文（用于高亮）
+        function renderOriginalText(userInput = '') {
+            const originalText = currentArticle.content || '';
+            const container = document.getElementById('originalText');
+            
+            let html = '';
+            for (let i = 0; i < originalText.length; i++) {
+                const char = originalText[i];
+                let className = 'char';
+                
+                if (i < userInput.length) {
+                    if (userInput[i] === char) {
+                        className += ' correct';
+                    } else {
+                        className += ' incorrect';
+                    }
+                } else if (i === userInput.length) {
+                    className += ' current';
+                }
+                
+                // 处理特殊字符
+                if (char === '\n') {
+                    html += `<span class="${className}">↵</span><br>`;
+                } else if (char === ' ') {
+                    html += `<span class="${className}">␣</span>`;
+                } else {
+                    html += `<span class="${className}">${escapeHtml(char)}</span>`;
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 监听输入
+        document.getElementById('inputText').addEventListener('input', function(e) {
+            if (!isPracticeStarted) return;
+            
+            const userInput = e.target.value;
+            const originalText = currentArticle.content || '';
+            
+            // 更新原文高亮
+            renderOriginalText(userInput);
+            
+            // 更新统计
+            updateStats(userInput, originalText);
+            
+            // 更新进度条
+            const progress = Math.min((userInput.length / originalText.length) * 100, 100);
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        });
+        
+        // 开始计时
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+        
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            if (!startTime) return;
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            document.getElementById('timeDisplay').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 更新统计数据
+        function updateStats(userInput, originalText) {
+            if (!startTime) return;
+            
+            const elapsedSeconds = (Date.now() - startTime) / 1000;
+            const elapsedMinutes = elapsedSeconds / 60;
+            
+            // 计算正确字符数
+            let correctChars = 0;
+            for (let i = 0; i < userInput.length; i++) {
+                if (i < originalText.length && userInput[i] === originalText[i]) {
+                    correctChars++;
+                }
+            }
+            
+            // 计算速度
+            const speed = elapsedMinutes > 0 ? Math.floor(correctChars / elapsedMinutes) : 0;
+            
+            // 计算准确率
+            const accuracy = userInput.length > 0 ? (correctChars / userInput.length * 100) : 0;
+            
+            // 更新显示
+            document.getElementById('speedDisplay').textContent = speed;
+            document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(1);
+        }
+        
+        // 重置练习
+        function resetPractice() {
+            // 停止计时器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            startTime = null;
+            isPracticeStarted = false;
+            currentArticle = null;
+            
+            // 重置UI
+            document.getElementById('statsPanel').style.display = 'none';
+            document.getElementById('practiceArea').style.display = 'none';
+            document.getElementById('inputText').value = '';
+            document.getElementById('inputText').disabled = true;
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('timeDisplay').textContent = '0:00';
+            document.getElementById('speedDisplay').textContent = '0';
+            document.getElementById('accuracyDisplay').textContent = '0.0';
+            
+            // 重置下拉框
+            document.getElementById('articleSelect').value = '';
+        }
+        
+        // 提交记录
+        async function submitRecord() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const userInput = document.getElementById('inputText').value;
+            const originalText = currentArticle.content || '';
+            
+            if (!studentName) {
+                showMessage('请输入学生姓名', 'error');
+                return;
+            }
+            
+            if (!currentArticle) {
+                showMessage('请选择文章', 'error');
+                return;
+            }
+            
+            if (!userInput) {
+                showMessage('请输入练习内容', 'error');
+                return;
+            }
+            
+            // 计算最终数据
+            const elapsedSeconds = startTime ? (Date.now() - startTime) / 1000 : 0;
+            const elapsedMinutes = elapsedSeconds / 60;
+            
+            let correctChars = 0;
+            for (let i = 0; i < userInput.length; i++) {
+                if (i < originalText.length && userInput[i] === originalText[i]) {
+                    correctChars++;
+                }
+            }
+            
+            const speed = elapsedMinutes > 0 ? Math.floor(correctChars / elapsedMinutes) : 0;
+            const accuracy = userInput.length > 0 ? (correctChars / userInput.length * 100) : 0;
+            
+            const record = {
+                studentName: studentName,
+                articleTitle: currentArticle.title,
+                durationSec: Math.floor(elapsedSeconds),
+                speed: speed,
+                accuracy: parseFloat(accuracy.toFixed(1)),
+                timestamp: new Date().toISOString(),
+                inputText: userInput,
+                correctChars: correctChars,
+                totalChars: userInput.length
+            };
+            
+            // 禁用按钮
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '提交中...';
+            
+            try {
+                const response = await fetch(RECORD_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(record)
+                });
+                
+                if (response.ok) {
+                    showMessage('提交成功！', 'success');
+                    
+                    // 重置练习（保留姓名和文章选择）
+                    setTimeout(() => {
+                        resetPractice();
+                        document.getElementById('studentName').value = studentName;
+                    }, 1500);
+                } else {
+                    showMessage('提交失败，请重试', 'error');
+                    btn.disabled = false;
+                    btn.textContent = '提交记录';
+                }
+            } catch (error) {
+                console.error('提交记录失败:', error);
+                showMessage('网络错误，请检查网络连接', 'error');
+                btn.disabled = false;
+                btn.textContent = '提交记录';
+            }
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        // HTML 转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

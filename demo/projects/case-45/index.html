@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":45,"key":"case-45","title":"算法填空 · 栈实现十进制转二进制","category":"programming","description":"栈算法步骤诊断：围绕填空一、填空二、填空三开展交互学习，在数据大屏中回看记录。","headline":"栈算法步骤诊断","view":"diagnostic","fields":[{"key":"answer1","label":"填空一"},{"key":"answer2","label":"填空二"},{"key":"answer3","label":"填空三"},{"key":"answer4","label":"填空四"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"UiXwYsT5rNJ"},"mapping":{"rr7oj93rmz":"UiXwYsT5rNJ"},"accent":"#416d89","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务四：栈实现十进制转二进制</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        .task-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .name-input {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .code-area {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: "Consolas", "Monaco", monospace;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        .blank-input {
+            width: 100px;
+            padding: 2px 5px;
+            border: 1px solid #3498db;
+            border-radius: 3px;
+            text-align: center;
+            font-family: "Consolas", monospace;
+        }
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .tip {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        
+        <form action="https://qf.kjxs.site/api/UiXwYsT5rNJ" method="post">
+            
+            <div class="form-item">
+            姓名：<input type="text" name="username" class="name-input" placeholder="请输入演示称呼" required></div>
+            <div>
+<h2 class="task-title">【任务四】用栈思想实现十进制数转换为二进制数</h2>
+            </div>
+
+            
+            <div class="form-item">
+                <label>代码填空：</label>
+                <div class="code-area">
+                    st=[-1]*100       #列表中元素初始值为-1<br>
+                    top=-1            #建栈<br>
+                    num=int(input("请输入十进制整数："))<br>
+                    while num>0:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;r=<input type="text" name="填空1" class="blank-input" placeholder="填空1" ><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="填空2" class="blank-input" placeholder="填空2" ><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;st[top]=r  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#余数入栈<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="填空3" class="blank-input" placeholder="填空3" ><br>
+                    while top>=0:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;print(st[top],end="") #余数出栈<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;top=top-1
+                </div>
+                <p class="tip">三个空依次为：求余数、栈顶指针自增、十进制数整除2</p>
+            </div>
+
+            
+            <div class="form-item">
+                <button type="submit" class="submit-btn">提交答案</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

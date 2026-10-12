@@ -1,0 +1,12 @@
+{
+  "id": "case-55",
+  "title": "精准 AI 视觉实验室",
+  "category": "observation",
+  "description": "通过摄像头开展视觉识别教学实验，提交识别模式与学习报告。",
+  "subjects": [
+    "人工智能"
+  ],
+  "order": 55,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -523,5 +523,180 @@ const languages = {
         right: "由一線教師用 AI 創造"
       }
     }
+  },
+  id: {
+    nav: {
+      logo: "QuickForm",
+      logoSub: "Platform Data AI-Natif",
+      links: [
+        { text: "Pendahuluan", href: "#problem" },
+        { text: "Panduan", href: "#solution" },
+        { text: "Cara Kerja", href: "#principle" },
+        { text: "Kasus", href: "#cases" },
+        { text: "Versi", href: "#versions" },
+        { text: "Cerita", href: "#story" },
+        { text: "Berita", href: "news.html" }
+      ],
+      cta: "Kunjungi Platform →"
+    },
+    hero: {
+      badge: "Alat Pendidikan AI-Natif · Sumber Terbuka · Gratis · Pengaturan Cepat 4 Langkah",
+      title: "QuickForm",
+      subtitle: "Buat halaman web interaktif hasil AI<br>dapat mengumpulkan data",
+      slogan: "Membuka 'kilometer terakhir' pendidikan berdaya AI",
+      actions: {
+        primary: "Mulai Gunakan QuickForm →",
+        secondary: "📖 Lihat Dokumentasi"
+      },
+      stats: {
+        schools: "Sekolah",
+        users: "Guru Terdaftar",
+        tasks: "Tugas Data",
+        submissions: "Data Terkumpul"
+      }
+    },
+    problem: {
+      label: "Masalah",
+      heading: "Halaman web interaktif itu hebat<br>tapi data tetap terisolasi",
+      desc: "Guru dapat dengan cepat menghasilkan halaman web interaktif seperti alat absensi kelas, permainan mencocokkan kata, dan simulasi fisika menggunakan model seperti DeepSeek dan GPT. Namun, data berharga dari klik dan pilihan siswa tetap berada secara lokal, tidak dapat dikumpulkan secara otomatis untuk guru.",
+      islands: [
+        { icon: "🎯", name: "Absensi Kelas", data: "32 data", status: "⚠ Tidak dapat dikumpulkan" },
+        { icon: "🔤", name: "Mencocokkan Kata", data: "128 data", status: "⚠ Tidak dapat dikumpulkan" },
+        { icon: "⚗️", name: "Laboratorium Kimia", data: "67 data", status: "⚠ Tidak dapat dikumpulkan" },
+        { icon: "📊", name: "Kuis Online", data: "256 data", status: "⚠ Tidak dapat dikumpulkan" },
+        { icon: "🔬", name: "Simulasi Fisika", data: "89 data", status: "⚠ Tidak dapat dikumpulkan" },
+        { icon: "📝", name: "Tanya Jawab Interaktif", data: "45 data", status: "⚠ Tidak dapat dikumpulkan" }
+      ],
+      cards: [
+        { icon: "🏝️", title: "Pulau Data", desc: "Setiap halaman web interaktif hasil AI adalah 'pulau data' yang terisolasi. Data interaksi siswa tetap berada di browser lokal, sehingga guru tidak dapat memahami penggunaan yang sebenarnya." },
+        { icon: "🚧", title: "Hambatan Teknis Tinggi", desc: "Untuk mengumpulkan data, guru biasanya membutuhkan keterampilan pengembangan backend untuk menyiapkan server dan basis data. Hambatan ini terlalu tinggi bagi sebagian besar guru di lapangan." },
+        { icon: "📉", title: "Tanpa Analisis Pembelajaran", desc: "Meskipun permainan mencocokkan kata menyenangkan, guru tidak dapat mengetahui siapa yang bermain atau kata mana yang memiliki tingkat kesalahan lebih tinggi, sehingga sulit untuk mengoptimalkan pembelajaran secara efektif." }
+      ]
+    },
+    solution: {
+      label: "Solusi",
+      heading: "Pengalaman Sederhana 4 Langkah",
+      desc: "QuickForm sendiri tidak menghasilkan halaman web, tetapi menyediakan API data yang dapat mengagregasi data dari halaman web mana pun. Selesaikan seluruh proses dari pengumpulan data hingga analisis cerdas hanya dalam empat langkah.",
+      steps: [
+        { num: "01", icon: "📮", title: "Buat URL Formulir", desc: "Daftarkan akun QuickForm, buat 'tugas data', dan sistem akan otomatis menghasilkan titik akhir API khusus—'kotak masuk digital' Anda." },
+        { num: "02", icon: "🤖", title: "Buat Halaman Web Interaktif", desc: "Gunakan model AI pilihan Anda untuk menghasilkan halaman web, cukup tambahkan satu kalimat ke prompt Anda:", prompt: "Silakan kirim data sebagai formulir ke<br>https://quickform.cn/api/..." },
+        { num: "03", icon: "📋", title: "Kumpulkan & Lihat Data", desc: "Setelah siswa mengirimkan data, lihat semua kiriman secara real-time di QuickForm, dengan dukungan untuk melihat entri individu atau mengekspor ke Excel secara massal." },
+        { num: "04", icon: "📊", title: "Buat Laporan Cerdas", desc: "Laporan analisis cerdas AI satu klik dengan jumlah kiriman, skor rata-rata, distribusi kesalahan, masalah yang sering muncul, dan visualisasi lainnya untuk cepat mengidentifikasi prioritas pembelajaran." }
+      ]
+    },
+    principle: {
+      label: "Cara Kerja",
+      heading: "Menggunakan AI untuk menyelesaikan masalah AI",
+      text: {
+        title: "Berdasarkan Teknologi Formulir Standar",
+        p1: "QuickForm menyediakan API data tulis (POST) dan baca (GET). Halaman web mana pun hanya perlu mengarahkan atribut <code>action</code> formulir ke titik akhir QuickForm, dan data akan otomatis diklasifikasikan dan disimpan.",
+        p2: "Karena teknologi formulir sudah matang, semua model AI dapat memahami dan menghasilkan kode yang sesuai—guru hanya perlu menambahkan satu kalimat ke prompt mereka.",
+        quote: "Data tidak perlu terstruktur secara ketat karena AI dapat menganalisis data yang 'berantakan'. Pengguna tidak perlu memahami tipe data atau SQL; selama mereka dapat mendeskripsikan kebutuhan mereka, AI dapat membantu analisis selanjutnya.",
+        p3: "Filosofi desain ini mewarisi gagasan Turing tentang 'menggunakan mesin untuk mengalahkan mesin'—menggunakan AI untuk menulis alat, mengumpulkan data, dan menganalisis data, dengan setiap langkah terkait dengan AI."
+      }
+    },
+    capabilities: {
+      label: "Kemampuan",
+      heading: "Lebih dari sekadar pengumpulan formulir",
+      desc: "Alamat API yang sama dapat menulis dan membaca data, memungkinkan berbagai mode interaksi.",
+      cards: [
+        { icon: "📝", title: "Aplikasi Klasik", desc: "Kirim data ke QuickForm menggunakan metode POST, mencakup kebutuhan umum seperti pengumpulan survei, ujian online, dan absensi kelas.", tags: ["Survei", "Ujian Online", "Absensi Kelas"] },
+        { icon: "📡", title: "Analisis Interaktif", desc: "Kirim data dengan halaman web A, lalu buat halaman web B untuk membaca dan menganalisis secara real-time, membangun dasbor data, kokpit, dan tampilan layar besar.", tags: ["Dasbor Data", "Kokpit", "Layar Besar"] },
+        { icon: "💬", title: "Interaksi Real-time", desc: "Kirim dan baca data secara bersamaan di halaman web yang sama, mengaktifkan fitur interaksi real-time seperti ruang obrolan, papan pesan, dan layar peluru.", tags: ["Ruang Obrolan", "Papan Pesan", "Layar Peluru"] }
+      ]
+    },
+    cases: {
+      label: "Kasus Penggunaan",
+      heading: "Digunakan oleh guru di seluruh negeri",
+      desc: "Guru di seluruh Indonesia menggunakan QuickForm secara luas dalam pengajaran kelas, pengajaran kreatif, dan skenario pemecahan masalah nyata.",
+      cards: [
+        { emoji: "🏫", title: "Pengumpulan Data Kelas Reguler", desc: "Sematkan halaman web interaktif ke dalam pengajaran sehari-hari untuk mengumpulkan data latihan kelas, kuis, dan umpan balik secara efisien.", items: ["Latihan dan pengujian instan di kelas", "Statistik absensi dan partisipasi siswa", "Layar tampilan real-time untuk data terkumpul"] },
+        { emoji: "🎮", title: "Aplikasi Pengajaran Kreatif", desc: "Gunakan halaman web interaktif hasil AI yang bersifat gamifikasi dan simulasi untuk merangsang minat siswa dan mengumpulkan data perilaku.", items: ["Interaksi pengajaran gamifikasi", "Pengumpulan data eksperimen simulasi", "Analisis proses perilaku belajar"] },
+        { emoji: "🌍", title: "Pemecahan Masalah Nyata", desc: "Mendukung proyek pembelajaran lintas disiplin dan skenario manajemen pengajaran, memungkinkan keputusan pengajaran berbasis data.", items: ["Proyek pembelajaran lintas disiplin siswa", "Optimasi manajemen pengajaran guru", "Studi kasus Sekolah Menengah Kejuruan Teknologi Wenzhou"] }
+      ]
+    },
+    versions: {
+      label: "Versi",
+      heading: "Pilih versi yang sesuai untuk Anda",
+      desc: "QuickForm memiliki tiga versi dengan fitur inti yang konsisten, semuanya mampu mengumpulkan data formulir tanpa batas.",
+      cards: [
+        { badge: "Online", title: "Versi Online", desc: "Situs demo untuk Edisi Kampus QuickForm, cocok untuk pembelajaran dan penelusuran, tidak direkomendasikan untuk pengajaran sebenarnya.", features: ["Siap digunakan, tidak perlu instalasi", "Mendukung akses model AI langsung", "Cocok untuk pembelajaran dan penelusuran", "Fitur komunitas bawaan", "Lalu lintas bersamaan terbatas", "Akses: quickform.cn"] },
+        { badge: "Sumber Terbuka", title: "Edisi Guru", desc: "Untuk guru individu, berjalan di komputer lokal, cocok untuk pengajaran kelas sehari-hari.", features: ["Sepenuhnya sumber terbuka, bebas dimodifikasi", "Mode pengguna tunggal, sederhana dan efisien", "Lingkungan Python bawaan", "Perangkat lunak portabel, siap digunakan", "Pengumpulan data jaringan lokal", "Dapat menggunakan proxy untuk akses di luar sekolah"] },
+        { badge: "Gratis", title: "Edisi Kampus", desc: "Untuk sekolah dan lembaga, diterapkan di server, mendukung kolaborasi di antara semua guru sekolah.", features: ["Gratis setelah menandatangani perjanjian kerja sama", "Diterapkan di internet atau intranet", "Mendukung banyak pengguna dan peran", "Mekanisme keamanan yang lebih komprehensif", "Pemeliharaan resmi dan dukungan teknis", "Pembaruan berkelanjutan dan iterasi fitur"] }
+      ]
+    },
+    story: {
+      label: "Cerita QuickForm",
+      heading: "Sabtu, sebuah percakapan<br>Kelahiran proyek AI-natif",
+      timeline: [
+        { date: "Akhir 2024", title: "Masalah Muncul", desc: "Setelah DeepSeek dirilis, guru mulai menggunakan model AI untuk membuat halaman web interaktif 'absensi kelas' dan 'mencocokkan kata'. Xie Zuoru menyadari dengan tajam bahwa halaman web ini statis dan data tidak dapat mengalir." },
+        { date: "Awal 2025", title: "Berpikir dan Menjelajah", desc: "Xie Zuoru menerbitkan 'Merancang Perangkat Lunak Interaktif dengan Model AI' di China Information Technology Education, mulai mencari solusi dan berharap perusahaan pendidikan akan mengembangkan alat sirkulasi data." },
+        { date: "1 November 2025", title: "QuickForm Lahir", desc: "Suatu Sabtu malam, Xie Zuoru membuka Trae (alat pemrograman ByteDance) dan memasukkan deskripsi kebutuhan. Dalam dua hari, prototipe QuickForm lahir. Namanya juga dipilih oleh AI." },
+        { date: "November 2025", title: "Pembentukan Tim dan Uji Beta", desc: "Fang Jianwen (Universitas Wenzhou) dan Lin Miaoyan segera bergabung. Lin Miaoyan menerapkan QuickForm secara online pada hari berikutnya. Uji beta resmi dimulai seminggu kemudian." },
+        { date: "Dalam sebulan", title: "Penyebaran Luas", desc: "Dengan hanya satu artikel akun publik, hampir 1000 pengguna terdaftar, dengan pengguna datang dari guru di lapangan di seluruh negeri." }
+      ],
+      highlight: {
+        title: "Proyek AI-Natif",
+        p1: "Seseorang bertanya, berapa lama waktu yang dibutuhkan untuk mengembangkan QuickForm? Prototipe ditulis hanya dalam dua hari. Selama pemeliharaan, tim tidak pernah 'menulis kode secara manual'.",
+        p2: "Menggunakan AI untuk menyelesaikan masalah baru yang dibawa oleh pemrograman AI, menggunakan AI untuk mengumpulkan data dan kemudian menggunakan AI untuk analisis—setiap langkah terkait dengan AI.",
+        p3: "Ini bukan lagi 'AI+' tradisional, tetapi 'aplikasi AI-natif' yang sejati.",
+        tags: ["🤖 Alat hasil tulisan AI", "📡 Data terkumpul AI", "📊 Data dianalisis AI", "✨ Nama dipilih AI"]
+      }
+    },
+    news: {
+      label: "Berita",
+      heading: "Pembaruan Terbaru",
+      desc: "Perkembangan dan berita terbaru tentang QuickForm"
+    },
+    team: {
+      label: "Tim",
+      heading: "Diprakarsai oleh guru di lapangan",
+      desc: "Tim QuickForm diprakarsai oleh guru di lapangan, berakar pada sinergi tim, kepercayaan, dan nilai-nilai yang sama.",
+      members: [
+        { name: "Xie Zuoru", role: "Sekolah Menengah Kejuruan Teknologi Wenzhou · Direktur Pusat Inovasi AI", bio: "Pemrogram senior dan pendidik di lapangan, pendiri QuickForm. Pengembang situs web awal, kemudian beralih ke pendidikan pembuat dan penelitian pendidikan AI." },
+        { name: "Fang Jianwen", role: "Universitas Wenzhou · PhD", bio: "Dari Departemen Teknologi Pendidikan di Universitas Wenzhou, memberikan dukungan akademik dan bimbingan arah penelitian untuk QuickForm, mempromosikan teorisasi dan sistematisasi proyek." },
+        { name: "Lin Miaoyan", role: "Sekolah Menengah Kejuruan Teknologi Wenzhou", bio: "Anggota pengembangan teknis inti, yang pertama kali menerapkan QuickForm secara online untuk pengujian, mendorong proyek dari prototipe ke produk." }
+      ],
+      support: {
+        title: "Tim dan Organisasi Pendukung",
+        logos: ["Rencana Xugu", "Tim XEduPro", "Penerbit Universitas Tsinghua", "Konferensi Pendidikan AI dan Teknologi Sekolah Menengah Pertama dan Atas Nasional", "Konferensi Pendidikan STEAM Sekolah Menengah Pertama dan Atas Nasional"]
+      }
+    },
+    footer: {
+      brand: {
+        logo: "QuickForm",
+        desc: "Buat halaman web interaktif hasil AI dapat mengumpulkan data. Membuka 'kilometer terakhir' pendidikan berdaya AI."
+      },
+      links: {
+        title: "Tautan",
+        items: [
+          { text: "Platform Resmi", href: "https://quickform.cn" },
+          { text: "Rencana Xugu", href: "https://www.vvplan.cn/" },
+          { text: "QF WZSTH", href: "https://wzkjgz.site/" },
+          { text: "QF ZMRobo", href: "https://qf.zmrobo.com/" },
+          { text: "OpenHydra", href: "https://openhydra.net/" }
+        ]
+      },
+      resources: {
+        title: "Sumber Daya",
+        items: [
+          { text: "Dokumentasi", href: "https://docs.quickform.cc/" },
+          { text: "Panduan 4 Langkah", href: "https://docs.quickform.cc/zh-cn/latest/guide/start.html" },
+          { text: "Kasus Penggunaan", href: "https://docs.quickform.cc/zh-cn/latest/case.html" },
+          { text: "Penerapan Lokal", href: "https://docs.quickform.cc/zh-cn/latest/guide/deploy.html" }
+        ]
+      },
+      contact: {
+        title: "Hubungi Kami",
+        items: [
+          { text: "Fang Jianwen: beginnerfjw@163.com", href: "mailto:beginnerfjw@163.com" },
+          { text: "Xie Zuoru: 8334180@qq.com", href: "mailto:8334180@qq.com" }
+        ]
+      },
+      bottom: {
+        left: "© 2025-2026 Tim QuickForm · Sumber Terbuka Gratis · Edisi Guru mengikuti perjanjian sumber terbuka",
+        right: "Dibuat oleh guru di lapangan dengan AI"
+      }
+    }
   }
 };

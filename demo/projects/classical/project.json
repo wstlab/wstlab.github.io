@@ -1,0 +1,12 @@
+{
+  "id": "classical",
+  "title": "文言虚词「之」用法检测",
+  "category": "assessment",
+  "description": "一字六义，五题辨析。保留原题与讲解，通过逐题分布和错项统计找到需要再读的地方。",
+  "subjects": [
+    "语文"
+  ],
+  "order": 3,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

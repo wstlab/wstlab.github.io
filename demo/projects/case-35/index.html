@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":35,"key":"case-35","title":"海上日出 · 分层挑战","category":"assessment","description":"日出分层学习谱：围绕挑战层级、正确数、题目数开展交互学习，在数据大屏中回看记录。","headline":"日出分层学习谱","view":"diagnostic","fields":[{"key":"level","label":"挑战层级"},{"key":"correct","label":"正确数"},{"key":"total","label":"题目数"},{"key":"score","label":"得分"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开练习"}],"tasks":{"records":"19A8POvooHZ"},"mapping":{"fhnud9pjfc":"19A8POvooHZ"},"accent":"#a16a48","capture":false,"lesson":"打开练习"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>海上日出 · 分层挑战 | 巴金经典课文练习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #d9e2ef 100%);
+            font-family: system-ui, 'Segoe UI', 'Noto Sans SC', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px 16px 40px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .hero {
+            background: #1e2f5a;
+            background-image: radial-gradient(circle at 10% 30%, rgba(255,215,150,0.2) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 2rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            color: white;
+        }
+        .hero h1 {
+            font-size: 1.8rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hero h1 span {
+            font-size: 2rem;
+        }
+        .hero p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 6px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(0px);
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,240,0.6);
+        }
+
+        /* 分层选择区 */
+        .level-selector {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .level-btn {
+            flex: 1;
+            background: #f0f3f9;
+            border: none;
+            padding: 12px 6px;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1e2f5a;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .level-btn.active {
+            background: #ffb347;
+            background: linear-gradient(135deg, #f5a623, #ffc371);
+            color: white;
+            box-shadow: 0 6px 12px rgba(245,166,35,0.3);
+        }
+        .level-badge {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.1);
+            border-radius: 40px;
+            padding: 2px 8px;
+        }
+
+        /* 姓名区域 */
+        .name-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .name-input {
+            flex: 2;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 2rem;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+        .name-input:focus {
+            outline: none;
+            border-color: #ffb347;
+            box-shadow: 0 0 0 3px rgba(255,180,71,0.2);
+        }
+
+        /* 题目区域 */
+        .quiz-area {
+            margin-top: 6px;
+        }
+        .question-item {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #ffb347;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 2rem;
+            border: 1px solid #e9edf2;
+            transition: 0.1s;
+        }
+        .option input {
+            width: 20px;
+            height: 20px;
+            accent-color: #f5a623;
+            margin: 0;
+        }
+        .option label {
+            font-size: 0.95rem;
+            flex: 1;
+            color: #334155;
+        }
+        .feedback {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            padding-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .correct-fb {
+            color: #15803d;
+        }
+        .wrong-fb {
+            color: #b91c1c;
+        }
+
+        /* 提交&评分栏 */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 10px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            flex: 1;
+            background: #1e2f5a;
+            border: none;
+            padding: 14px 0;
+            border-radius: 2.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-score {
+            background: #2b6e4f;
+        }
+        .btn-submit {
+            background: #c4451c;
+        }
+        .score-panel {
+            background: #fef9e3;
+            border-radius: 1.5rem;
+            padding: 12px 18px;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #ffe1a0;
+        }
+        .small-note {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        button {
+            cursor: pointer;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        hr {
+            margin: 12px 0;
+            border-color: #eef2ff;
+        }
+        .level-tag {
+            display: inline-block;
+            background: #e6edf5;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            margin-bottom: 6px;
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 12px 30px;
+            }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .question-text {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="hero">
+        <h1><span>🌅</span> 海上日出 · 分层挑战</h1>
+        <p>巴金 · 伟大奇观 | 三阶题库 自主勾选 智能判分</p>
+    </div>
+
+    
+    <div class="card">
+        <div style="font-weight: 600; margin-bottom: 8px;">✨ 同学姓名</div>
+        <div class="name-area">
+            <input type="text" id="studentName" class="name-input" placeholder="请输入演示称呼" autocomplete="off">
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <div style="font-weight: 600; margin-bottom: 12px;">📚 选择挑战层级（可多选）</div>
+        <div class="level-selector">
+            <button data-level="basic" class="level-btn">🌱 基础题 <span class="level-badge">15题</span></button>
+            <button data-level="intermediate" class="level-btn">📖 提升题 <span class="level-badge">10题</span></button>
+            <button data-level="challenge" class="level-btn">🌟 挑战题 <span class="level-badge">3题</span></button>
+        </div>
+        <div class="small-note" style="margin-top: 8px;">✅ 勾选一个或多个层级，系统自动合并答题</div>
+    </div>
+
+    
+    <div class="card" style="padding-bottom: 0.5rem;">
+        <div style="font-weight: 600; margin-bottom: 6px;">📝 选择题库</div>
+        <div id="questionsContainer" class="quiz-area">
+            
+            <div style="text-align: center; padding: 20px; color: #6c757d;">请至少选择一个层级，题目将自动展示</div>
+        </div>
+        
+        <div class="action-bar">
+            <button id="checkScoreBtn" class="btn-primary btn-score">✅ 判分 · 看成绩</button>
+            <button id="submitRecordBtn" class="btn-primary btn-submit">📤 提交记录</button>
+        </div>
+        <div id="scoreDisplay" class="score-panel" style="display: none;">
+            
+        </div>
+        <div class="small-note">⭐ 选择题自动判断对错，判分后高亮显示正误，提交前请填写姓名</div>
+    </div>
+</div>
+
+<script>
+    // ---------- 依据三个文档合并构建 分层题库 (选择题) ----------
+    // 基础层 (15题)  整合自原文档基础部分
+    const basicQuestions = [
+        { text: "《海上日出》一文的作者是？", options: ["A. 老舍", "B. 巴金", "C. 叶圣陶", "D. 冰心"], answer: "B" },
+        { text: "作者为了看日出，常常？", options: ["A. 晚睡", "B. 早起", "C. 中午观察", "D. 傍晚等待"], answer: "B" },
+        { text: "太阳“负着重荷似的一步一步，慢慢地努力上升”中，“重荷”意思是？", options: ["A. 很重的货物", "B. 很大的压力或负担", "C. 很多颜色", "D. 很高的温度"], answer: "B" },
+        { text: "黑云日出时，太阳替黑云镶了一道？", options: ["A. 红边", "B. 银边", "C. 金边", "D. 紫边"], answer: "C" },
+        { text: "课文最后说“这不是很伟大的奇观吗？”这句话表达了作者？", options: ["A. 疑问", "B. 赞美", "C. 批评", "D. 害怕"], answer: "B" },
+        { text: "天空还是一片______，颜色很浅。", options: ["A. 浅蓝", "B. 深蓝", "C. 紫色", "D. 灰色"], answer: "A" },
+        { text: "太阳好像负着重荷似的______，慢慢地努力上升。", options: ["A. 一刹那", "B. 一步一步", "C. 转眼间", "D. 快速奔跑"], answer: "B" },
+        { text: "一刹那间，这个深红的圆东西，忽然发出了______的亮光。", options: ["A. 柔和", "B. 夺目", "C. 微弱", "D. 金色"], answer: "B" },
+        { text: "太阳在黑云里放射的光芒，透过黑云的______，替黑云镶了一道发光的金边。", options: ["A. 缝隙", "B. 重围", "C. 边缘", "D. 中心"], answer: "B" },
+        { text: "这时候发亮的不仅是太阳、云和海水，连______也成了光亮的了。", options: ["A. 海鸟", "B. 我自己", "C. 船帆", "D. 天空"], answer: "B" },
+        { text: "根据课文，作者只写了晴天时的海上日出。（判断正误）", options: ["A. 正确", "B. 错误"], answer: "B" },
+        { text: "“冲出重围”中的“重围”指的是黑云。（判断）", options: ["A. 正确", "B. 错误"], answer: "A" },
+        { text: "课文最后一句是反问句，表达了对日出的赞叹。（判断）", options: ["A. 正确", "B. 错误"], answer: "A" },
+        { text: "作者描写云堆日出时，出现了一片灿烂的亮光，水天难辨。", options: ["A. 正确", "B. 错误"], answer: "A" },
+        { text: "“一刹那间”意思是极短的时间，下列哪个词意思相近？", options: ["A. 很久很久", "B. 转眼间", "C. 一小时", "D. 慢慢"], answer: "B" }
+    ];
+
+    // 提升层 (10题) 综合豆包版&DS版
+    const intermediateQuestions = [
+        { text: "从课文中找出表示“时间极短”的词语，下列哪个是？", options: ["A. 努力上升", "B. 一刹那间", "C. 负着重荷", "D. 光彩夺目"], answer: "B" },
+        { text: "“太阳好像负着重荷似的一步一步”运用了什么修辞？", options: ["A. 比喻", "B. 拟人", "C. 夸张", "D. 排比"], answer: "B" },
+        { text: "晴天日出过程：出现小半边脸 → ______ → 跳出海面 → 发出夺目光亮。", options: ["A. 努力上升", "B. 放射光芒", "C. 冲破云霞", "D. 慢慢下沉"], answer: "C" },
+        { text: "黑云日出时，太阳替黑云______。", options: ["A. 染成紫色", "B. 镶了一道金边", "C. 劈开一条路", "D. 涂上红色"], answer: "B" },
+        { text: "“这不是很伟大的奇观吗？”这句话是______句。", options: ["A. 疑问", "B. 反问", "C. 设问", "D. 感叹"], answer: "B" },
+        { text: "作者一共描写了几种情况下的海上日出？", options: ["A. 2种", "B. 3种", "C. 4种", "D. 5种"], answer: "B" },
+        { text: "日出之前，天边先出现的是？", options: ["A. 太阳", "B. 红霞", "C. 黑云", "D. 星星"], answer: "B" },
+        { text: "最能体现日出变化顺序的词语是？", options: ["A. 清静、灿烂", "B. 转眼间、一刹那", "C. 努力、可爱", "D. 扩大、放射"], answer: "B" },
+        { text: "“太阳终于冲破了云霞，完全跳出了海面”从“冲破”“跳出”可以看出太阳上升时？", options: ["A. 轻松愉快", "B. 充满力量与气势", "C. 犹豫不决", "D. 毫无变化"], answer: "B" },
+        { text: "作者写黑云日出时，太阳把黑云染成了？", options: ["A. 金色或红色", "B. 紫色或红色", "C. 蓝色或紫色", "D. 白色或银色"], answer: "B" }
+    ];
+
+    // 挑战层 (3题)  突出思辨与表达 (以选择题形式客观化但保持高认知)
+    const challengeQuestions = [
+        { text: "作者认为海上日出是“伟大的奇观”，主要原因不包括下列哪一项？", options: ["A. 太阳不畏重围，冲破阻碍带来光明", "B. 色彩丰富变化神奇，展现自然力量", "C. 海上日出非常罕见，一辈子只有一次", "D. 即便被黑云遮挡，依然光芒万丈"], answer: "C" },
+        { text: "课文描写侧面烘托了日出奇观，例如写“连我自己也成了光亮的了”，这样写的好处是？", options: ["A. 突出作者心情低落", "B. 表现阳光的强烈与感染力，人景合一", "C. 说明海上环境湿润", "D. 表达作者想跳进海里"], answer: "B" },
+        { text: "如果你用第一人称写观察日记，描写黑云日出时，下列哪句最能体现课文意境？", options: ["A. 太阳慢慢消失不见", "B. 太阳替黑云镶上金边，最后冲出重围，光亮照亮一切", "C. 黑云把太阳遮得严严实实", "D. 太阳害怕黑云躲起来了"], answer: "B" }
+    ];
+
+    // 映射
+    let currentSelectedLevels = {
+        basic: false,
+        intermediate: false,
+        challenge: false
+    };
+
+    let currentQuestions = [];      // 存储当前展示的题目对象
+    let userAnswers = {};           // 存储 { idx: selectedLetter }
+    let scored = false;             // 是否已经判分
+    let scoreDetail = { correct: 0, total: 0 };
+
+    // DOM 元素
+    const container = document.getElementById("questionsContainer");
+    const scorePanel = document.getElementById("scoreDisplay");
+    const checkBtn = document.getElementById("checkScoreBtn");
+    const submitBtn = document.getElementById("submitRecordBtn");
+    const nameInput = document.getElementById("studentName");
+
+    // 辅助：获取选项字母值 从 label 提取 A B C D
+    function getOptionLetter(optText) {
+        if (optText.startsWith("A.")) return "A";
+        if (optText.startsWith("B.")) return "B";
+        if (optText.startsWith("C.")) return "C";
+        if (optText.startsWith("D.")) return "D";
+        if (optText === "A. 正确" || optText === "A. 正确") return "A";
+        if (optText === "B. 错误") return "B";
+        return optText.charAt(0);
+    }
+
+    // 合并题目依据当前选中的level
+    function buildQuestionSet() {
+        let qs = [];
+        if (currentSelectedLevels.basic) qs.push(...basicQuestions.map((q, idx) => ({ ...q, level: 'basic', originalIdx: idx })));
+        if (currentSelectedLevels.intermediate) qs.push(...intermediateQuestions.map((q, idx) => ({ ...q, level: 'intermediate', originalIdx: idx })));
+        if (currentSelectedLevels.challenge) qs.push(...challengeQuestions.map((q, idx) => ({ ...q, level: 'challenge', originalIdx: idx })));
+        return qs;
+    }
+
+    // 渲染题目
+    function renderQuestions() {
+        const qs = buildQuestionSet();
+        currentQuestions = qs;
+        userAnswers = {};
+        scored = false;
+        scorePanel.style.display = "none";
+        if (qs.length === 0) {
+            container.innerHTML = `<div style="text-align: center; padding: 30px; color: #6b7280;">🌊 请至少选择一个层级，开始挑战海上日出 🌊</div>`;
+            return;
+        }
+
+        let html = '';
+        qs.forEach((q, idx) => {
+            const selectedVal = userAnswers[idx] ? userAnswers[idx] : '';
+            html += `
+                <div class="question-item" data-qidx="${idx}">
+                    <div class="level-tag">${q.level === 'basic' ? '🌱 基础' : (q.level === 'intermediate' ? '📖 提升' : '🌟 挑战')}</div>
+                    <div class="question-text">${idx+1}. ${q.text}</div>
+                    <div class="options" id="options-${idx}">
+                        ${q.options.map(opt => {
+                            const optLetter = getOptionLetter(opt);
+                            const checkedAttr = (selectedVal === optLetter) ? 'checked' : '';
+                            return `
+                                <div class="option" data-opt-letter="${optLetter}">
+                                    <input type="radio" name="q${idx}" value="${optLetter}" id="q${idx}_${optLetter}" ${checkedAttr}>
+                                    <label for="q${idx}_${optLetter}">${opt}</label>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="feedback" id="fb-${idx}" style="display: none;"></div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+
+        // 绑定radio变更事件，记录答案
+        qs.forEach((_, idx) => {
+            const radios = document.querySelectorAll(`input[name="q${idx}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    userAnswers[idx] = e.target.value;
+                    if (scored) {
+                        // 如果已经判分，再次修改时清除显示判分标记 (重置评分状态)
+                        scored = false;
+                        scorePanel.style.display = "none";
+                        // 清除反馈样式
+                        document.querySelectorAll(`.feedback`).forEach(fb => fb.style.display = 'none');
+                        document.querySelectorAll(`.option`).forEach(opt => opt.style.backgroundColor = '');
+                    }
+                });
+            });
+        });
+    }
+
+    // 判分逻辑
+    function computeScore() {
+        if (currentQuestions.length === 0) {
+            alert("请至少选择一个层级再进行判分~");
+            return false;
+        }
+        let correctCount = 0;
+        const total = currentQuestions.length;
+        // 检查未作答题目
+        for (let i = 0; i < total; i++) {
+            if (!userAnswers[i]) {
+                alert(`第 ${i+1} 题还未作答，请完成所有选中的题目再判分。`);
+                return false;
+            }
+        }
+        // 计算正确率
+        for (let i = 0; i < total; i++) {
+            const q = currentQuestions[i];
+            const userAns = userAnswers[i];
+            if (userAns === q.answer) correctCount++;
+        }
+        scoreDetail.correct = correctCount;
+        scoreDetail.total = total;
+        scored = true;
+
+        // 更新界面：显示每题正确/错误反馈，并高亮选项背景
+        for (let i = 0; i < total; i++) {
+            const q = currentQuestions[i];
+            const userAns = userAnswers[i];
+            const isCorrect = (userAns === q.answer);
+            const fbDiv = document.getElementById(`fb-${i}`);
+            if (fbDiv) {
+                fbDiv.style.display = 'flex';
+                if (isCorrect) {
+                    fbDiv.innerHTML = `<span>✅ 回答正确</span>`;
+                    fbDiv.className = "feedback correct-fb";
+                } else {
+                    const correctLetter = q.answer;
+                    let correctText = "";
+                    for (let opt of q.options) {
+                        if (getOptionLetter(opt) === correctLetter) {
+                            correctText = opt;
+                            break;
+                        }
+                    }
+                    fbDiv.innerHTML = `<span>❌ 错误，正确答案是 ${correctLetter}. ${correctText.substring(2)}</span>`;
+                    fbDiv.className = "feedback wrong-fb";
+                }
+            }
+            // 高亮选项背景: 正确选项绿色，错误所选红色（如果错误）
+            const optionsDiv = document.getElementById(`options-${i}`);
+            if (optionsDiv) {
+                const allOptDivs = optionsDiv.querySelectorAll('.option');
+                allOptDivs.forEach(optDiv => {
+                    optDiv.style.backgroundColor = '';
+                    const radio = optDiv.querySelector('input');
+                    if (radio) {
+                        const optVal = radio.value;
+                        if (optVal === q.answer) {
+                            optDiv.style.backgroundColor = '#e0f2e7';  // 正确选项浅绿
+                        }
+                        if (!isCorrect && optVal === userAns && userAns !== q.answer) {
+                            optDiv.style.backgroundColor = '#ffe0db';  // 错误所选浅红
+                        }
+                    }
+                });
+            }
+        }
+        // 显示总分
+        scorePanel.style.display = "block";
+        scorePanel.innerHTML = `🏆 得分：${scoreDetail.correct} / ${scoreDetail.total}  (正确率 ${Math.round((scoreDetail.correct/total)*100)}%)<br>🎯 层级组合: ${getSelectedLevelsName()}`;
+        return true;
+    }
+
+    function getSelectedLevelsName() {
+        const names = [];
+        if (currentSelectedLevels.basic) names.push("基础");
+        if (currentSelectedLevels.intermediate) names.push("提升");
+        if (currentSelectedLevels.challenge) names.push("挑战");
+        return names.length ? names.join("+") : "无";
+    }
+
+    // 提交成绩到API
+    async function submitRecord() {
+        const studentName = nameInput.value.trim();
+        if (!studentName) {
+            alert("请填写学生姓名后再提交成绩 🌟");
+            return;
+        }
+        if (!scored) {
+            const hasAnswered = Object.keys(userAnswers).length === currentQuestions.length && currentQuestions.length > 0;
+            if (!hasAnswered && currentQuestions.length>0) {
+                alert("请先完成所有题目并点击【判分·看成绩】后再提交！");
+                return;
+            } else if (!scored && currentQuestions.length>0){
+                const confirmFirst = confirm("还没有判分，是否先判分再提交？点击确定将自动判分后提交。");
+                if (confirmFirst) {
+                    const success = computeScore();
+                    if (!success) return;
+                } else {
+                    return;
+                }
+            } else if(currentQuestions.length===0){
+                alert("请先选择层级并答题后再提交");
+                return;
+            }
+        }
+        // 确保得分已计算
+        if (!scored && currentQuestions.length>0) {
+            const ok = computeScore();
+            if (!ok) return;
+        }
+        const payload = {
+            student: studentName,
+            levels: getSelectedLevelsName(),
+            totalQuestions: scoreDetail.total,
+            correctCount: scoreDetail.correct,
+            scorePercent: Math.round((scoreDetail.correct/scoreDetail.total)*100),
+            timestamp: new Date().toISOString(),
+            exercise: "海上日出分层挑战"
+        };
+        try {
+            const response = await fetch("https://qf.kjxs.site/api/19A8POvooHZ", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (response.ok) {
+                alert(`📨 提交成功！ ${studentName} 同学，成绩已记录。\n得分: ${scoreDetail.correct}/${scoreDetail.total}`);
+            } else {
+                alert("提交失败，服务器响应异常，但成绩已显示，可稍后重试。");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("网络错误，无法提交。但你的成绩已经展示，可截图保存。");
+        }
+    }
+
+    // 层级按钮事件
+    function initLevelButtons() {
+        const btns = document.querySelectorAll(".level-btn");
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const level = btn.getAttribute("data-level");
+                if (level === "basic") currentSelectedLevels.basic = !currentSelectedLevels.basic;
+                if (level === "intermediate") currentSelectedLevels.intermediate = !currentSelectedLevels.intermediate;
+                if (level === "challenge") currentSelectedLevels.challenge = !currentSelectedLevels.challenge;
+                // 更新按钮样式
+                btns.forEach(b => {
+                    const lvl = b.getAttribute("data-level");
+                    if ((lvl === "basic" && currentSelectedLevels.basic) ||
+                        (lvl === "intermediate" && currentSelectedLevels.intermediate) ||
+                        (lvl === "challenge" && currentSelectedLevels.challenge)) {
+                        b.classList.add("active");
+                    } else {
+                        b.classList.remove("active");
+                    }
+                });
+                renderQuestions();
+            });
+        });
+    }
+
+    checkBtn.addEventListener("click", () => {
+        if (currentQuestions.length === 0) {
+            alert("请至少选择一个层级，题目会显示出来~");
+            return;
+        }
+        computeScore();
+    });
+    submitBtn.addEventListener("click", submitRecord);
+
+    // 初始默认勾选基础题（让界面有内容）
+    currentSelectedLevels.basic = true;
+    initLevelButtons();
+    renderQuestions();
+    // 高亮基础按钮
+    document.querySelectorAll(".level-btn").forEach(btn => {
+        if (btn.getAttribute("data-level") === "basic") btn.classList.add("active");
+    });
+</script>
+</body>
+</html>

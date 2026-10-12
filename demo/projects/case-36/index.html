@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":36,"key":"case-36","title":"单词跑酷挑战","category":"practice","description":"单词闯关轨迹：围绕单元、用时、最佳用时开展交互学习，在数据大屏中回看记录。","headline":"单词闯关轨迹","view":"diagnostic","fields":[{"key":"unit_name","label":"单元"},{"key":"time","label":"用时"},{"key":"best_time","label":"最佳用时"},{"key":"errors","label":"错误"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"应用展示"}],"tasks":{"records":"N5W6yYD7KSC"},"mapping":{"gy1zkjw9nq":"N5W6yYD7KSC"},"accent":"#4468ab","capture":false,"lesson":"应用展示"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>警察马里奥单词跑酷 - V23防作弊版</title>
+    <style>
+        /* ============================================================
+           设计契约（马里奥单词跑酷）
+           本页优化严格保留以下原始视觉基因，不作换皮：
+             配色   马里奥官方色系 —— #ffcc00 黄（描边/高亮）、#e70012 红（主按钮）、
+                    #5c94fc 天空蓝（游戏区）、#1a472a 深绿（页面底）、#f39c12 橙（表头）
+             圆角   12~28px，方块感 + 圆角，配合像素游戏气质
+             触感   按钮底部实心投影（box-shadow 0 4px 0）+ 无位移
+             字体   sans-serif，数值加粗（900），强调成绩可读性
+             语言   深色面板（rgba(0,0,0,.85)）+ 黄色描边强调
+           新增内容一律走下列变量，便于统一微调与回滚。
+           ============================================================ */
+        :root {
+            /* —— 原始色板（原样保留） —— */
+            --m-yellow:  #ffcc00;
+            --m-yellow-2:#ffd966;
+            --m-yellow-3:#ffecb3;
+            --m-red:     #e70012;
+            --m-red-d:   #8b0000;
+            --m-sky:     #5c94fc;
+            --m-green:   #1a472a;
+            --m-orange:  #f39c12;
+            --m-orange-2:#ffae42;
+            --m-orange-d:#b4621a;
+            --m-cream:   #fff9e8;
+            --m-panel:   rgba(0, 0, 0, .85);
+            --m-panel-2: #2c2c2c;
+            --m-line:    #444;
+            --m-ok:      #4caf50;
+            --m-ok-d:    #357a38;
+            --m-blue:    #2196f3;
+            --m-blue-d:  #0b7dda;
+
+            /* —— 名次专属色（新增，仅用于榜单前三） —— */
+            --m-gold:   #d4a017;
+            --m-silver: #8e9aa6;
+            --m-bronze: #b8743a;
+
+            --m-radius: 12px; --m-radius-lg: 20px;
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; min-height: 100vh; background: #1a472a; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; padding: 10px; overflow-x: hidden; }
+        
+        .game-scale-wrapper { position: relative; width: 800px; height: 450px; transform-origin: center top; transition: transform 0.2s ease; }
+        .game-wrapper { background: #2b2b2b; border-radius: 24px; padding: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        #game-container { position: relative; width: 800px; height: 450px; background-color: #5c94fc; border: 5px solid #f7d44a; border-radius: 20px; overflow: hidden; }
+
+        #music-toggle { position: absolute; top: 12px; left: 12px; z-index: 100; width: 44px; height: 44px; background: rgba(0,0,0,0.6); border-radius: 50%; border: 2px solid #ffcc00; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #fff; font-size: 22px; }
+
+        #ui-layer { position: absolute; top: 12px; left: 65px; right: 12px; display: flex; justify-content: space-between; z-index: 20; pointer-events: none; }
+        .stat-box { background: rgba(0,0,0,0.7); color: #ffffff; padding: 6px 14px; border-radius: 20px; font-size: 16px; font-weight: 900; border: 2px solid #ffcc00; pointer-events: auto; }
+
+        #word-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff9e8; padding: 15px; border-radius: 28px; border: 6px solid #e70012; display: none; width: 95%; max-width: 760px; flex-direction: column; align-items: center; z-index: 2000; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .modal-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #ffd966; padding-bottom: 8px; }
+        #word-chinese { font-size: 22px; font-weight: bold; background: #ffecb3; padding: 4px 20px; border-radius: 40px; color: #c0392b; margin: 0; }
+        .modal-exit-btn { background: #e70012; color: white; border: none; padding: 8px 16px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; }
+
+        #spell-display { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; margin: 10px 0; min-height: 60px; width: 100%; }
+        .letter-box { width: 38px; height: 48px; background: #fff; border: 2px solid #ffcd94; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; position: relative; }
+        .letter-underline { position: absolute; bottom: 5px; width: 60%; height: 2px; background: #333; }
+        .letter-btn { background: #ffae42; color: #2c1a00; font-weight: bold; width: 46px; height: 46px; font-size: 22px; border-radius: 12px; margin: 3px; cursor: pointer; border: none; box-shadow: 0 3px 0 #b4621a; }
+        .letter-btn.hidden { opacity: 0; pointer-events: none; }
+
+        .info-panel { width: 95vw; max-width: 830px; margin-top: 15px; background: rgba(0, 0, 0, 0.85); border-radius: 20px; padding: 15px; color: white; }
+        .rank-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; background: #2c2c2c; border-radius: 10px; overflow: hidden; }
+        .rank-table th { background: #f39c12; color: #000; padding: 10px; }
+        .rank-table td { padding: 8px; text-align: center; border-bottom: 1px solid #444; }
+
+        /* ── 排行榜增强：名次徽章 + 成绩等宽 + 本人行醒目标注 ── */
+        .rank-table td.rk { width: 56px; }
+        .rank-table td.sc {
+            font-weight: 900;
+            color: var(--m-yellow);
+            font-variant-numeric: tabular-nums;   /* 成绩等宽，纵向可比 */
+        }
+        .medal {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 50%;
+            font-weight: 900; font-size: 13px; color: #2c1a00;
+        }
+        .medal.g1 { background: var(--m-gold);   box-shadow: 0 2px 0 #9c7609; }
+        .medal.g2 { background: var(--m-silver); box-shadow: 0 2px 0 #6c7883; color: #fff; }
+        .medal.g3 { background: var(--m-bronze); box-shadow: 0 2px 0 #8b5628; color: #fff; }
+        .rank-table tr.top1 td { background: rgba(212, 160, 23, .14); }
+        .rank-table tr.top2 td { background: rgba(142, 154, 166, .12); }
+        .rank-table tr.top3 td { background: rgba(184, 116, 58, .12); }
+
+        /* 本人行：在原「深灰底 + 黄字」基础上加左侧黄条与「我」标签 */
+        .rank-table tr.me td {
+            background: #444;
+            color: var(--m-yellow);
+            font-weight: bold;
+        }
+        .rank-table tr.me td:first-child { box-shadow: inset 4px 0 0 var(--m-yellow); }
+        .me-tag {
+            display: inline-block;
+            background: var(--m-yellow);
+            color: #2c1a00;
+            border-radius: 20px;
+            padding: 0 7px;
+            font-size: 11px;
+            font-weight: 900;
+            margin-left: 5px;
+            vertical-align: 1px;
+        }
+
+        /* ── 提交状态提示（把"为什么不能提交"说清楚） ── */
+        .submit-hint {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 10px;
+            padding: 9px 14px;
+            border-radius: var(--m-radius);
+            font-size: 13px;
+            font-weight: bold;
+            border: 2px solid transparent;
+            transition: background .2s, border-color .2s, color .2s;
+        }
+        .submit-hint.locked {
+            background: rgba(255, 255, 255, .07);
+            border-color: #555;
+            color: #bbb;
+        }
+        .submit-hint.ready {
+            background: rgba(76, 175, 80, .18);
+            border-color: var(--m-ok);
+            color: #b6e6b8;
+        }
+        .submit-hint.done {
+            background: rgba(33, 150, 243, .16);
+            border-color: var(--m-blue);
+            color: #b3daff;
+        }
+
+        /* ── 键盘可达性：统一焦点环 ── */
+        .big-btn:focus-visible,
+        #submit-best-btn:focus-visible,
+        #restart-unit-btn:focus-visible,
+        #login-btn:focus-visible,
+        #music-toggle:focus-visible,
+        #modal-exit-btn:focus-visible,
+        #spell-confirm-btn:focus-visible,
+        #spell-reset-btn:focus-visible,
+        .letter-btn:focus-visible,
+        select:focus-visible,
+        input:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 204, 0, .65);
+        }
+
+        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.96); display: flex; justify-content: center; align-items: center; z-index: 3000; border-radius: 20px; }
+        .big-btn { background: #e70012; color: white; border: none; border-radius: 12px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 0 #8b0000; }
+
+        /* 🌟 锁定按钮样式 */
+        .btn-locked { background: #555 !important; color: #999 !important; box-shadow: none !important; cursor: not-allowed !important; opacity: 0.6; }
+
+        #mario { position: absolute; bottom: 100px; left: 80px; z-index: 10; width: 85px; height: 85px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="20" y="32" width="24" height="24" fill="%23e70012"/><rect x="24" y="36" width="16" height="20" fill="%23003399"/><circle cx="32" cy="24" r="14" fill="%23ffdbac"/><path d="M14 18 Q32 2 50 18 L50 24 L14 24 Z" fill="%23003399"/><circle cx="32" cy="14" r="4" fill="%23FFD700"/><text x="32" y="22" font-size="5" text-anchor="middle" fill="white" font-weight="bold">POLICE</text></svg>'); background-size: contain; background-repeat: no-repeat; }
+        #ground { position: absolute; bottom: 0; width: 200%; height: 100px; background-color: #e67e22; border-top: 5px solid #d35400; background-image: linear-gradient(335deg, #d35400 20px, transparent 20px); background-size: 50px 50px; }
+        #obstacle { position: absolute; bottom: 100px; font-size: 50px; z-index: 6; }
+        .running-anim { animation: runBounce 0.2s infinite alternate; }
+        @keyframes runBounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        .jumping-anim { animation: jumpAnim 0.6s ease-out; }
+        @keyframes jumpAnim { 0%, 100% { bottom: 100px; } 50% { bottom: 250px; } }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper" id="main-wrapper">
+    <div class="game-scale-wrapper" id="scale-engine">
+        <div id="game-container">
+            <div id="music-toggle">🔊</div>
+            <div id="ground"></div>
+            <div id="mario" class="running-anim"></div>
+            <div id="obstacle"></div>
+            
+            <div id="ui-layer">
+                <div class="stat-box">⏱️ <span id="game-timer">0.00</span>s</div>
+                <div class="stat-box">📖 剩余: <span id="remaining">0</span></div>
+            </div>
+
+            <div id="word-modal">
+                <div class="modal-header">
+                    <button class="modal-exit-btn" id="modal-exit-btn">🏠 退出本单元</button>
+                    <div id="word-chinese">加载中...</div>
+                    <div style="width: 80px"></div>
+                </div>
+                <div id="spell-display"></div>
+                <div id="letter-buttons"></div>
+                <div style="display:flex; justify-content:center; gap:15px; margin-top:15px;">
+                    <button id="spell-confirm-btn" style="background:#4caf50; color:white; border:none; padding:12px 30px; border-radius:40px; font-weight:bold; font-size:18px; cursor:pointer;">✅ 提交拼写</button>
+                    <button id="spell-reset-btn" style="background:#ff9800; color:white; border:none; padding:12px 30px; border-radius:40px; font-weight:bold; font-size:18px; cursor:pointer;">🔄 重置</button>
+                </div>
+            </div>
+
+            <div id="overlay-screen" class="overlay-screen">
+                <div class="selection-box" id="auth-panel" style="background: #2c2c2c; padding: 20px; border-radius: 30px; border: 4px solid #f39c12; width: 360px;">
+                    <h2 style="color:#ffcc00; margin-top:0; text-align:center;">👮‍♂️ 警察马里奥跑酷</h2>
+                    <select id="class-select" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; font-size:16px;"><option value="演示一班">演示一班</option><option value="演示二班">演示二班</option></select>
+                    <input type="text" value="01" id="student-id" placeholder="学号 (如: 01)" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; font-size:16px;">
+                    <input type="text" value="钟沐霖" id="student-name" placeholder="演示称呼（如：钟沐霖）" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; font-size:16px;">
+                    <div id="login-warning" style="color:#ffaa66; font-size:14px; margin-bottom:10px; text-align:center;"></div>
+                    <button id="login-btn" class="big-btn">🚀 开启探险</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-panel" id="rank-panel" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>👤 <span id="stu-badge" style="background:#ffdd99; color:#5a3e1b; padding:4px 10px; border-radius:20px; font-weight:bold;"></span> | 🎮 <strong id="unit-badge" style="color:#ffcc00;">U1</strong></div>
+        <div id="pb-display" style="background:#ffaa33; color:#000; padding:4px 12px; border-radius:20px; font-weight:bold; font-size:14px;">⭐ 云端最佳: --</div>
+    </div>
+    <div style="display:flex; gap:10px; margin:15px 0;">
+        <button id="submit-best-btn" class="btn-locked" style="background:#4caf50; color:white; border:none; padding:10px; border-radius:10px; font-weight:bold; flex:1; cursor:not-allowed;">📤 提交本次成绩</button>
+        <button id="restart-unit-btn" style="background:#ff9800; color:white; border:none; padding:10px; border-radius:10px; font-weight:bold; flex:1; cursor:pointer;">🔄 重新开始</button>
+        <button class="big-btn" style="background:#2196f3; box-shadow:0 4px 0 #0b7dda; padding:10px; flex:1;" onclick="location.reload()">👥 切换账号</button>
+    </div>
+    
+    <div class="submit-hint locked" id="submit-hint">
+        <span>🔒</span><span id="submit-hint-text">请先完成本单元全部单词，通关后即可提交成绩</span>
+    </div>
+    <div id="rank-container"></div>
+</div>
+
+<script>
+    const API_URL = 'https://qf.kjxs.site/api/N5W6yYD7KSC'; 
+    const GET_URL = 'https://qf.kjxs.site/api/N5W6yYD7KSC/all';
+
+    let isMuted = false;
+    const sfx = {
+        bgm: new Audio('https://assets.mixkit.co/active_storage/sfx/131/131-preview.mp3'),
+        jump: new Audio('https://assets.mixkit.co/active_storage/sfx/2070/2070-preview.mp3'),
+        alert: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
+        correct: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
+        wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/2565/2565-preview.mp3')
+    };
+
+    function playSfx(name, loop=false) { if(!isMuted && sfx[name]){ sfx[name].loop=loop; if(!loop) sfx[name].currentTime=0; sfx[name].play().catch(()=>{}); } }
+    function stopSfx(name) { if(sfx[name]){ sfx[name].pause(); sfx[name].currentTime=0; } }
+
+    const classStudentMap = Object.fromEntries(["演示一班","演示二班"].map(c=>[c,Array.from({length:50},(_,i)=>"探索者"+String(i+1).padStart(2,"0"))]));
+
+    const UNITS_WORDS = {
+        1: [ { english: "eat breakfast", chinese: "吃早饭" },{ english: "have class", chinese: "上……课" },{ english: "play sports", chinese: "进行体育运动" },{ english: "exercise", chinese: "活动；运动" },{ english: "do morning exercises", chinese: "做早操" },{ english: "eat dinner", chinese: "吃晚饭" },{ english: "clean my room", chinese: "打扫我的房间" },{ english: "go for a walk", chinese: "散步" },{ english: "go shopping", chinese: "去买东西；购物" },{ english: "take", chinese: "学习；上（课）" },{ english: "dancing", chinese: "跳舞；舞蹈" },{ english: "take a dancing class", chinese: "上舞蹈课" } ],
+        2: [ { english: "spring", chinese: "春天" },{ english: "summer", chinese: "夏天" },{ english: "autumn", chinese: "秋天" },{ english: "winter", chinese: "冬天" },{ english: "season", chinese: "季节" },{ english: "picnic", chinese: "野餐" },{ english: "go on a picnic", chinese: "去野餐" },{ english: "pick", chinese: "摘；采集" },{ english: "pick apples", chinese: "摘苹果" },{ english: "snowman", chinese: "雪人" },{ english: "make a snowman", chinese: "堆雪人" },{ english: "go swimming", chinese: "去游泳" } ],
+        3: [ { english: "January", chinese: "一月" },{ english: "February", chinese: "二月" },{ english: "March", chinese: "三月" },{ english: "April", chinese: "四月" },{ english: "May", chinese: "五月" },{ english: "June", chinese: "六月" },{ english: "July", chinese: "七月" },{ english: "August", chinese: "八月" },{ english: "September", chinese: "九月" },{ english: "October", chinese: "十月" },{ english: "November", chinese: "十一月" },{ english: "December", chinese: "十二月" } ],
+        4: [ { english: "first (1st)", chinese: "第一（的）" },{ english: "second (2nd)", chinese: "第二（的）" },{ english: "third (3rd)", chinese: "第三（的）" },{ english: "fourth (4th)", chinese: "第四（的）" },{ english: "fifth (5th)", chinese: "第五（的）" },{ english: "twelfth (12th)", chinese: "第十二（的）" },{ english: "twentieth (20th)", chinese: "第二十（的）" },{ english: "twenty-first (21st)", chinese: "第二十一（的）" },{ english: "twenty-third (23rd)", chinese: "第二十三（的）" },{ english: "thirtieth (30th)", chinese: "第三十（的）" } ],
+        5: [ { english: "mine", chinese: "我的" },{ english: "yours", chinese: "你（们）的" },{ english: "his", chinese: "他的" },{ english: "hers", chinese: "她的" },{ english: "theirs", chinese: "他们的；她们的；它们的" },{ english: "ours", chinese: "我们的" },{ english: "climbing", chinese: "（正在）攀登；攀爬" },{ english: "eating", chinese: "（正在）吃" },{ english: "playing", chinese: "（正在）玩耍" },{ english: "jumping", chinese: "（正在）跳" },{ english: "drinking", chinese: "（正在）喝（水）" },{ english: "sleeping", chinese: "（正在）睡觉" } ],
+        6: [ { english: "doing morning exercises", chinese: "（正在）做早操" },{ english: "having class", chinese: "（正在）上……课" },{ english: "eating lunch", chinese: "（正在）吃午饭" },{ english: "reading a book", chinese: "（正在）看书" },{ english: "listening to music", chinese: "（正在）听音乐" },{ english: "keep", chinese: "保持某种状态" },{ english: "keep to the right", chinese: "靠右" },{ english: "keep your desk clean", chinese: "保持你的课桌干净" },{ english: "talk quietly", chinese: "小声讲话" },{ english: "turn", chinese: "顺序" },{ english: "take turns", chinese: "按顺序来" } ]
+    };
+
+    let currentStudent = null, currentUnit = 1, gameActive = false, isPaused = false;
+    let gameSpeed = 5, startTime = 0, obstaclePos = 850, groundPos = 0, lastTime = 0, gameLoopId = null;
+    let queue = [], currentTarget = "", currentInput = "";
+
+    function handleResize() {
+        const engine = document.getElementById('scale-engine');
+        const availableW = window.innerWidth - 20;
+        const scale = Math.min(availableW / 800, 1.1);
+        engine.style.transform = `scale(${scale})`;
+        document.getElementById('main-wrapper').style.height = (450 * scale + 20) + 'px';
+    }
+    window.addEventListener('resize', handleResize); handleResize();
+
+    // 登录
+    document.getElementById('login-btn').onclick = () => {
+        const cls = document.getElementById('class-select').value;
+        const sid = document.getElementById('student-id').value.trim().padStart(2,'0');
+        const name = document.getElementById('student-name').value.trim();
+        if(cls && Number(sid)>=1 && Number(sid)<=50 && name) {
+            currentStudent = { class: cls, id: sid, name: name };
+            document.getElementById('stu-badge').innerText = `${name}(${sid})`;
+            document.getElementById('rank-panel').style.display = 'block';
+            showUnitMenu();
+        } else { document.getElementById('login-warning').innerText = "❌ 验证失败"; }
+    };
+
+    function showUnitMenu() {
+        gameActive = false; stopSfx('bgm');
+        if(gameLoopId) cancelAnimationFrame(gameLoopId);
+        // 🌟 锁死提交按钮
+        lockSubmitButton(true);
+        const screen = document.getElementById('overlay-screen');
+        screen.style.display = 'flex';
+        screen.innerHTML = `<div class="selection-box" style="background:#2c2c2c; padding:25px; border-radius:30px; border:4px solid #f39c12; width:420px;">
+            <h2 style="color:#ffcc00; margin-bottom:20px;">🎮 选择挑战关卡</h2>
+            <div class="unit-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                ${[1,2,3,4,5,6].map(i=>`<button class="big-btn unit-btn-style" onclick="startGame(${i})">Unit ${i}</button>`).join('')}
+            </div>
+            <button class="big-btn" style="background:#666; box-shadow:0 4px 0 #444;" onclick="location.reload()">🔓 退出账号</button>
+        </div>`;
+        updateCloudRank();
+    }
+
+    // 🌟 控制提交按钮锁定的函数（同时更新状态提示，把原因说清楚）
+    function lockSubmitButton(isLocked) {
+        const btn = document.getElementById('submit-best-btn');
+        const hint = document.getElementById('submit-hint');
+        const hintText = document.getElementById('submit-hint-text');
+        if (isLocked) {
+            btn.classList.add('btn-locked');
+            btn.disabled = true;
+            btn.style.cursor = 'not-allowed';
+            btn.innerText = "📤 挑战完成后解锁";
+            if (hint) {
+                hint.className = 'submit-hint locked';
+                hint.firstElementChild.innerText = '🔒';
+                hintText.innerText = '请先完成本单元全部单词，通关后即可提交成绩';
+            }
+        } else {
+            btn.classList.remove('btn-locked');
+            btn.disabled = false;
+            btn.style.cursor = 'pointer';
+            btn.innerText = "📤 提交本次成绩";
+            if (hint) {
+                const t = parseFloat(document.getElementById('game-timer').innerText) || 0;
+                hint.className = 'submit-hint ready';
+                hint.firstElementChild.innerText = '✅';
+                hintText.innerText = `本单元已通关，用时 ${t.toFixed(1)}s —— 可以提交成绩了`;
+            }
+        }
+    }
+
+    // 提交后把提示切到「已提交」态
+    function markSubmitted() {
+        const hint = document.getElementById('submit-hint');
+        const hintText = document.getElementById('submit-hint-text');
+        if (!hint) return;
+        hint.className = 'submit-hint done';
+        hint.firstElementChild.innerText = '☁️';
+        hintText.innerText = '成绩已同步到云端，可在下方排行榜查看名次';
+    }
+
+    document.getElementById('modal-exit-btn').onclick = () => { showUnitMenu(); document.getElementById('word-modal').style.display = 'none'; };
+
+    window.startGame = (u) => {
+        currentUnit = u;
+        queue = [...UNITS_WORDS[u]].sort(()=>Math.random()-0.5);
+        document.getElementById('remaining').innerText = queue.length;
+        document.getElementById('unit-badge').innerText = "U" + u;
+        document.getElementById('overlay-screen').style.display = 'none';
+        document.getElementById('word-modal').style.display = 'none';
+        // 🌟 核心修复：开始挑战即锁死提交按钮
+        lockSubmitButton(true);
+        obstaclePos = 850; gameActive = true; isPaused = false;
+        startTime = performance.now(); lastTime = performance.now();
+        playSfx('bgm', true);
+        if(gameLoopId) cancelAnimationFrame(gameLoopId);
+        requestAnimationFrame(gameLoop);
+        updateCloudRank();
+    };
+
+    function gameLoop(now) {
+        if(!gameActive) return;
+        if(!isPaused) {
+            const dt = (now - lastTime) / 16; lastTime = now;
+            groundPos -= gameSpeed * dt; if(groundPos <= -50) groundPos = 0;
+            document.getElementById('ground').style.backgroundPosition = `${groundPos}px 0px`;
+            obstaclePos -= gameSpeed * dt;
+            document.getElementById('obstacle').style.left = obstaclePos + "px";
+            document.getElementById('game-timer').innerText = ((now - startTime)/1000).toFixed(2);
+            if(obstaclePos < 150 && obstaclePos > 100) { if(queue.length > 0) openModal(queue.shift()); else finishGame(); }
+            if(obstaclePos < -100) { obstaclePos = 850; document.getElementById('obstacle').innerText = Math.random()>0.5?"🐢":"🍄"; }
+        } else { lastTime = now; }
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function openModal(word) {
+        isPaused = true; stopSfx('bgm'); playSfx('alert');
+        currentTarget = word.english.replace(/[^a-zA-Z0-9]/g, '');
+        currentInput = "";
+        document.getElementById('word-chinese').innerText = word.chinese;
+        const display = document.getElementById('spell-display'); display.innerHTML = "";
+        
+        word.english.split(' ').forEach(w => {
+            const group = document.createElement('div'); group.style = "display:inline-flex; gap:4px; margin:2px;";
+            [...w].forEach(c => {
+                if(/[a-zA-Z0-9]/.test(c)) {
+                    const b = document.createElement('div'); b.className = 'letter-box';
+                    b.innerHTML = `<div class="letter-underline"></div>`; group.appendChild(b);
+                } else {
+                    const d = document.createElement('div'); d.style = "font-size:18px; color:#c0392b; line-height:48px;";
+                    d.innerText = c; group.appendChild(d);
+                }
+            });
+            display.appendChild(group);
+            const space = document.createElement('div'); space.style.width = "12px"; display.appendChild(space);
+        });
+
+        const btnBox = document.getElementById('letter-buttons'); btnBox.innerHTML = "";
+        [...currentTarget].sort(()=>Math.random()-0.5).forEach(l => {
+            const btn = document.createElement('button'); btn.className = "letter-btn"; btn.innerText = l;
+            btn.onclick = () => {
+                if(currentInput.length < currentTarget.length) {
+                    currentInput += l; btn.classList.add('hidden');
+                    const allBoxes = document.querySelectorAll('.letter-box');
+                    allBoxes[currentInput.length-1].innerHTML = `<span>${l}</span><div class="letter-underline"></div>`;
+                }
+            };
+            btnBox.appendChild(btn);
+        });
+        document.getElementById('word-modal').style.display = 'flex';
+    }
+
+    document.getElementById('spell-confirm-btn').onclick = () => {
+        if(currentInput === currentTarget) {
+            playSfx('correct'); document.getElementById('word-modal').style.display = 'none';
+            document.getElementById('mario').classList.add('jumping-anim'); playSfx('jump');
+            setTimeout(() => { document.getElementById('mario').classList.remove('jumping-anim'); isPaused = false; obstaclePos = -100; document.getElementById('remaining').innerText = queue.length; playSfx('bgm', true); }, 600);
+        } else { playSfx('wrong'); alert("拼写不正确"); }
+    };
+
+    document.getElementById('spell-reset-btn').onclick = () => {
+        stopSfx('wrong'); currentInput = "";
+        document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('hidden'));
+        document.querySelectorAll('.letter-box').forEach(b => b.innerHTML = `<div class="letter-underline"></div>`);
+    };
+
+    document.getElementById('restart-unit-btn').onclick = () => { startGame(currentUnit); };
+
+    async function updateCloudRank() {
+        const container = document.getElementById('rank-container');
+        container.innerHTML = '<div style="text-align:center; padding:15px; color:#aaa;">⏳ 正在读取云端战绩...</div>';
+        try {
+            const res = await fetch(GET_URL + '?t=' + Date.now());
+            const data = await res.json();
+            const records = data.submissions || data.data || [];
+            const unitKey = "U" + currentUnit;
+            
+            const bests = new Map();
+            records.filter(r => (r.unit_name === unitKey || r.unit === unitKey) && (r.class_name === currentStudent.class || r.class === currentStudent.class))
+                   .forEach(r => {
+                       const sid = r.student_id; const dur = parseFloat(r.duration);
+                       if(!bests.has(sid) || dur < bests.get(sid).duration) bests.set(sid, r);
+                   });
+            
+            const myServerBest = bests.get(currentStudent.id);
+            const finalPB = myServerBest ? parseFloat(myServerBest.duration) : null;
+            document.getElementById('pb-display').innerText = finalPB ? `⭐ 云端最佳: ${finalPB.toFixed(1)}s` : `⭐ 云端最佳: --`;
+            
+            const top10 = [...bests.values()].sort((a,b)=>parseFloat(a.duration)-parseFloat(b.duration)).slice(0,10);
+            if(top10.length === 0) { container.innerHTML = '<p style="text-align:center;">✨ 暂无排名</p>'; return; }
+            let html = `<table class="rank-table"><tr><th>排名</th><th>学号</th><th>姓名</th><th>成绩</th></tr>`;
+            top10.forEach((r, i) => {
+                const isMe = r.student_id === currentStudent.id;
+                const cls = [i < 3 ? `top${i + 1}` : '', isMe ? 'me' : ''].filter(Boolean).join(' ');
+                const rank = i < 3
+                    ? `<span class="medal g${i + 1}">${i + 1}</span>`
+                    : (i + 1);
+                html += `<tr class="${cls}">` +
+                        `<td class="rk">${rank}</td>` +
+                        `<td>${r.student_id}</td>` +
+                        `<td>${r.student_name}${isMe ? '<span class="me-tag">我</span>' : ''}</td>` +
+                        `<td class="sc">${parseFloat(r.duration).toFixed(1)}s</td></tr>`;
+            });
+            container.innerHTML = html + '</table>';
+        } catch(e) { container.innerHTML = '<p style="color:#ffaa66; text-align:center; padding:15px;">网络拥堵，稍后重试</p>'; }
+    }
+
+    document.getElementById('submit-best-btn').onclick = async () => {
+        // 🌟 核心防作弊校验
+        if (gameActive || queue.length > 0) {
+            alert("⚠️ 挑战尚未完成！请拼完本单元所有单词后再提交成绩。");
+            return;
+        }
+
+        const time = parseFloat(document.getElementById('game-timer').innerText);
+        if(time <= 0) return alert("请先通关游戏再提交成绩！");
+
+        try {
+            document.getElementById('submit-best-btn').innerText = "⏳ 提交中...";
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ class_name: currentStudent.class, student_id: currentStudent.id, student_name: currentStudent.name, unit_name: "U"+currentUnit, duration: time, score: 100, timestamp: Date.now() }) });
+            if(res.ok) { 
+                alert("✅ 成绩已成功上传！"); 
+                markSubmitted();      // 提示切到「已提交」态
+                updateCloudRank(); 
+            }
+        } catch(e) { alert("同步失败"); }
+        finally { document.getElementById('submit-best-btn').innerText = "📤 提交本次成绩"; }
+    };
+
+    function finishGame() {
+        gameActive = false; 
+        stopSfx('bgm');
+        const time = parseFloat(document.getElementById('game-timer').innerText);
+        // 🌟 单元通关后，解锁提交按钮
+        lockSubmitButton(false);
+        alert(`🏁 单元通关！本次用时: ${time}s。\n请点击下方“提交本次成绩”同步至云端。`);
+        updateCloudRank();
+    }
+
+    document.getElementById('music-toggle').onclick = function() { isMuted = !isMuted; this.innerText = isMuted ? "🔇" : "🔊"; if(isMuted) Object.values(sfx).forEach(s => s.pause()); else if(gameActive && !isPaused) playSfx('bgm', true); };
+    /* Entry form is already present in the original HTML. */
+</script>
+</body>
+</html>

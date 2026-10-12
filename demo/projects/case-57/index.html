@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":57,"key":"case-57","title":"信息科技综合测评","category":"assessment","description":"信息科技学情图谱：围绕总分、客观题得分、操作题得分开展交互学习，在数据大屏中回看记录。","headline":"信息科技学情图谱","view":"diagnostic","fields":[{"key":"totalScore","label":"总分"},{"key":"objectiveScore","label":"客观题得分"},{"key":"operationScore","label":"操作题得分"},{"key":"answers","label":"逐题答案"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"模拟卷（自动批改）"}],"tasks":{"records":"nI9Cv88JlAA"},"mapping":{"kw9skiqdaa":"nI9Cv88JlAA"},"accent":"#a16a48","capture":false,"lesson":"模拟卷（自动批改）"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>信息科技学业考试模拟卷（含自动批改+解析）</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #f0f7ff;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #1e2a3e;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            padding: 24px 28px;
+        }
+        h1 {
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #1e3c72, #2b4c7c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-top: 0;
+            border-left: 6px solid #2b6e9e;
+            padding-left: 18px;
+        }
+        .sub {
+            color: #4a627a;
+            border-bottom: 2px solid #e2edf7;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+        .info-card {
+            background: #eef4fa;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            border: 1px solid #cde0ef;
+        }
+        .info-field { flex: 1; min-width: 160px; }
+        .info-field label { display: block; font-weight: 600; color: #1f4970; margin-bottom: 6px; font-size: 0.9rem; }
+        .info-field input, .info-field select { width: 100%; padding: 10px 14px; border-radius: 40px; border: 1px solid #bdd4e6; background: white; font-size: 1rem; outline: none; }
+        .section-title { font-size: 1.7rem; font-weight: 600; background: #eef3fc; padding: 10px 18px; border-radius: 40px; margin: 20px 0 18px 0; color: #1f4e7a; }
+        .question-card { background: #ffffff; border: 1px solid #e4edf5; border-radius: 20px; padding: 16px 22px; margin-bottom: 18px; transition: all 0.2s; }
+        .question-card.correct { border-left: 6px solid #48bb78; }
+        .question-card.wrong { border-left: 6px solid #f56565; }
+        .q-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 12px; color: #0b355c; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+        .q-num { background: #d9e9fa; border-radius: 30px; padding: 2px 12px; font-size: 0.85rem; }
+        .options { margin-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+        .option label { margin-left: 8px; font-weight: normal; cursor: pointer; }
+        .match-group, .sort-group { background: #f8fafd; border-radius: 20px; padding: 12px 20px; margin: 12px 0; }
+        .match-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 14px; padding: 8px; border-bottom: 1px dashed #cbdde9; }
+        .match-left { flex: 2; font-weight: 500; }
+        .match-right { flex: 2; }
+        select { padding: 8px 12px; border-radius: 30px; border: 1px solid #bdd4e6; background: white; font-size: 0.9rem; width: 100%; max-width: 320px; }
+        .sort-item { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; background: #ffffff; padding: 8px 14px; border-radius: 40px; border: 1px solid #e2edf4; }
+        .sort-order input { width: 70px; text-align: center; padding: 6px; border-radius: 20px; border: 1px solid #b9d2e8; }
+        .sort-text { flex: 1; }
+        button { background: #1f6392; border: none; color: white; font-weight: bold; font-size: 1.1rem; padding: 12px 32px; border-radius: 40px; cursor: pointer; transition: 0.2s; margin-top: 20px; width: 100%; }
+        button:hover { background: #0e4a70; transform: scale(0.99); }
+        button:disabled { background: #a0aec0; cursor: not-allowed; transform: none; }
+        .score-result { margin-top: 20px; padding: 20px; border-radius: 28px; text-align: center; background: #e9f4e9; color: #2b6e3b; font-weight: bold; font-size: 1.3rem; display: none; }
+        .score-result.visible { display: block; animation: fadeIn 0.5s; }
+        .explanation { margin-top: 12px; padding: 12px; background: #fffaf0; border-radius: 16px; font-size: 0.9rem; color: #c05621; border-left: 4px solid #f6ad55; display: none; }
+        .explanation.visible { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        footer { font-size: 0.75rem; text-align: center; margin-top: 32px; color: #6c8eae; }
+        .sub-question { margin-top: 22px; border-left: 3px solid #a0c4e4; padding-left: 18px; }
+        .scenario-text { background: #f8fafd; padding: 14px 18px; border-radius: 20px; margin: 12px 0 16px 0; font-size: 0.95rem; border-left: 4px solid #5b9acf; color: #1f3b4c; line-height: 1.45; }
+        .required-star { color: #d9534f; margin-left: 3px; }
+        @media (max-width: 700px) {
+            .container { padding: 16px; }
+            .question-card { padding: 12px 16px; }
+            .match-row { flex-direction: column; align-items: flex-start; }
+            select { max-width: 100%; }
+        }
+    </style>
+<style id="exam-progress-layer">
+/* ============================================================
+   答题进度层 · 学考模拟卷
+   延续原页视觉基因，不引入新调性：
+     色板  #f0f7ff 页面底 / #eef4fa 信息卡底 / #bdd4e6 边框
+           #1f4e7a 主文字 / #1f4970 标签 / #2b6e9e 强调蓝
+           #48bb78 正确绿 / #f56565 错误红
+     圆角  40px（胶囊）/ 28px（信息卡）/ 20px（题目卡）
+   ============================================================ */
+:root {
+    --e-bg:      #f0f7ff;
+    --e-card:    #eef4fa;
+    --e-line:    #bdd4e6;
+    --e-line-2:  #e2edf7;
+    --e-ink:     #1e2a3e;
+    --e-ink-2:   #1f4e7a;
+    --e-ink-3:   #4a627a;
+    --e-accent:  #2b6e9e;
+    --e-ok:      #48bb78;
+    --e-bad:     #f56565;
+    --e-radius:  20px;
+    --e-pill:    40px;
+}
+
+/* 进度面板：吸顶，答题时始终可见 */
+.exam-progress {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--e-line);
+    border-radius: var(--e-radius);
+    padding: 12px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 6px 18px -8px rgba(30, 60, 114, .28);
+}
+
+.exam-progress .ep-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 9px;
+}
+
+.exam-progress .ep-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--e-ink-2);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.exam-progress .ep-num .done { color: var(--e-ok); }
+
+.exam-progress .ep-label {
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--e-ink-3);
+}
+
+.exam-progress .ep-rest {
+    margin-left: auto;
+    font-size: .88rem;
+    color: var(--e-ink-3);
+    font-variant-numeric: tabular-nums;
+}
+
+.exam-progress .ep-rest b { color: #c05621; font-size: 1.02rem; }
+
+.exam-progress .ep-track {
+    height: 10px;
+    border-radius: var(--e-pill);
+    background: #e2edf7;
+    overflow: hidden;
+}
+
+.exam-progress .ep-fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--e-pill);
+    background: linear-gradient(90deg, #63b3ed, var(--e-accent));
+    transition: width .35s ease;
+}
+
+/* 题号导航：点一下就跳到该题 */
+.exam-progress .ep-grid {
+    display: grid;                            /* 用 grid 精确排布，避免 flex 把按钮拉伸/换行成色条 */
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+    max-height: 104px;
+    overflow-y: auto;
+}
+
+.exam-progress .ep-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 46px;
+    height: 28px;
+    padding: 0;
+    border-radius: 9px;
+    border: 1px solid var(--e-line);
+    background: #fff;
+    color: var(--e-ink-3);
+    font-size: .78rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+    font-variant-numeric: tabular-nums;
+}
+
+.exam-progress .ep-chip:hover { border-color: var(--e-accent); color: var(--e-accent); }
+.exam-progress .ep-chip.answered {
+    background: #e9f4e9;
+    border-color: #9fd6a8;
+    color: #276749;
+}
+.exam-progress .ep-chip.oper { border-style: dashed; }
+
+/* 全部答完时的完成态 */
+.exam-progress.all-done {
+    background: #f0fbf3;
+    border-color: #9fd6a8;
+}
+
+/* 被跳转定位到的题目：短暂高亮，帮学生找到位置 */
+.question-card.locate {
+    animation: locatePulse 1.4s ease-out;
+}
+@keyframes locatePulse {
+    0%   { background: #fff8e1; border-color: var(--e-accent); }
+    100% { background: #ffffff; border-color: #e4edf5; }
+}
+
+/* 键盘可达性：原页完全没有焦点样式 */
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+#submitBtn:focus-visible,
+.exam-progress .ep-chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(43, 110, 158, .42);
+}
+
+/* 移动端：连线与排序在窄屏容易挤，做一次收敛 */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .container { padding: 16px 14px; border-radius: 24px; }
+    h1 { font-size: 1.4rem; padding-left: 12px; border-left-width: 5px; }
+    .section-title { font-size: 1.2rem; padding: 8px 14px; }
+    .question-card { padding: 12px 14px; }
+    .info-card { padding: 14px; gap: 12px; border-radius: 20px; }
+    .exam-progress { padding: 10px 12px; }
+    .exam-progress .ep-num { font-size: 1.25rem; }
+    .exam-progress .ep-chip { min-width: 26px; height: 26px; font-size: .72rem; }
+    .match-row { flex-direction: column; align-items: stretch; }
+    .match-left, .match-right { flex: 1 1 100%; }
+    select { max-width: 100%; }
+    .sort-item { gap: 10px; }
+    #submitBtn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .question-card.locate { animation: none; }
+    .exam-progress .ep-fill { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>📄 信息科技学业考试模拟卷（含自动批改+解析）</h1>
+    <div class="sub">⭐ 满分100分 | 提交后自动批改、每道错题下方显示解析，答卷数据发送至服务器</div>
+
+    <div class="info-card">
+        <div class="info-field"><label>班级 <span class="required-star">*</span></label><select id="classSelect"><option value="">请选择班级</option><option>初二1班</option><option>初二2班</option><option>初二3班</option><option>初二4班</option><option>初二5班</option><option>初二6班</option><option>初二7班</option><option>初二8班</option></select></div>
+        <div class="info-field"><label>姓名 <span class="required-star">*</span></label><input type="text" id="studentName" placeholder="演示称呼"></div>
+        <div class="info-field"><label>知新软件学号</label><input type="text" id="studentId" placeholder="学号 / 考号"></div>
+    </div>
+
+    <div id="exam-root"></div>
+    <button id="submitBtn">📨 提交答卷 & 批改试卷</button>
+    <div id="scoreDisplay" class="score-result"></div>
+    <footer>诚信作答 · 独立思考 · 提交后系统自动批改并显示解析，每人仅可提交一次</footer>
+</div>
+
+<script>
+    // ======================= 单选题库 =======================
+    const singleQuestions = [
+        "互联网的雏形是（ ）","关于搜索引擎的工作原理，下列说法正确的是（ ）",
+        "某同学想查找由国家卫生健康委员会发布的关于青少年近视防控的最新官方指南，为学校宣传栏制作资料。以下搜索策略能最快速、精准地帮助他找到目标信息的是（ ）",
+        "在微视频制作过程中，以下步骤不能用于优化视频内容的是（ ）","关于互联网中不同类型数据的特点和价值，下列说法错误的是（ ）",
+        "在\"家乡非遗文化\"网站开发前的准备阶段，下列做法中不恰当的是（ ）",
+        "某同学在本地电脑上使用浏览器直接打开了自己制作的\"醒狮非遗文化\"网页文件（index.html），浏览效果正常。于是他认为，自己的网站已经成功\"发布\"到互联网，全世界的人都能访问了。小华的理解是否正确？请分析并选择最准确的选项。（ ）",
+        "小明家新装了宽带，并购买了一台无线路由器。他希望既能让台式电脑稳定高速地在线学习，又能让手机和平板电脑在家里移动时方便上网。针对台式电脑和移动设备，分别采用哪种网络连接方式更为合适？（ ）",
+        "在浏览器中输入网址（例如 www.example.com）并按下回车后，计算机会首先执行以下哪项操作，以便能够访问该网站？（ ）",
+        "关于电子邮件发送和接收的过程，下列说法正确的是（ ）","在TCP/IP协议族中，IP协议和TCP协议扮演着不同但至关重要的角色。关于它们的主要功能，以下描述正确的是（ ）",
+        "为完成\"社区垃圾分类宣传\"小组项目，小组成员需要共同收集资料、设计宣传方案并整合成一份研究报告。下列协作方式中，最能高效支持该任务的是（ ）",
+        "某网络购物平台发生大规模用户数据泄露事件，包括姓名、电话、订单信息等，部分用户随后遭遇精准诈骗。根据我国相关法律法规，下列说法正确的是（ ）",
+        "为了增强在线账户的安全性，避免因密码泄露导致他人非法登录，以下哪种身份验证方式在\"知道密码\"的基础上额外增加了一层保护？（ ）",
+        "某同学想使用生成式人工智能工具来辅助编写一个\"单词消消乐\"游戏网页的部分HTML代码。关于这类工具生成代码的原理和正确使用方法，下列说法正确的是（ ）",
+        "某智慧农业项目通过在农田中部署多种传感器（如土壤湿度传感器、光照传感器、温度传感器等），实时采集作物生长环境数据，并通过网络传输到云端平台进行分析，最终由系统自动控制灌溉设备进行精准浇水。以下物联网的特征在该项目中没有体现的是（ ）",
+        "在智能门票验证系统中，使用动态二维码代替传统纸质票或静态二维码，其最主要的技术优势是（ ）",
+        "某市图书馆引入了基于RFID技术的智能图书管理系统。读者持带有RFID标签的借书证进入图书馆，当读者从书架取书后，只需将书籍和借书证一起放在自助借还机上，系统即可自动识别并完成借阅。此过程中，系统依靠读写器与RFID标签进行无线通信。下列关于该系统中RFID技术工作原理的描述，不正确的是（ ）",
+        "关于红外传感器在人流量监测系统中的应用，下列说法正确的是（ ）","某景区使用智能环境质量监测系统，同时部署温度传感器、湿度传感器、PM2.5传感器和噪声传感器来监测环境质量。下列关于该系统所用到的多传感器融合技术的原理与优势，说法正确的是（ ）",
+        "某智慧农业项目需要在面积广阔的农田中部署多个土壤湿度传感器，这些传感器需要将采集的数据传输到距离约1公里外的控制中心。项目要求数据传输稳定、节点功耗低，且传感器数量较多（超过50个）。下列无线通信技术中，最符合该项目要求的是（ ）",
+        "某学校使用智慧教室蓝牙灯控系统，老师用手机连接灯具实现开关与调光。下列关于蓝牙工作原理的说法，正确的是（ ）",
+        "在智能家居系统中，多个传感器（如温湿度传感器、光照传感器）需要将采集的数据实时上报到云端平台，以便用户通过手机APP远程查看。同时，用户也可能通过APP向家里的智能灯泡发送\"开灯\"指令。为了实现这种设备与云端之间高效、稳定的数据双向通信，下列通信协议中最适合采用的是（ ）",
+        "关于无线局域网（Wi-Fi）技术，下列描述正确的是（ ）","某校计划建设\"智慧宿舍能耗监控系统\"，需要在每个宿舍安装智能电表、水表和空调温湿度传感器。这些传感器需要将采集的能耗数据实时、可靠地上传到校园数据中心，供管理员远程查看与分析。下列技术方案中，在兼顾数据实时性、传输可靠性及网络部署复杂度方面最合理的是（ ）",
+        "在一个智能农业系统中，部署了土壤湿度传感器实时采集数据，并通过无线网络将数据传输到云端平台，农户可以通过手机APP远程查看数据并控制灌溉设备。关于该系统中物联网三层架构的描述，不正确的是（ ）",
+        "某市计划在大型公园部署一套智慧环境监测系统，用于实时监测公园内的空气质量（如PM2.5、温湿度、噪音等）。传感器节点分布范围较广（覆盖约1平方公里），且部署位置多数不具备市电供电条件，需要电池供电。监测数据需要每小时上报一次至位于公园管理处的中央服务器，用于环境质量分析与公示。下列通信方案中，最能满足该项目低功耗、远距离、多节点需求的是（ ）",
+        "某城市计划建设一个\"智慧停车\"系统，通过在停车场每个车位安装地磁传感器来检测车位占用状态。传感器检测到车辆停入或离开时，会将状态变化信息通过无线网络发送到数据网关，网关通过4G网络将数据上传至云平台。用户在手机APP上可以实时查看空闲车位信息并进行导航。关于该系统的描述，下列选项中不正确的是（ ）",
+        "某智慧医院引入了一套\"智慧病区\"管理系统，用于提升住院患者的护理质量与安全。下列对该系统中物联网技术应用场景的描述中，最能体现物联网技术核心特征（全面感知、可靠传递、智能处理）并准确说明其工作原理的是（ ）",
+        "人工智能技术正在智慧医疗领域发挥重要作用。例如，基于深度学习的医疗影像辅助诊断系统可以通过分析患者的X光片、CT影像等，辅助医生快速识别病灶。关于此类系统的工作原理与特点，下列说法不正确的是（ ）"
+    ];
+    const singleOptions = [
+        ["A. 万维网","B. TCP/IP协议","C. DNS系统","D. 阿帕网（ARPANET）"],
+        ["A. 搜索引擎只能搜索文字信息，无法搜索图片或视频","B. 搜索引擎通过人工方式逐一整理互联网上的所有信息","C. 搜索引擎使用\"网络爬虫\"自动抓取并索引网页内容","D. 搜索引擎的搜索结果完全随机排序，与关键词无关"],
+        ["A. 在搜索引擎中输入\"近视\"然后逐页浏览结果","B. 在搜索引擎中输入\"青少年近视防控指南\"","C. 在搜索引擎中输入\"site:nhc.gov.cn 青少年近视 防控 指南\"","D. 在短视频平台搜索\"如何预防近视\"的相关视频"],
+        ["A. 创意构思","B. 拍摄素材","C. 后期加工","D. 发布视频"],
+        ["A. 文本数据易于理解和分析，适合用于信息传播和知识分享","B. 图片和视频数据直观生动，但数据量通常较大，处理成本较高","C. 数据库数据结构化程度高，便于复杂查询与分析，但缺乏灵活性","D. 音频数据在信息传递中效率最高，且占用存储空间通常最小"],
+        ["A. 从专业图片网站下载无水印的高清素材，并仔细阅读其版权声明","B. 直接将某知名画家创作的国画作品扫描后作为网站背景，未作任何说明","C. 使用\"CC0\"协议（公共领域贡献）的图片，并在网站\"关于我们\"页面对来源进行标注","D. 规划网站结构，明确\"历史渊源\"、\"技艺展示\"、\"传承人物\"等栏目，并分工收集相应素材"],
+        ["A.正确，因为能在浏览器中打开就说明网页已经在线，只要把网页文件链接发给别人即可访问","B.不正确，网站发布通常需要将网页文件上传到互联网上的服务器（如网站托管平台、云服务器），并为网站配置一个可通过互联网访问的域名或IP地址","C.不正确，网站文件必须经过加密处理后才算正式发布，否则无法被他人看到","D.正确，只要将电脑连接到互联网，并保持开机状态，其他人就能通过小华的电脑IP地址访问这个网"],
+        ["A.台式电脑和移动设备都使用 Wi-Fi 无线连接","B.台式电脑和移动设备都使用网线有线连接","C.台式电脑使用网线有线连接，移动设备使用 Wi-Fi 无线连接","D.台式电脑使用 Wi-Fi 无线连接，移动设备使用网线有线连接"],
+        ["A.直接通过IP地址连接目标网站服务器","B.向DNS服务器发送请求，将域名解析为对应的IP地址","C.检查浏览器中是否已缓存该网页的全部内容","D.向网站服务器发送一个HTTP请求，请求网页数据"],
+        ["A. 发件人撰写邮件后，直接通过POP3协议将邮件发送到收件人的电脑上","B. 发件人邮箱的服务器使用SMTP协议，将邮件发送给收件人邮箱的服务器","C. 收件人通过SMTP协议从自己的邮箱服务器下载邮件到本地客户端","D. 电子邮件从发件人到收件人，全程只使用TCP/IP协议，不需要特定的应用层协议"],
+        ["A. IP协议负责将数据分割成数据包，并确保它们按序、可靠地到达目的地；TCP协议负责为数据包选择传输路径","B. IP协议负责数据在网络中的路由和寻址，将数据包送达目标设备；TCP协议负责建立可靠连接，确保数据完整、有序地传输","C. TCP协议和IP协议功能完全相同，只是名称不同，都用于确保网络通信的可靠性","D. IP协议负责对传输的数据进行加密，保障通信安全；TCP协议负责管理网络设备的物理连接"],
+        ["A. 各自使用本地文档软件撰写，最后通过U盘合并文件","B. 创建在线共享文档，设置编辑权限，多人实时协作撰写与修改","C. 轮流使用组长的一台电脑，依次输入各自负责的内容","D. 仅通过社交软件群聊发送文字片段，由一人手动汇总"],
+        ["A. 平台只需加强技术防护即可免责，因黑客攻击属于不可抗力","B. 根据《中华人民共和国反电信网络诈骗法》，电信运营商应主动监测拦截诈骗信息，用户无需采取任何防护措施","C. 依据《中华人民共和国网络安全法》和《中华人民共和国个人信息保护法》，平台未履行数据保护义务需承担法律责任","D. 根据《中华人民共和国数据安全法》，此类数据泄露事件仅需由公安机关处罚，公民个人无权提起诉讼"],
+        ["A. 定期更换一个更复杂的密码","B. 在不同的网站使用不同的密码","C. 开启短信验证码或动态令牌等双重身份验证","D. 将密码记录在安全的笔记本上"],
+        ["A.生成式人工智能工具完全自主创作代码，其生成结果无需任何人工检查或修改即可直接使用","B.生成式人工智能工具根据海量代码数据进行训练和学习，能理解自然语言描述并生成相应的代码片段","C.向工具提问时，描述越模糊、越简短，生成的代码质量通常越高","D.生成式人工智能工具生成的代码版权完全归工具开发者所有，使用者不能在任何项目中使用"],
+        ["A. 全面感知","B. 可靠传递","C. 智能处理","D. 虚拟交互"],
+        ["A. 二维码图案更美观","B. 二维码生成速度更快","C. 二维码内容可定期更新，防止被复制盗用","D. 二维码存储容量更大"],
+        ["A.读写器向RFID标签发射特定频率的无线电波，为无源标签提供能量以激活芯片","B.标签被激活后，将存储在芯片中的书籍或读者信息通过无线电波发送给读写器","C.读写器将接收到的信息通过专用软件传送给图书馆后台数据库服务器，完成借阅记录更新","D.RFID标签与读写器之间需要建立物理接触或精确对准，才能完成信息读取"],
+        ["A. 红外传感器通过发射并接收无线电波来检测人体","B. 红外传感器主要依靠检测人体发出的热量（红外辐射）来工作","C. 红外传感器必须在光线充足的条件下才能正常工作","D. 红外传感器无法区分人与其他移动物体，因此不能用于精确计数"],
+        ["A.只需将多种传感器集中安装，无需算法处理，就是多传感器融合技术","B.原理是通过算法将多个传感器的数据进行整合分析，提升环境质量监测的准确性和全面性","C.相比单一传感器，该技术的优势是数据整合更单一，更容易出现误报漏报","D.该技术只能用不同类型传感器，不能用多个同类型传感器进行数据验证"],
+        ["A. Wi-Fi","B. 蓝牙（Bluetooth）","C. ZigBee","D. LoRa"],
+        ["A.蓝牙是远距离通信技术，通信距离可达100米以上，可跨教学楼控制","B.蓝牙功耗很高，需要频繁给灯具充电才能维持使用","C.蓝牙只能单向传输数据，手机可以发指令给灯，灯不能回传任何信息","D.蓝牙设备必须先配对建立连接，才能传输控制指令，支持一对一或一对多"],
+        ["A. HTTP 协议","B. SMTP 协议","C. MQTT 协议","D. TCP 协议"],
+        ["A. Wi-Fi信号不能穿透墙壁，只能在视距范围内使用","B. Wi-Fi的覆盖范围通常可达数公里，适合广域网通信","C. Wi-Fi采用无线电波传输数据，工作频段包括2.4GHz和5GHz","D. Wi-Fi设备必须通过网线连接到互联网才能工作"],
+        ["A. 所有传感器通过蓝牙连接至宿舍内的学生手机，再通过手机蜂窝网络上传数据","B. 每个传感器内置SIM卡，直接通过4G/5G蜂窝网络将数据发送至数据中心","C. 在每层楼部署Wi-Fi网络，所有传感器通过Wi-Fi直接连接并上传数据至数据中心","D. 在每层楼部署一个集中器（内置ZigBee或LoRa模块），传感器通过低功耗局域网技术将数据汇聚至集中器，集中器再通过校园有线网络（或Wi-Fi）将数据转发至数据中心"],
+        ["A. 土壤湿度传感器属于感知层，负责采集物理世界的信息","B. 无线网络（如4G/NB-IoT）属于网络层，负责数据的可靠传输","C. 云端平台的数据分析功能属于应用层，负责提供具体的农业管理服务","D. 农户的手机APP属于网络层，负责数据的转发与路由"],
+        ["A. 所有传感器节点通过蓝牙将数据直接发送至中央服务器","B. 传感器节点通过Wi-Fi组建局域网，将数据汇聚至中央服务器","C. 每个传感器节点内置4G/5G模块，直接通过蜂窝网络上传数据至云平台，再由云平台转发至中央服务器","D. 传感器节点通过LoRa或NB-IoT等低功耗广域网技术将数据上传至附近的网关，网关再通过有线网络将数据汇总至中央服务器"],
+        ["A. 地磁传感器属于感知层设备，负责采集车位状态数据","B. 4G网络属于网络层，负责将车位数据传输至云平台","C. 手机APP属于应用层，为用户提供车位查询与导航服务","D. 该系统完全不需要网络层，传感器可以直接与手机APP通信"],
+        ["A. 护士使用PDA（个人数字助理）扫描患者腕带上的二维码，快速查询其电子病历。","B. 病房的Wi-Fi网络全覆盖，方便患者和家属使用手机连接网络。","C. 智能病床搭载多种传感器（如心率监测垫、离床感应器），可自动采集患者生命体征与活动状态，数据通过网关实时上传至护士站中央系统。当数据异常时，系统会自动预警。","D. 医生在办公室通过视频会议系统，与异地专家共同查看一位患者的X光片并进行会诊。"],
+        ["A. 该系统需要利用大量已标注的医学影像数据进行训练，学习识别疾病的特征模式","B. 该系统可以完全替代医生，独立做出最终的诊断结论和治疗方案","C. 该系统能够处理海量影像数据，帮助医生提高筛查效率，减轻工作负担","D. 系统的诊断结果可能存在误差，最终仍需由专业医生进行审核和决策"]
+    ];
+    // 修正第28题答案（索引27）为 D
+    const singleAnswers = ["D","C","C","D","D","B","B","C","B","B","B","B","C","C","B","D","C","D","B","B","D","D","C","C","D","D","D","D","C","B"];
+    const singleExplanations = [
+        "互联网的雏形是1969年的阿帕网(ARPANET)。","网络爬虫自动抓取并索引网页内容是搜索引擎的核心原理。",
+        "site语法可以将搜索范围限定在特定网站，快速找到官方权威信息。","发布视频不是优化步骤，而是最终成果展示环节。",
+        "音频数据在信息传递中效率一般且占用空间并非最小（文本更小）。","直接使用他人作品未作说明侵犯著作权，属于不当做法。",
+        "网站发布需要上传至服务器并配置域名/IP，仅本地打开无法被外部访问。","台式机用网线稳定高速；移动设备用Wi-Fi方便移动。",
+        "浏览器首先向DNS服务器请求将域名解析为IP地址。","SMTP协议负责邮件发送，POP3负责接收。",
+        "IP负责寻址路由，TCP负责可靠传输。","在线共享文档支持多人实时协作，效率最高。",
+        "《网络安全法》和《个人信息保护法》规定了平台的数据保护义务。","双重身份验证在密码基础上增加额外保护层。",
+        "生成式AI基于海量代码训练，能理解自然语言生成代码。","虚拟交互未体现，物联网特征为全面感知、可靠传递、智能处理。",
+        "动态二维码定期更新可防止复制盗用。","RFID无需物理接触即可读取信息。",
+        "红外传感器靠检测人体发出的红外辐射工作。","多传感器融合通过算法整合分析数据，提升准确性。",
+        "LoRa技术适合远距离、低功耗、大连接场景。","蓝牙必须先配对建立连接，支持一对一或一对多。",
+        "MQTT协议专为物联网设备双向通信设计，轻量高效。","Wi-Fi工作在2.4GHz和5GHz频段。",
+        "集中器方案兼顾实时性、可靠性和部署成本。","手机APP属于应用层，网络层负责数据传输。",
+        "LoRa/NB-IoT满足低功耗、远距离、多节点需求。","传感器不能直接与APP通信，必须通过网络层。",
+        "C选项完整体现了感知、传输、智能处理的物联网特征。","AI不能完全替代医生，最终诊断需由医生确认。"
+    ];
+
+    // ======================= 操作题评分（基于参考答案） =======================
+    function calculateOperationalScore() {
+        let score = 0;
+        // 31题
+        const q31_1 = document.querySelector('input[name="q31_1"]:checked');
+        if (q31_1 && q31_1.value === 'B') score += 2;
+        for (let i=1;i<=4;i++) {
+            const sel = document.querySelector(`select[name="q31_2_${i}"]`);
+            if (sel && ((i===1 && sel.value==='B')||(i===2 && sel.value==='C')||(i===3 && sel.value==='A')||(i===4 && sel.value==='D'))) score += 1;
+        }
+        let sort31 = []; for(let i=0;i<4;i++){ let inp = document.querySelector(`input[name="q31_3_order_${i}"]`); if(inp) sort31.push(parseInt(inp.value)); }
+        if(sort31.length===4 && sort31[0]===1 && sort31[1]===2 && sort31[2]===3 && sort31[3]===4) score += 2;
+        const q31_4 = document.querySelector('input[name="q31_4"]:checked');
+        if (q31_4 && q31_4.value === 'C') score += 2;
+
+        // 32题
+        const s32_1 = document.querySelector('select[name="q32_1_1"]'), s32_2 = document.querySelector('select[name="q32_1_2"]'), s32_3 = document.querySelector('select[name="q32_1_3"]');
+        if(s32_1 && s32_1.value === 'C') score += 1; if(s32_2 && s32_2.value === 'A') score += 1; if(s32_3 && s32_3.value === 'B') score += 1;
+        const soil = document.querySelector('select[name="q32_2_1"]'), temp = document.querySelector('select[name="q32_2_2"]'), zig = document.querySelector('select[name="q32_2_3"]');
+        if(soil && soil.value === 'B') score += 1; if(temp && temp.value === 'C') score += 1; if(zig && zig.value === 'G') score += 1;
+        let sort32 = []; for(let i=0;i<6;i++){ let inp = document.querySelector(`input[name="q32_3_order_${i}"]`); if(inp) sort32.push(parseInt(inp.value)); }
+        if(sort32.length===6 && sort32[0]===1 && sort32[1]===2 && sort32[2]===3 && sort32[3]===4 && sort32[4]===5 && sort32[5]===6) score += 3;
+        for(let i=1;i<=4;i++){ let sel = document.querySelector(`select[name="q32_4_${i}"]`); if(sel && ((i===1 && sel.value==='C')||(i===2 && sel.value==='D')||(i===3 && sel.value==='A')||(i===4 && sel.value==='B'))) score += 0.5; }
+
+        // 33题
+        const q33_1 = document.querySelector('input[name="q33_1"]:checked'); if(q33_1 && q33_1.value === 'C') score += 2;
+        for(let i=1;i<=4;i++){ let sel = document.querySelector(`select[name="q33_2_${i}"]`); if(sel && ((i===1 && sel.value==='D')||(i===2 && sel.value==='C')||(i===3 && sel.value==='A')||(i===4 && sel.value==='B'))) score += 1; }
+        let sort33 = []; for(let i=0;i<4;i++){ let inp = document.querySelector(`input[name="q33_3_order_${i}"]`); if(inp) sort33.push(parseInt(inp.value)); }
+        if(sort33.length===4 && sort33[0]===1 && sort33[1]===2 && sort33[2]===3 && sort33[3]===4) score += 2;
+        const q33_4 = document.querySelector('input[name="q33_4"]:checked'); if(q33_4 && q33_4.value === 'B') score += 2;
+
+        // 34题
+        for(let i=1;i<=4;i++){ let sel = document.querySelector(`select[name="q34_1_${i}"]`); if(sel && ((i===1 && sel.value==='B')||(i===2 && sel.value==='A')||(i===3 && sel.value==='C')||(i===4 && sel.value==='D'))) score += 0.5; }
+        const f1 = document.querySelector('select[name="q34_2_1"]'), f2 = document.querySelector('select[name="q34_2_2"]'), f3 = document.querySelector('select[name="q34_2_3"]'), f4 = document.querySelector('select[name="q34_2_4"]');
+        if(f1 && f1.value === 'E') score += 1; if(f2 && f2.value === 'B') score += 1; if(f3 && f3.value === 'F') score += 1; if(f4 && f4.value === 'C') score += 1;
+        const q34_3 = document.querySelector('input[name="q34_3"]:checked'); if(q34_3 && q34_3.value === 'C') score += 2;
+        const q34_4 = document.querySelector('input[name="q34_4"]:checked'); if(q34_4 && q34_4.value === 'D') score += 2;
+        return score;
+    }
+
+    // 解析文本辅助
+    function getOperExplanation(questionId, subId) {
+        const map = {
+            "31_1": "在线协作平台应支持多人实时编辑，百度网盘主要是云存储，不适合协同编辑。",
+            "31_2": "官方来源可信度高；个人博客/视频主观性强需警惕。正确匹配：1-B,2-C,3-A,4-D。",
+            "31_3": "正确的流程是：创建文档→分工编辑→讨论批注→统一审阅。顺序应为 A→B→C→D。",
+            "31_4": "设置指定成员可编辑，其他仅查看是安全的分享方式。",
+            "32_1": "应用层(数据分析/控制)、感知层(传感器)、网络层(通信模块)。正确连接：1-C,2-A,3-B。",
+            "32_2": "土壤湿度用湿度传感器，温度用温度传感器，ZigBee适合低功耗自组网。",
+            "32_3": "正确顺序：B(采集)→D(传感→网关)→F(网关→云端)→A(分析)→E(指令)→C(执行)。",
+            "32_4": "曲线图-云可视化；自动控制-执行器；传感器探测-感知；汇聚网关-网络传输。正确匹配：1-C,2-D,3-A,4-B。",
+            "33_1": "AI基于深度学习，需要标注数据训练，不能替代医生。",
+            "33_2": "路线规划-决策算法；推荐-推荐系统；人脸识别-计算机视觉；语音-自然语言处理。正确匹配：1-D,2-C,3-A,4-B。",
+            "33_3": "正确流程：C(数据准备)→A(训练)→D(评估)→B(应用)。",
+            "33_4": "未经患者同意收集影像数据违反伦理和法律。",
+            "34_1": "传感器-感知层；通信-网络层；平台-应用层；阀门-执行器。正确匹配：1-B,2-A,3-C,4-D。",
+            "34_2": "流程：D(采集)→E(传输至网关)→B(上传云端)→F(存储)→C(分析)→A(指令)。",
+            "34_3": "实时上传云端并生成共享图表报告最有利于长期记录和协作分析。",
+            "34_4": "取消自动灌溉是消极回避，不合理，应优化传感器或增加校验。"
+        };
+        return map[`${questionId}_${subId}`] || "参考答案见解析。";
+    }
+
+    // 生成完整试卷HTML（包含完整题干描述）
+    function buildFullExamHTML() {
+        let html = `<div class="section-title">📌 一、单项选择题（共30题，每题2分，共60分）</div>`;
+        for (let i = 0; i < singleQuestions.length; i++) {
+            html += `<div class="question-card" data-qtype="single" data-qid="${i+1}" data-correct="${singleAnswers[i]}" data-explanation="${singleExplanations[i]}">
+                        <div class="q-title"><span class="q-num">${i+1}</span> ${singleQuestions[i]}</div>
+                        <div class="options">`;
+            for (let opt of singleOptions[i]) {
+                html += `<div class="option"><label><input type="radio" name="mc_${i+1}" value="${opt.charAt(0)}"> ${opt}</label></div>`;
+            }
+            html += `</div><div class="explanation"></div></div>`;
+        }
+        html += `<div class="section-title">📁 二、操作题（共4题，每题10分，共40分）</div>`;
+
+        // ========= 31题 完整题干 =========
+        html += `<div class="question-card" data-qtype="oper" data-qid="31">
+            <div class="q-title">31. 社区智能节水宣传项目</div>
+            <div class="scenario-text">📖 学校计划开展“智慧社区，绿色生活”主题活动，你所在的班级需要完成一项“社区智能节水宣传”项目。项目要求同学们在线学习节水知识、收集与甄别资料，并协作制作一份宣传方案。作为项目组技术负责人，你需要完成以下任务。</div>
+            <div class="sub-question" data-sub="1"><strong>(1) 为了高效管理项目进度、共享资料和协同编辑方案文档，项目组需要选择一个合适的在线协作平台。下列平台中，最不适合用于此项多人在线协作任务的是（2分）</strong><div class="options"><div class="option"><label><input type="radio" name="q31_1" value="A"> A.腾讯文档</label></div><div class="option"><label><input type="radio" name="q31_1" value="B"> B.百度网盘</label></div><div class="option"><label><input type="radio" name="q31_1" value="C"> C.金山文档</label></div><div class="option"><label><input type="radio" name="q31_1" value="D"> D.飞书项目</label></div></div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="2"><strong>(2)在收集“智能节水技术”相关资料时，你找到了以下四个信息来源。请将左侧的信息来源与右侧其可信度等级用直线连接起来。（4分）</strong><div class="match-group">
+                <div class="match-row"><div class="match-left">1. 某个人博客上关于"家用节水神器"的推广文章，带有购买链接。</div><div class="match-right"><select name="q31_2_1"><option value="">请选择</option><option value="A">A.可信度一般，需交叉验证</option><option value="B">B.可信度较低，警惕商业推广</option><option value="C">C.可信度高，具有权威性</option><option value="D">D.可信度低，内容主观性强</option></select></div></div>
+                <div class="match-row"><div class="match-left">2. 中华人民共和国水利部官方网站发布的《国家节水行动方案》解读。</div><div class="match-right"><select name="q31_2_2"><option value="">请选择</option><option value="A">A.可信度一般，需交叉验证</option><option value="B">B.可信度较低，警惕商业推广</option><option value="C">C.可信度高，具有权威性</option><option value="D">D.可信度低，内容主观性强</option></select></div></div>
+                <div class="match-row"><div class="match-left">3. 一篇来自"知乎"平台，由多位工程师参与讨论的技术分析帖。</div><div class="match-right"><select name="q31_2_3"><option value="">请选择</option><option value="A">A.可信度一般，需交叉验证</option><option value="B">B.可信度较低，警惕商业推广</option><option value="C">C.可信度高，具有权威性</option><option value="D">D.可信度低，内容主观性强</option></select></div></div>
+                <div class="match-row"><div class="match-left">4. 一段短视频平台博主自制的"节水小妙招"视频，无任何数据或专家支持。</div><div class="match-right"><select name="q31_2_4"><option value="">请选择</option><option value="A">A.可信度一般，需交叉验证</option><option value="B">B.可信度较低，警惕商业推广</option><option value="C">C.可信度高，具有权威性</option><option value="D">D.可信度低，内容主观性强</option></select></div></div>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="3"><strong>(3) 小组决定使用腾讯文档共同撰写宣传方案。以下是使用在线文档协作时的几个关键步骤，但其顺序已被打乱。请将这些步骤按合理的操作流程进行排序，将代表步骤的字母（A-D）按顺序填写在下方横线上（2分）</strong><div class="sort-group">
+                <div class="sort-item"><div class="sort-order"><input type="number" name="q31_3_order_0" min="1" max="4" step="1" placeholder="顺序"></div><div class="sort-text">A. 组长创建在线文档，设置编辑权限，并将文档链接分享给小组成员。</div></div>
+                <div class="sort-item"><div class="sort-order"><input type="number" name="q31_3_order_1" min="1" max="4" step="1" placeholder="顺序"></div><div class="sort-text">B. 小组成员分别领取任务，同步在线编辑自己负责的部分，并可实时看到他人的修改。</div></div>
+                <div class="sort-item"><div class="sort-order"><input type="number" name="q31_3_order_2" min="1" max="4" step="1" placeholder="顺序"></div><div class="sort-text">C. 利用文档的"编辑"与"批注"功能，对文稿内容进行讨论和修改建议。</div></div>
+                <div class="sort-item"><div class="sort-order"><input type="number" name="q31_3_order_3" min="1" max="4" step="1" placeholder="顺序"></div><div class="sort-text">D. 所有成员编辑完成后，由组长统一审阅，并使用"修订记录"功能回溯或确定最终版本。</div></div>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="4"><strong>(4) 宣传方案初稿完成后，需要在班级内公开征集意见，但又要防止文档被无关人员篡改。作为技术负责人，你会选择以下哪种分享方式？（2分）</strong><div class="options"><div class="option"><label><input type="radio" name="q31_4" value="A"> A.生成一个公开链接，并将链接发布到班级QQ群，设置"任何人可编辑"</label></div><div class="option"><label><input type="radio" name="q31_4" value="B"> B.生成一个分享链接，并设置为"仅限班级同学查看"，同时设置"禁止下载"</label></div><div class="option"><label><input type="radio" name="q31_4" value="C"> C.生成一个分享链接，设置为"指定人员（项目组成员）可编辑"，其他人员"仅可查看"</label></div><div class="option"><label><input type="radio" name="q31_4" value="D"> D.将文档下载为PDF格式，通过电子邮件附件发送给全班同学</label></div></div><div class="explanation sub-exp"></div></div>
+        </div>`;
+
+        // 32题
+        html += `<div class="question-card" data-qtype="oper" data-qid="32">
+            <div class="q-title">32. “智慧农业温室大棚”模拟系统</div>
+            <div class="scenario-text">📖 学校科技社团计划搭建一个“智慧农业温室大棚”模拟系统，用于研究物联网技术在现代农业中的应用。该系统需要实现环境监测、自动控制和远程管理。请作为项目组成员，完成以下任务。</div>
+            <div class="sub-question" data-sub="1"><strong>(1) 智慧农业温室大棚系统通常采用物联网三层架构进行设计。请将左侧的系统组件与右侧对应的物联网架构层次用直线连接起来。</strong><div class="match-group">
+                <div class="match-row"><div class="match-left">1. 云端数据分析平台、手机APP控制端、自动灌溉阀门、补光灯</div><div class="match-right"><select name="q32_1_1"><option value="">选择层次</option><option value="A">A.感知层</option><option value="B">B.网络层</option><option value="C">C.应用层</option></select></div></div>
+                <div class="match-row"><div class="match-left">2. 土壤湿度传感器、光照传感器</div><div class="match-right"><select name="q32_1_2"><option value="">选择层次</option><option value="A">A.感知层</option><option value="B">B.网络层</option><option value="C">C.应用层</option></select></div></div>
+                <div class="match-row"><div class="match-left">3. Wi-Fi模块、4G通信模块</div><div class="match-right"><select name="q32_1_3"><option value="">选择层次</option><option value="A">A.感知层</option><option value="B">B.网络层</option><option value="C">C.应用层</option></select></div></div>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="2"><strong>(2) 为了监测大棚内的环境数据并传输到服务器，需要选择合适的传感器和通信方式。请从下列选项中，选择最合适的一项填入空白处。（3分）</strong><br>监测土壤湿度应选用 <select name="q32_2_1"><option value="">请选择</option><option value="A">超声波传感器</option><option value="B">湿度传感器</option><option value="C">温度传感器</option><option value="D">红外传感器</option></select>；<br>监测空气温度应选用 <select name="q32_2_2"><option value="">请选择</option><option value="A">超声波传感器</option><option value="B">湿度传感器</option><option value="C">温度传感器</option><option value="D">红外传感器</option></select>；<br>大棚位置距离学校服务器机房约200米，中间无遮挡，且需要传输的数据量很小，但部署的传感器节点较多（超过20个）。为这些传感器选择一种低功耗、可自组网的无线通信技术，最合适的是 <select name="q32_2_3"><option value="">请选择</option><option value="E">Wi-Fi</option><option value="F">蓝牙</option><option value="G">ZigBee</option><option value="H">4G/5G蜂窝网络</option></select><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="3"><strong>(3) 以下是智慧农业系统中一次自动灌溉触发过程中，数据的产生与处理步骤，顺序已被打乱。请将这些步骤按正确的逻辑顺序进行排序，将代表步骤的字母（A-F）按顺序填写在横线上。（3分）</strong><div class="sort-group">${["A. 云端平台分析数据，发现土壤湿度低于预设阈值。","B. 土壤湿度传感器持续采集数据。","C. 执行器（电磁阀）打开，开始灌溉。","D. 传感器通过网络将数据发送至大棚内的网关。","E. 云端平台通过4G网络向大棚内的控制器发出\"开启灌溉\"指令。","F. 网关通过有线网络/4G将数据上传至云端平台。"].map((step,idx)=>`<div class="sort-item"><div class="sort-order"><input type="number" name="q32_3_order_${idx}" min="1" max="6" step="1" placeholder="顺序"></div><div class="sort-text">${step}</div></div>`).join('')}</div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="4"><strong>(4) 智慧农业系统实现了多种智能功能。请将左侧的系统功能描述与右侧其主要依托的物联网技术原理用直线连接起来。（2分）</strong><div class="match-group">
+                <div class="match-row"><div class="match-left">1. 管理员在手机上可实时查看千里之外大棚的温湿度数据曲线图。</div><div class="match-right"><select name="q32_4_1"><option value="">匹配原理</option><option value="A">A.传感器感知外界信息</option><option value="B">B.无线/有线网络的数据传输</option><option value="C">C.云平台的数据存储与可视化</option><option value="D">D.基于规则的自动控制（执行器响应）</option></select></div></div>
+                <div class="match-row"><div class="match-left">2. 系统根据预设的土壤湿度阈值，自动控制水泵的开启与关闭。</div><div class="match-right"><select name="q32_4_2"><option value="">匹配原理</option><option value="A">A.传感器感知外界信息</option><option value="B">B.无线/有线网络的数据传输</option><option value="C">C.云平台的数据存储与可视化</option><option value="D">D.基于规则的自动控制（执行器响应）</option></select></div></div>
+                <div class="match-row"><div class="match-left">3. 温湿度传感器探测大棚的温湿度值。</div><div class="match-right"><select name="q32_4_3"><option value="">匹配原理</option><option value="A">A.传感器感知外界信息</option><option value="B">B.无线/有线网络的数据传输</option><option value="C">C.云平台的数据存储与可视化</option><option value="D">D.基于规则的自动控制（执行器响应）</option></select></div></div>
+                <div class="match-row"><div class="match-left">4. 大棚内的各种传感器数据通过无线网络汇聚到网关设备。</div><div class="match-right"><select name="q32_4_4"><option value="">匹配原理</option><option value="A">A.传感器感知外界信息</option><option value="B">B.无线/有线网络的数据传输</option><option value="C">C.云平台的数据存储与可视化</option><option value="D">D.基于规则的自动控制（执行器响应）</option></select></div></div>
+            </div><div class="explanation sub-exp"></div></div>
+        </div>`;
+
+        // 33题
+        html += `<div class="question-card" data-qtype="oper" data-qid="33">
+            <div class="q-title">33. “人工智能辅助医疗影像诊断系统”</div>
+            <div class="scenario-text">📖 某医院引入了一套“人工智能辅助医疗影像诊断系统”，用于辅助医生快速、精准地分析肺部CT影像，识别早期病变。该系统基于深度学习技术，其开发与应用过程涉及数据、算法、训练和伦理等多个环节。作为项目组的技术实习生，请你完成以下任务。</div>
+            <div class="sub-question" data-sub="1"><strong>(1) 关于此“人工智能辅助诊断系统”的描述，以下说法最准确的是（2分）</strong><div class="options">${["A.该系统只是一个存储了大量CT影像的数据库","B.该系统通过模拟人类医生的诊断经验，根据预设的固定规则对影像进行判断","C.该系统基于深度学习算法，利用大量已标注的影像数据训练模型，使其能够自动识别和标注病变特征","D.该系统具备人类的意识和情感，能够完全独立完成诊断并给出治疗方案"].map((opt,idx)=>`<div class="option"><label><input type="radio" name="q33_1" value="${String.fromCharCode(65+idx)}"> ${opt}</label></div>`).join('')}</div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="2"><strong>(2) 人工智能技术正广泛应用于智慧社会的不同领域。请将左侧的具体应用描述与右侧所依托的主要人工智能技术用直线连接起来。（4分）</strong><div class="match-group">
+                <div class="match-row"><div class="match-left">1. 手机地图APP根据实时路况为你规划出最快捷的回家路线。</div><div class="match-right"><select name="q33_2_1"><option value="">选择技术</option><option value="A">A.计算机视觉</option><option value="B">B.语音识别与自然语言处理</option><option value="C">C.推荐系统与数据挖掘</option><option value="D">D.智能决策与优化算法</option></select></div></div>
+                <div class="match-row"><div class="match-left">2. 在线学习平台根据你的答题记录，智能推荐个性化的练习题。</div><div class="match-right"><select name="q33_2_2"><option value="">选择技术</option><option value="A">A.计算机视觉</option><option value="B">B.语音识别与自然语言处理</option><option value="C">C.推荐系统与数据挖掘</option><option value="D">D.智能决策与优化算法</option></select></div></div>
+                <div class="match-row"><div class="match-left">3. 小区门禁系统通过摄像头识别住户面部特征，自动开门。</div><div class="match-right"><select name="q33_2_3"><option value="">选择技术</option><option value="A">A.计算机视觉</option><option value="B">B.语音识别与自然语言处理</option><option value="C">C.推荐系统与数据挖掘</option><option value="D">D.智能决策与优化算法</option></select></div></div>
+                <div class="match-row"><div class="match-left">4. 智能音箱能够听懂你的语音指令，并播放音乐或查询天气。</div><div class="match-right"><select name="q33_2_4"><option value="">选择技术</option><option value="A">A.计算机视觉</option><option value="B">B.语音识别与自然语言处理</option><option value="C">C.推荐系统与数据挖掘</option><option value="D">D.智能决策与优化算法</option></select></div></div>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="3"><strong>(3) 以下是开发上述医疗影像诊断系统时，其机器学习模型训练的关键步骤，顺序已被打乱。请将这些步骤按合理的逻辑顺序进行排序，将代表步骤的字母（A-D）按顺序填写在横线上。（2分）</strong><div class="sort-group">${["A. 模型训练与调优：将数据输入深度学习算法（如卷积神经网络），让模型从数据中学习病变特征，并不断调整参数以提升准确率。 ","B. 模型应用：将训练好的模型部署到医院系统中，处理新的、未知的CT影像，输出辅助诊断建议。","C. 数据准备：收集并清洗海量肺部CT影像数据，并由专业医生对影像中的病变区域进行精确标注。","D. 模型评估：使用另一批未参与训练的“测试集”影像数据验证模型的性能，评估其识别准确率、可靠性等指标。"].map((step,idx)=>`<div class="sort-item"><div class="sort-order"><input type="number" name="q33_3_order_${idx}" min="1" max="4" step="1" placeholder="顺序"></div><div class="sort-text">${step}</div></div>`).join('')}</div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="4"><strong>(4) 在推广使用该AI辅助诊断系统时，项目组必须考虑其带来的伦理与安全挑战。下列做法中，不符合科技伦理和信息社会责任的是（2分）</strong><div class="options">${["A.向患者和医生明确说明AI的诊断结果仅为辅助参考，最终诊断必须由执业医生确认","B.为了追求更高的模型准确率，在未经患者知情同意的情况下，尽可能多地收集和使用患者的个人医疗影像数据","C.建立严格的数据安全管理制度，对训练和诊断过程中涉及的所有患者数据进行脱敏和加密处理","D.定期对AI模型的诊断结果进行人工审核和评估，监控其可能存在的误判偏差，确保其公平性"].map((opt,idx)=>`<div class="option"><label><input type="radio" name="q33_4" value="${String.fromCharCode(65+idx)}"> ${opt}</label></div>`).join('')}</div><div class="explanation sub-exp"></div></div>
+        </div>`;
+
+        // 34题
+        html += `<div class="question-card" data-qtype="oper" data-qid="34">
+            <div class="q-title">34. “智慧校园气象站”项目</div>
+            <div class="scenario-text">📖 你所在的学校计划建设一个“智慧校园气象站”项目，融合地理、信息科技等多学科知识，实时监测校园内不同区域的温度、湿度、风速、光照等气象数据，并通过物联网技术将数据上传至云平台。气象数据不仅用于校园环境研究，还计划接入校园灌溉系统，实现基于气象数据的智能浇灌。作为项目组成员，请你参与系统设计与分析。</div>
+            <div class="sub-question" data-sub="1"><strong>(1) 智慧校园气象站需要部署多种传感器和网络设备。请将左侧的设备或模块与右侧其在物联网三层架构（感知层、网络层、应用层）中的主要角色和功能用直线连接起来。（2分）</strong><div class="match-group">
+                <div class="match-row"><div class="match-left">1. 温湿度传感器、风速传感器</div><div class="match-right"><select name="q34_1_1"><option value="">选择角色</option><option value="A">A.网络层 - 负责将采集到的数据通过Wi-Fi或4G网络传输到云服务器</option><option value="B">B.感知层 - 负责采集物理世界的环境数据（如温度、湿度、风速）</option><option value="C">C.应用层 - 负责数据存储、分析、展示，并根据数据自动生成浇灌指令</option><option value="D">D.感知层 - 负责接收指令并执行具体操作（如打开/关闭阀门）</option></select></div></div>
+                <div class="match-row"><div class="match-left">2. Wi-Fi通信模块 / 4G通信模块</div><div class="match-right"><select name="q34_1_2"><option value="">选择角色</option><option value="A">A.网络层 - 负责将采集到的数据通过Wi-Fi或4G网络传输到云服务器</option><option value="B">B.感知层 - 负责采集物理世界的环境数据</option><option value="C">C.应用层 - 负责数据存储、分析、展示，并根据数据自动生成浇灌指令</option><option value="D">D.感知层 - 负责接收指令并执行具体操作</option></select></div></div>
+                <div class="match-row"><div class="match-left">3. 云端数据可视化平台与智能浇灌决策程序</div><div class="match-right"><select name="q34_1_3"><option value="">选择角色</option><option value="A">A.网络层 - 负责数据传输</option><option value="B">B.感知层 - 采集环境数据</option><option value="C">C.应用层 - 数据存储、分析、展示，自动生成浇灌指令</option><option value="D">D.感知层(执行器)</option></select></div></div>
+                <div class="match-row"><div class="match-left">4. 校园灌溉系统的自动控制阀门</div><div class="match-right"><select name="q34_1_4"><option value="">选择角色</option><option value="A">A.网络层</option><option value="B">B.感知层</option><option value="C">C.应用层</option><option value="D">D.感知层(执行器) - 负责接收指令并执行具体操作</option></select></div></div>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="2"><strong>(2) 以下是智慧校园气象站系统中，从数据采集到触发智能浇灌的一次完整工作流程，但步骤顺序已被打乱。请将这些步骤按正确的逻辑顺序进行排序，将代表步骤的字母（A-F）按顺序填写在横线上。 （4分）</strong><div>首尾已固定 D → ① → ② → ③ → ④ → A，请选择正确选项：A.指令下发与执行：云端平台通过通信网络向校园特定区域的灌溉控制器发送“开启浇水”指令，控制器打开电磁阀。 
+B.数据上传：气象站内的通信模块（如Wi-Fi）将打包好的数据发送至云端服务器。 
+C.数据分析与决策：云端平台分析数据，发现某区域土壤湿度低于阈值且未来几小时无降雨，符合自动灌溉条件。 
+D.数据采集：部署在校园各处的气象传感器（如土壤湿度、光照传感器）持续采集环境数据。 
+E.数据传输：传感器将采集到的模拟信号转换为数字信号，并通过短距离通信（如ZigBee）发送至气象站内的主控/网关设备。 
+F. 数据接收与处理：云端服务器接收并存储来自气象站的数据。<br>
+            ① <select name="q34_2_1"><option value="">请选择</option><option value="E">E. 数据传输：传感器将采集到的模拟信号转换为数字信号，并通过短距离通信（如ZigBee）发送至气象站内的主控/网关设备</option><option value="B">B. 数据上传：气象站内的通信模块（如Wi-Fi）将打包好的数据发送至云端服务器</option><option value="F">F. 数据接收与处理：云端服务器接收并存储来自气象站的数据</option><option value="C">C. 数据分析与决策：云端平台分析数据，发现某区域土壤湿度低于阈值且未来几小时无降雨，符合自动灌溉条件</option></select><br>
+            ② <select name="q34_2_2"><option value="">请选择</option><option value="B">B. 数据上传：气象站内的通信模块（如Wi-Fi）将打包好的数据发送至云端服务器</option><option value="E">E. 数据传输：传感器将采集到的模拟信号转换为数字信号，并通过短距离通信（如ZigBee）发送至气象站内的主控/网关设备</option><option value="F">F. 数据接收与处理：云端服务器接收并存储来自气象站的数据</option><option value="C">C. 数据分析与决策：云端平台分析数据，发现某区域土壤湿度低于阈值且未来几小时无降雨，符合自动灌溉条件</option></select><br>
+            ③ <select name="q34_2_3"><option value="">请选择</option><option value="F">F. 数据接收与处理：云端服务器接收并存储来自气象站的数据</option><option value="E">E. 数据传输：传感器将采集到的模拟信号转换为数字信号，并通过短距离通信（如ZigBee）发送至气象站内的主控/网关设备</option><option value="B">B. 数据上传：气象站内的通信模块（如Wi-Fi）将打包好的数据发送至云端服务器</option><option value="C">C. 数据分析与决策：云端平台分析数据，发现某区域土壤湿度低于阈值且未来几小时无降雨，符合自动灌溉条件</option></select><br>
+            ④ <select name="q34_2_4"><option value="">请选择</option><option value="C">C. 数据分析与决策：云端平台分析数据，发现某区域土壤湿度低于阈值且未来几小时无降雨，符合自动灌溉条件</option><option value="E">E. 数据传输：传感器将采集到的模拟信号转换为数字信号，并通过短距离通信（如ZigBee）发送至气象站内的主控/网关设备</option><option value="B">B. 数据上传：气象站内的通信模块（如Wi-Fi）将打包好的数据发送至云端服务器</option><option value="F">F. 数据接收与处理：云端服务器接收并存储来自气象站的数据</option></select>
+            </div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="3"><strong>(3) 学校计划将气象数据用于地理课程的“校园微气候分析”研究。考虑到需要长期记录数据变化趋势并支持在线协作分析，下列技术方案中最合适的是（2分）</strong><div class="options"><div class="option"><label><input type="radio" name="q34_3" value="A"> A. 将传感器数据每日手动记录在纸质表格上，课代表汇总后交给地理老师。</label></div><div class="option"><label><input type="radio" name="q34_3" value="B"> B. 将传感器数据存储在气象站本地的SD卡中，每周由信息科技社团成员拷贝到一台公共电脑上。</label></div><div class="option"><label><input type="radio" name="q34_3" value="C"> C. 利用物联网平台将传感器数据实时上传至云端，并生成可在线共享的数据图表和分析报告。</label></div><div class="option"><label><input type="radio" name="q34_3" value="D"> D. 要求每位同学每天轮流去气象站抄录数据，并在自己的笔记本上绘制变化曲线。</label></div></div><div class="explanation sub-exp"></div></div>
+            <div class="sub-question" data-sub="4"><strong>(4) 在智慧校园气象站项目中，需要考虑数据安全与系统可靠性。下列对于潜在风险的分析与对策中，不合理的是（2分）</strong><div class="options"><div class="option"><label><input type="radio" name="q34_4" value="A"> A. 风险：传感器露天安装，可能因恶劣天气（如雷击）损坏。对策：为传感器加装防雷装置和物理防护罩，并定期巡检维护。</label></div><div class="option"><label><input type="radio" name="q34_4" value="B"> B. 风险：云平台存储的气象数据可能被未授权访问或篡改。对策：在云平台设置严格的访问权限和身份认证，并对重要数据进行加密存储。</label></div><div class="option"><label><input type="radio" name="q34_4" value="C"> C. 风险：网络故障可能导致数据无法上传，影响实时监测。对策：为气象站设备设计本地数据缓存功能，在网络恢复后自动补传数据。</label></div><div class="option"><label><input type="radio" name="q34_4" value="D"> D. 风险：自动灌溉系统可能因传感器数据错误而过度浇水。对策：为了绝对安全，取消自动灌溉功能，全部恢复为人工手动控制。</label></div></div><div class="explanation sub-exp"></div></div>
+        </div>`;
+        return html;
+    }
+
+    // 批改试卷并显示解析
+    function gradeExam() {
+        let singleScore = 0;
+        // 单选题批改
+        for (let i = 1; i <= 30; i++) {
+            const selected = document.querySelector(`input[name="mc_${i}"]:checked`);
+            const userAnswer = selected ? selected.value : null;
+            const correct = singleAnswers[i-1];
+            const isCorrect = (userAnswer === correct);
+            if (isCorrect) singleScore += 2;
+            const card = document.querySelector(`.question-card[data-qtype="single"][data-qid="${i}"]`);
+            if (card) {
+                card.classList.remove('correct', 'wrong');
+                card.classList.add(isCorrect ? 'correct' : 'wrong');
+                const expDiv = card.querySelector('.explanation');
+                if (expDiv) {
+                    expDiv.innerHTML = isCorrect ? '' : `<strong>❌ 错误</strong> 正确答案：${correct}。解析：${singleExplanations[i-1]}`;
+                    expDiv.classList.toggle('visible', !isCorrect);
+                }
+            }
+        }
+        const operScore = calculateOperationalScore();
+        // 为操作题每个子题添加解析（显示参考答案）
+        for (let qid of [31,32,33,34]) {
+            for (let sub=1; sub<=4; sub++) {
+                const expDiv = document.querySelector(`.question-card[data-qid="${qid}"] .sub-question[data-sub="${sub}"] .sub-exp`);
+                if (expDiv) {
+                    expDiv.innerHTML = `<strong>📝 参考答案</strong><br>${getOperExplanation(`${qid}`, sub)}`;
+                    expDiv.classList.add('visible');
+                }
+            }
+        }
+        const totalScore = singleScore + operScore;
+        const scoreDiv = document.getElementById('scoreDisplay');
+        scoreDiv.innerHTML = `🎉 您的得分：${totalScore} 分 （单选题 ${singleScore} 分 + 操作题 ${operScore} 分） 🎉`;
+        scoreDiv.classList.add('visible');
+        return { totalScore, singleScore, operScore };
+    }
+
+    // 防重复提交标记的存储key
+    function getSubmissionKey(classVal, nameVal, studentIdVal) {
+        return `exam_submitted_${classVal}_${nameVal}_${studentIdVal || ''}`;
+    }
+
+    // 检查是否已经提交过
+    function isAlreadySubmitted(classVal, nameVal, studentIdVal) {
+        const key = getSubmissionKey(classVal, nameVal, studentIdVal);
+        return localStorage.getItem(key) === 'true';
+    }
+
+    // 标记已提交
+    function markSubmitted(classVal, nameVal, studentIdVal) {
+        const key = getSubmissionKey(classVal, nameVal, studentIdVal);
+        localStorage.setItem(key, 'true');
+    }
+
+    async function submitExam() {
+        const classVal = document.getElementById('classSelect').value;
+        const nameVal = document.getElementById('studentName').value.trim();
+        const studentIdVal = document.getElementById('studentId').value.trim();
+        if (!classVal || !nameVal) {
+            alert('请填写班级和姓名后再提交。');
+            return;
+        }
+        // 检查是否已提交
+        if (isAlreadySubmitted(classVal, nameVal, studentIdVal)) {
+            alert('您已经提交过答卷，不可重复提交！');
+            return;
+        }
+
+        const { totalScore, singleScore, operScore } = gradeExam();
+        const payload = {
+            class: classVal,
+            name: nameVal,
+            studentId: studentIdVal || "未填写",
+            totalScore: totalScore,
+            singleScore: singleScore,
+            operScore: operScore,
+            timestamp: new Date().toISOString(),
+            answers: {}
+        };
+        const allInputs = document.querySelectorAll('input, select');
+        allInputs.forEach(el => {
+            if (el.type === 'radio' && !el.checked) return;
+            if (el.type === 'radio' && el.checked) payload.answers[el.name] = el.value;
+            else if (el.type !== 'radio' && el.value !== undefined && el.value !== '') payload.answers[el.name] = el.value;
+        });
+        const sortNumbers = document.querySelectorAll('input[type="number"]');
+        sortNumbers.forEach(inp => { if(inp.name) payload.answers[inp.name] = inp.value; });
+        
+        try {
+            await fetch('https://qf.kjxs.site/api/nI9Cv88JlAA', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            // 提交成功后标记
+            markSubmitted(classVal, nameVal, studentIdVal);
+            // 可选：禁用提交按钮
+            document.getElementById('submitBtn').disabled = true;
+            alert('提交成功！成绩已记录，不可再次提交。');
+        } catch(e) {
+            console.warn('提交失败', e);
+            alert('提交失败，请稍后重试。');
+        }
+    }
+
+    // 页面加载时，如果用户已经填写过信息且已提交，可禁用按钮（可选）
+    function checkPreviousSubmission() {
+        const classVal = document.getElementById('classSelect').value;
+        const nameVal = document.getElementById('studentName').value.trim();
+        const studentIdVal = document.getElementById('studentId').value.trim();
+        if (classVal && nameVal && isAlreadySubmitted(classVal, nameVal, studentIdVal)) {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('scoreDisplay').innerHTML = '⚠️ 您已经完成了本次考试，不可重复提交。';
+            document.getElementById('scoreDisplay').classList.add('visible');
+        }
+    }
+
+    document.getElementById('exam-root').innerHTML = buildFullExamHTML();
+    document.getElementById('submitBtn').addEventListener('click', submitExam);
+    // 监听信息改变时，重新检测提交状态（可选）
+    const fields = ['classSelect', 'studentName', 'studentId'];
+    fields.forEach(id => {
+        document.getElementById(id).addEventListener('change', checkPreviousSubmission);
+        document.getElementById(id).addEventListener('input', checkPreviousSubmission);
+    });
+    checkPreviousSubmission();
+</script>
+<script id="exam-progress-script">
+/* 答题进度与题号导航：独立脚本，只读取 DOM，不触碰题库与判分逻辑 */
+(function () {
+  'use strict';
+
+  function cards() {
+    return Array.prototype.slice.call(document.querySelectorAll('.question-card'));
+  }
+
+  // 判断某题是否已作答
+  function isAnswered(card) {
+    var type = card.getAttribute('data-qtype');
+    if (type === 'oper') {
+      var subs = card.querySelectorAll('.sub-question');
+      if (subs.length) {
+        // 操作题含多个小问：每个小问都必须有作答
+        for (var i = 0; i < subs.length; i++) {
+          if (!subAnswered(subs[i])) return false;
+        }
+        return true;
+      }
+      return subAnswered(card);
+    }
+    // 单选：radio 有选中即可
+    return !!card.querySelector('input[type=radio]:checked');
+  }
+
+  function subAnswered(scope) {
+    var groups = {};
+    var inputs = scope.querySelectorAll('input, select');
+    for (var i = 0; i < inputs.length; i++) {
+      var el = inputs[i];
+      if (el.type === 'radio') {
+        var n = el.name;
+        if (!groups[n]) groups[n] = false;
+        if (el.checked) groups[n] = true;
+      } else if (el.type === 'number') {
+        if (String(el.value).trim() !== '') return true;   // 排序题：填了任一顺序即计入
+      } else if (el.tagName === 'SELECT') {
+        if (String(el.value).trim() !== '') return true;   // 连线题：选了任一项即计入
+      }
+    }
+    for (var k in groups) { if (!groups[k]) return false; }
+    return Object.keys(groups).length > 0;
+  }
+
+  function build() {
+    var list = cards();
+    if (!list.length) return;
+
+    var panel = document.createElement('div');
+    panel.className = 'exam-progress';
+    panel.id = 'examProgress';
+    panel.setAttribute('role', 'progressbar');
+    panel.setAttribute('aria-valuemin', '0');
+    panel.setAttribute('aria-valuemax', '100');
+    panel.innerHTML =
+      '<div class="ep-head">' +
+        '<span class="ep-num"><span class="done" id="epDone">0</span> / ' + list.length + '</span>' +
+        '<span class="ep-label">已作答</span>' +
+        '<span class="ep-rest" id="epRest"></span>' +
+      '</div>' +
+      '<div class="ep-track"><div class="ep-fill" id="epFill"></div></div>' +
+      '<div class="ep-grid" id="epGrid"></div>';
+
+    var anchor = document.getElementById('exam-root');
+    anchor.parentNode.insertBefore(panel, anchor);
+
+    // 题号导航
+    var grid = panel.querySelector('#epGrid');
+    list.forEach(function (card, idx) {
+      var qid = card.getAttribute('data-qid') || (idx + 1);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ep-chip' + (card.getAttribute('data-qtype') === 'oper' ? ' oper' : '');
+      btn.textContent = qid;
+      btn.title = '跳转到第 ' + qid + ' 题';
+      btn.setAttribute('aria-label', '跳转到第 ' + qid + ' 题');
+      btn.addEventListener('click', function () {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.remove('locate');
+        void card.offsetWidth;           // 重启动画
+        card.classList.add('locate');
+        setTimeout(function () { card.classList.remove('locate'); }, 1600);
+      });
+      grid.appendChild(btn);
+    });
+
+    update();
+  }
+
+  function update() {
+    var panel = document.getElementById('examProgress');
+    if (!panel) return;
+    var list = cards();
+    var chips = panel.querySelectorAll('.ep-chip');
+    var done = 0;
+
+    list.forEach(function (card, idx) {
+      var answered = isAnswered(card);
+      if (answered) done++;
+      if (chips[idx]) chips[idx].classList.toggle('answered', answered);
+    });
+
+    var total = list.length;
+    var rest = total - done;
+    var pct = total ? Math.round(done / total * 100) : 0;
+
+    panel.querySelector('#epDone').textContent = done;
+    panel.querySelector('#epRest').innerHTML = rest > 0
+      ? '还有 <b>' + rest + '</b> 题未作答'
+      : '✅ 已全部作答，可以提交';
+    panel.querySelector('#epFill').style.width = pct + '%';
+    panel.setAttribute('aria-valuenow', String(pct));
+    panel.classList.toggle('all-done', rest === 0 && total > 0);
+  }
+
+  // 事件委托：任何输入变化都刷新进度
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.closest && e.target.closest('.question-card')) update();
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'number') update();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', build);
+  } else {
+    build();
+  }
+})();
+</script>
+</body>
+</html>

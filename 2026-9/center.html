@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学员作品中心 · AI赋能课堂数智融合工作坊</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23123A5F'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%23C8862B'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23FFFFFF' opacity='.85'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23FFFFFF' opacity='.85'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%23C8862B'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#EEF2F6;
+    --grid:#DCE4EC;
+    --card:#FFFFFF;
+    --ink:#16283A;
+    --muted:#5A6B7B;
+    --primary:#123A5F;
+    --primary-dark:#0F2F4E;
+    --primary-soft:#E7EEF5;
+    --accent:#C8862B;
+    --accent-soft:#FBF3E3;
+    --line:#DCE3EA;
+    --ok:#1F7A4D;
+    --ok-soft:#E7F4EC;
+    --err:#B3382C;
+    --err-soft:#FBE9E6;
+    --radius:14px;
+    --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC",Georgia,serif;
+    --sans:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  /* 关键：类选择器（如 .skeleton{display:grid}）会覆盖 [hidden] 的 UA 默认 display:none，
+     必须显式兜底，否则骨架屏、筛选提示等无法真正隐藏 */
+  [hidden]{display:none!important}
+  button,input,select{font-family:inherit}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 32px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 32px 100%,
+      var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    min-height:100vh;
+  }
+  .page{max-width:1240px;margin:0 auto;padding:18px 20px 56px}
+  body.stage-mode .page{max-width:100%;padding:16px 28px 40px}
+
+  /* ===== 页头：紧凑吸顶栏（品牌在左、栏目在右，同一行）===== */
+  .masthead{
+    position:sticky;top:0;z-index:30;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px 20px;flex-wrap:wrap;
+    padding:9px 14px;margin-bottom:16px;
+    background:rgba(245,248,251,.92);
+    -webkit-backdrop-filter:saturate(1.5) blur(12px);
+    backdrop-filter:saturate(1.5) blur(12px);
+    border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 4px 14px rgba(18,58,95,.055);
+  }
+  .mh-brand{display:flex;align-items:center;gap:11px;flex:1 1 auto;min-width:0}
+  .mh-mark{
+    flex:none;width:36px;height:36px;border-radius:10px;
+    background:var(--primary);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mh-mark svg{width:19px;height:19px}
+  .mh-text{flex:1 1 auto;min-width:0}
+  h1{font-family:var(--serif);font-size:19px;font-weight:900;line-height:1.25;color:var(--primary);letter-spacing:.01em}
+  .masthead .sub{
+    margin-top:1px;color:var(--muted);font-size:12.5px;line-height:1.35;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .tabs{display:inline-flex;gap:5px;background:#E0E8F0;border-radius:999px;padding:4px;flex:none}
+  .tabs button{
+    border:none;background:transparent;font-size:13.5px;font-weight:700;color:var(--muted);
+    padding:8px 15px;border-radius:999px;cursor:pointer;transition:all .15s;letter-spacing:.02em;
+  }
+  .tabs button:hover{color:var(--primary)}
+  .tabs button.active{background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(18,58,95,.14)}
+
+  /* ===== 表单 ===== */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 28px 24px;box-shadow:0 10px 30px rgba(18,58,95,.07);
+  }
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:14px;font-weight:700;color:var(--primary);margin-bottom:8px}
+  .field label .req{color:var(--err);margin-left:2px}
+  .field .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+  input[type="text"],input[type="url"],textarea{
+    width:100%;font:inherit;font-size:15px;color:var(--ink);
+    padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+    background:#FBFCFE;outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  textarea{resize:vertical;min-height:104px;line-height:1.65}
+  input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(18,58,95,.12);background:#fff}
+  input::placeholder,textarea::placeholder{color:#9AA9B6}
+  .file-zone{
+    border:1.5px dashed #B9C6D3;border-radius:10px;background:#FBFCFE;
+    padding:24px 16px;text-align:center;cursor:pointer;transition:all .15s;
+  }
+  .file-zone:hover,.file-zone.drag{border-color:var(--primary);background:var(--primary-soft)}
+  .file-zone .fz-ic{
+    display:inline-flex;width:40px;height:40px;border-radius:10px;background:var(--primary-soft);
+    color:var(--primary);align-items:center;justify-content:center;margin-bottom:8px;
+  }
+  .file-zone .fz-main{font-size:14px;font-weight:500}
+  .file-zone .fz-main b{color:var(--primary)}
+  .file-zone .fz-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+  #fileInput{display:none}
+  .file-name{
+    display:none;align-items:center;gap:10px;background:var(--ok-soft);
+    border:1px solid #BFE0CB;border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:10px;
+  }
+  .file-name.show{display:flex}
+  .file-name .fname{flex:1;color:var(--ok);font-weight:500;word-break:break-all}
+  .file-name button{border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px}
+  .submit-btn{
+    width:100%;border:none;border-radius:12px;cursor:pointer;font-size:16px;font-weight:700;
+    padding:14px 20px;color:#fff;background:var(--primary);transition:background .15s,transform .05s;letter-spacing:.04em;
+  }
+  .submit-btn:hover{background:var(--primary-dark)}
+  .submit-btn:active{transform:translateY(1px)}
+  .submit-btn:disabled{background:#9FB2C4;cursor:not-allowed}
+  .submit-btn .spin{
+    display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;margin-right:8px;vertical-align:-3px;animation:rot .8s linear infinite;
+  }
+  .submit-btn.loading .spin{display:inline-block}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .status{display:none;align-items:flex-start;gap:10px;margin-top:16px;border-radius:10px;padding:13px 15px;font-size:14px;line-height:1.55}
+  .status.show{display:flex}
+  .status svg{width:18px;height:18px;flex:none;margin-top:2px}
+  .status.ok{background:var(--ok-soft);color:var(--ok);border:1px solid #BFE0CB}
+  .status.err{background:var(--err-soft);color:var(--err);border:1px solid #EFC9C2}
+  .status a{color:inherit;font-weight:700}
+  .foot-note{margin-top:18px;text-align:center;font-size:13px;color:var(--muted)}
+  .foot-note a{color:var(--primary);font-weight:500;text-decoration:none;border-bottom:1px solid #B9C8D6;cursor:pointer}
+
+  /* ===== 统计条 ===== */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;box-shadow:0 4px 14px rgba(18,58,95,.05);
+  }
+  .stat .num{font-family:var(--serif);font-size:26px;font-weight:900;color:var(--primary);line-height:1.15}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .stat.acc .num{color:var(--accent)}
+
+  /* ===== 工具条 ===== */
+  .toolbar{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    box-shadow:0 4px 14px rgba(18,58,95,.05);
+  }
+  .search-wrap{position:relative;flex:1 1 220px;min-width:180px}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:#8A98A5;fill:none;stroke-width:2}
+  .search-wrap input{padding-left:36px}
+  .seg{display:inline-flex;background:#EDF1F5;border-radius:9px;padding:3px}
+  .seg button{
+    border:none;background:transparent;font-size:13px;font-weight:700;color:var(--muted);
+    padding:7px 13px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .seg button.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(18,58,95,.14)}
+  select.sel{
+    border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);
+    font-size:13px;padding:9px 11px;cursor:pointer;outline:none;
+  }
+  select.sel:focus{border-color:var(--primary)}
+  .chk{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+  .chk input{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+  .tool-btn{
+    border:1.5px solid var(--primary);border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;
+    color:var(--primary);background:#fff;padding:9px 15px;transition:all .15s;white-space:nowrap;
+  }
+  .tool-btn:hover{background:var(--primary);color:#fff}
+  .tool-btn:disabled{opacity:.5;cursor:not-allowed}
+  .tool-btn.ghost{color:var(--muted);border-color:#B9C6D3}
+  .tool-btn.ghost:hover{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+  .filter-note{
+    font-size:12.5px;color:var(--muted);margin:-8px 0 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .filter-note svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2;flex:none}
+
+  /* ===== 作品网格 ===== */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  body.stage-mode .grid{grid-template-columns:repeat(4,1fr);gap:22px}
+  .work-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:0 0 18px;display:flex;flex-direction:column;position:relative;overflow:hidden;
+    box-shadow:0 6px 20px rgba(18,58,95,.06);transition:transform .15s,box-shadow .15s;
+  }
+  .work-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--primary),var(--accent));opacity:.85;
+  }
+  .work-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(18,58,95,.12)}
+  .work-card .inner{padding:20px 20px 0;display:flex;flex-direction:column;flex:1}
+  .work-card .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .work-card .idx{font-family:var(--serif);font-size:12.5px;font-weight:700;color:var(--accent);letter-spacing:.1em}
+  .kind-tag{
+    font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;letter-spacing:.02em;white-space:nowrap;
+  }
+  .kind-file{background:var(--ok-soft);color:var(--ok);border:1px solid #BFE0CB}
+  .kind-url{background:var(--primary-soft);color:var(--primary);border:1px solid #C9D9E8}
+  .kind-img{background:var(--accent-soft);color:var(--accent);border:1px solid #EBD5A9}
+  .kind-other{background:#F0F3F6;color:var(--muted);border:1px solid var(--line)}
+  .work-card h3{
+    font-family:var(--serif);font-size:18.5px;font-weight:700;color:var(--primary);
+    line-height:1.4;margin-bottom:11px;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .work-card .meta{font-size:13.5px;color:var(--muted);margin-bottom:5px;word-break:break-all}
+  .work-card .meta b{color:var(--ink);font-weight:500}
+  .work-card .time{
+    font-size:12.5px;color:#8A98A5;margin-top:auto;padding-top:13px;display:flex;align-items:center;gap:6px;
+  }
+  .work-card .time svg{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2}
+  .work-card .actions{margin-top:13px;display:flex;gap:8px}
+  .link-btn{
+    flex:1;text-align:center;text-decoration:none;border:none;cursor:pointer;
+    background:var(--primary);color:#fff;border-radius:9px;font-size:13.5px;font-weight:700;
+    padding:9px 10px;transition:background .15s;
+  }
+  .link-btn:hover{background:var(--primary-dark)}
+  .link-btn.sec{background:#fff;color:var(--primary);border:1.5px solid #C9D9E8;flex:0 0 auto;padding:9px 13px}
+  .link-btn.sec:hover{background:var(--primary-soft);border-color:var(--primary)}
+  .thumb{
+    width:100%;height:132px;object-fit:cover;background:#EDF1F5;
+    border-bottom:1px solid var(--line);display:block;
+  }
+  body.stage-mode .work-card h3{font-size:22px}
+  body.stage-mode .work-card .meta{font-size:14.5px}
+
+  /* ===== 状态区 ===== */
+  .state{grid-column:1 / -1;text-align:center;padding:56px 20px;color:var(--muted)}
+  .state svg{width:44px;height:44px;stroke:var(--line);fill:none;stroke-width:1.6;margin-bottom:12px}
+  .state p{font-size:14.5px}
+  .state .retry{
+    margin-top:14px;border:1.5px solid var(--primary);color:var(--primary);background:#fff;
+    border-radius:999px;padding:8px 22px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .state .retry:hover{background:var(--primary);color:#fff}
+  .skeleton{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .skeleton .sk{height:196px;border-radius:var(--radius);background:#fff;border:1px solid var(--line);padding:22px}
+  .skeleton .sk i{
+    display:block;border-radius:6px;
+    background:linear-gradient(90deg,#EDF1F5 25%,#F7F9FB 50%,#EDF1F5 75%);
+    background-size:200% 100%;animation:shine 1.2s infinite;
+  }
+  .skeleton .sk i:nth-child(1){width:34%;height:12px;margin-bottom:16px}
+  .skeleton .sk i:nth-child(2){width:78%;height:18px;margin-bottom:14px}
+  .skeleton .sk i:nth-child(3){width:55%;height:12px;margin-bottom:10px}
+  .skeleton .sk i:nth-child(4){width:42%;height:12px}
+  @keyframes shine{to{background-position:-200% 0}}
+
+  /* ===== 预览弹层 ===== */
+  .preview{position:fixed;inset:0;z-index:90;background:rgba(12,24,38,.72);display:flex;flex-direction:column;padding:22px}
+  .preview[hidden]{display:none}
+  .pv-panel{
+    background:#fff;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;
+    width:100%;height:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .pv-bar{
+    display:flex;align-items:center;gap:12px;padding:12px 16px;
+    border-bottom:1px solid var(--line);background:#FBFCFE;flex-wrap:wrap;
+  }
+  .pv-title{flex:1 1 240px;min-width:0}
+  .pv-title .t{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pv-title .m{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pv-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .pv-btn{
+    border:1.5px solid var(--line);background:#fff;color:var(--primary);border-radius:8px;
+    font-size:13px;font-weight:700;padding:7px 13px;cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap;
+  }
+  .pv-btn:hover{background:var(--primary-soft);border-color:var(--primary)}
+  .pv-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .pv-btn.primary:hover{background:var(--primary-dark)}
+  .pv-btn:disabled{opacity:.45;cursor:not-allowed}
+  .pv-body{flex:1;position:relative;background:#F4F7FA;min-height:0}
+  .pv-body iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .pv-fallback{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;background:#F4F7FA;padding:32px;text-align:center;
+  }
+  .pv-fallback[hidden]{display:none}
+  .pv-fallback svg{width:48px;height:48px;stroke:#B9C6D3;fill:none;stroke-width:1.6}
+  .pv-fallback h4{font-family:var(--serif);font-size:19px;color:var(--primary)}
+  .pv-fallback p{font-size:14px;color:var(--muted);max-width:520px}
+  .pv-warn{
+    position:absolute;left:0;right:0;bottom:0;background:var(--accent-soft);border-top:1px solid #EBD5A9;
+    color:#8A5A16;font-size:13px;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .pv-warn[hidden]{display:none}
+  .pv-warn a{color:#8A5A16;font-weight:700}
+  .pv-warn button{
+    border:1.5px solid #D8B673;background:#fff;color:#8A5A16;border-radius:7px;
+    font-size:12.5px;font-weight:700;padding:5px 11px;cursor:pointer;white-space:nowrap;
+  }
+
+  footer{margin-top:44px;text-align:center;font-size:12.5px;color:#8A98A5}
+
+  /* ===== 课件下载 ===== */
+  .cw-head h2{font-family:var(--serif);font-size:18.5px;font-weight:900;color:var(--primary);margin-bottom:4px}
+  .cw-head p{font-size:13px;color:var(--muted);margin-bottom:15px}
+  .cw-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .cw-item{
+    display:flex;align-items:center;gap:16px;
+    border:1px solid var(--line);border-radius:12px;background:#FBFCFE;
+    padding:18px 20px;transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .cw-item:hover{border-color:var(--primary);background:#fff;box-shadow:0 6px 18px rgba(18,58,95,.08)}
+  .cw-no{font-family:var(--serif);font-size:15px;font-weight:900;color:var(--accent);flex:none;letter-spacing:.08em}
+  .cw-info{flex:1;min-width:0}
+  .cw-name{font-size:15.5px;font-weight:700;color:var(--primary);line-height:1.45;word-break:break-word}
+  .cw-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .cw-btn{
+    flex:none;background:var(--primary);color:#fff;text-decoration:none;
+    border-radius:9px;font-size:14px;font-weight:700;padding:11px 24px;
+    transition:background .15s;letter-spacing:.04em;
+  }
+  .cw-btn:hover{background:var(--primary-dark)}
+  .cw-tip{font-size:12.5px;color:var(--muted);margin-top:20px;padding-top:16px;border-top:1px solid var(--line);line-height:1.7}
+
+  /* ===== 学习资料 ===== */
+  .lr-head h2{font-family:var(--serif);font-size:18.5px;font-weight:900;color:var(--primary);margin-bottom:4px}
+  .lr-head p{font-size:13px;color:var(--muted);margin-bottom:15px}
+  .lr-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .lr-item{
+    display:flex;align-items:center;gap:16px;
+    border:1px solid var(--line);border-radius:12px;background:#FBFCFE;
+    padding:18px 20px;transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .lr-item:hover{border-color:var(--primary);background:#fff;box-shadow:0 6px 18px rgba(18,58,95,.08)}
+  .lr-no{font-family:var(--serif);font-size:15px;font-weight:900;color:var(--accent);flex:none;letter-spacing:.08em}
+  .lr-info{flex:1;min-width:0}
+  .lr-name{font-size:15.5px;font-weight:700;color:var(--primary);line-height:1.45;word-break:break-word}
+  .lr-sub{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.65}
+  .lr-sub .lr-host{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:#40566E;background:#EAEFF5;border-radius:4px;padding:1px 6px;white-space:nowrap}
+  .lr-btn{
+    flex:none;background:var(--primary);color:#fff;text-decoration:none;
+    border-radius:9px;font-size:14px;font-weight:700;padding:11px 24px;
+    transition:background .15s;letter-spacing:.04em;white-space:nowrap;
+  }
+  .lr-btn:hover{background:var(--primary-dark)}
+  .lr-tip{font-size:12.5px;color:var(--muted);margin-top:20px;padding-top:16px;border-top:1px solid var(--line);line-height:1.7}
+
+  /* ===== 学员留言 ===== */
+  .mb-head h2{font-family:var(--serif);font-size:18.5px;font-weight:900;color:var(--primary);margin-bottom:4px}
+  .mb-head p{font-size:13px;color:var(--muted);margin-bottom:15px}
+  .mb-head p b{color:var(--primary)}
+  .mb-form-card{margin-bottom:26px}
+  .mb-wall-head{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+  .mb-wall-head h2{font-family:var(--serif);font-size:19px;font-weight:900;color:var(--primary)}
+  .mb-count{font-size:13px;color:var(--muted)}
+  .msg-list{display:flex;flex-direction:column;gap:14px}
+  .msg-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:0 4px 14px rgba(18,58,95,.05);
+    transition:box-shadow .15s,transform .15s;
+  }
+  .msg-card:hover{box-shadow:0 10px 24px rgba(18,58,95,.1);transform:translateY(-2px)}
+  .msg-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .msg-tag{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 9px;letter-spacing:.02em;white-space:nowrap}
+  .mt-req{background:var(--primary-soft);color:var(--primary);border:1px solid #C9D9E8}
+  .mt-doubt{background:var(--accent-soft);color:var(--accent);border:1px solid #EBD5A9}
+  .mt-other{background:#F0F3F6;color:var(--muted);border:1px solid var(--line)}
+  .msg-no{font-family:var(--serif);font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.1em}
+  .msg-time{font-size:12.5px;color:#8A98A5;margin-left:auto}
+  .msg-text{font-size:15px;line-height:1.75;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .msg-meta{font-size:13px;color:var(--muted);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);word-break:break-all}
+  body.stage-mode .msg-text{font-size:17px}
+
+  /* ===== 宽屏：提交表单分两栏，减少纵向滚动（左=作品信息，右=作品内容）===== */
+  @media (min-width:760px){
+    #submitForm{
+      display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start;
+      grid-template-areas:
+        "f1 f4"
+        "f2 f4"
+        "f3 f5"
+        "sb sb"
+        "st st";
+    }
+    #submitForm>.field:nth-child(1){grid-area:f1}
+    #submitForm>.field:nth-child(2){grid-area:f2}
+    #submitForm>.field:nth-child(3){grid-area:f3}
+    #submitForm>.field:nth-child(4){grid-area:f4}
+    #submitForm>.field:nth-child(5){grid-area:f5}
+    #submitForm>.submit-btn{grid-area:sb}
+    #submitForm>.status{grid-area:st}
+
+    #msgForm{
+      display:grid;grid-template-columns:1fr 1fr;column-gap:22px;align-items:start;
+      grid-template-areas:
+        "n u"
+        "t t"
+        "m m"
+        "b b"
+        "s s";
+    }
+    #msgForm>.field:nth-child(1){grid-area:n}
+    #msgForm>.field:nth-child(2){grid-area:u}
+    #msgForm>.field:nth-child(3){grid-area:t}
+    #msgForm>.field:nth-child(4){grid-area:m}
+    #msgForm>.submit-btn{grid-area:b}
+    #msgForm>.status{grid-area:s}
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width:1000px){
+    .grid,.skeleton,body.stage-mode .grid{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:620px){
+    .page{padding:14px 14px 40px}
+    body.stage-mode .page{padding:14px 14px 36px}
+    .card{padding:22px 18px 20px}
+    .grid,.skeleton,body.stage-mode .grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+    .stat .num{font-size:22px}
+    .toolbar{flex-direction:column;align-items:stretch}
+    .search-wrap{flex:1 1 auto}
+    input[type="text"],input[type="url"],textarea{font-size:16px}
+    .masthead{padding:8px 12px;gap:10px;margin-bottom:14px}
+    .mh-mark{width:32px;height:32px;border-radius:9px}
+    .mh-mark svg{width:17px;height:17px}
+    h1{font-size:17px}
+    .tabs button{padding:8px 13px;font-size:13px}
+    /* 5 个栏目在窄屏改成整行等分，避免折成 4+1 的不整齐排布 */
+    body:not(.stage-mode) .tabs{
+      display:grid;grid-auto-flow:column;grid-auto-columns:1fr;
+      gap:4px;width:100%;padding:4px;border-radius:16px;
+    }
+    body:not(.stage-mode) .tabs button{padding:10px 2px;font-size:12.5px;letter-spacing:0;white-space:nowrap;min-width:0}
+    .lr-item{flex-wrap:wrap;gap:12px}
+    .lr-btn{width:100%;text-align:center;padding:12px 0}
+    .preview{padding:0}
+    .pv-panel{border-radius:0}
+    .pv-title{flex:1 1 100%}
+  }
+  @media (max-width:360px){
+    body:not(.stage-mode) .tabs button{font-size:11.5px;padding:9px 0}
+    .lr-btn{padding:11px 0}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="mh-brand">
+      <span class="mh-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M12 8v8" stroke="#C8862B"/></svg>
+      </span>
+      <div class="mh-text">
+        <h1>学员作品中心</h1>
+        <p class="sub" id="pageSub">正在读取活动信息…</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="功能切换" id="tabs">
+      <button type="button" id="tab-submit" role="tab" aria-selected="true">提交作品</button>
+      <button type="button" id="tab-gallery" role="tab" aria-selected="false">作品展示</button>
+      <button type="button" id="tab-courseware" role="tab" aria-selected="false">课件下载</button>
+      <button type="button" id="tab-resource" role="tab" aria-selected="false">学习资料</button>
+      <button type="button" id="tab-message" role="tab" aria-selected="false">学员留言</button>
+    </nav>
+  </header>
+
+  <!-- ================= 视图：提交作品 ================= -->
+  <section id="view-submit" role="tabpanel">
+    <main class="card">
+      <form id="submitForm" novalidate>
+
+        <div class="field">
+          <label for="workTitle">作品名称<span class="req">*</span></label>
+          <input type="text" id="workTitle" maxlength="80" placeholder="请输入作品名称，例如：课堂倒计时器" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="studentName">学员姓名<span class="req">*</span></label>
+          <input type="text" id="studentName" maxlength="40" placeholder="请输入您的姓名" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="workUnit">单位<span class="req">*</span></label>
+          <input type="text" id="workUnit" maxlength="80" placeholder="请输入所在学校 / 单位名称" autocomplete="organization">
+        </div>
+
+        <div class="field">
+          <label for="fileZone">上传作品文件</label>
+          <div class="file-zone" id="fileZone" role="button" tabindex="0" aria-label="选择作品文件">
+            <span class="fz-ic">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            </span>
+            <div class="fz-main">点击选择或拖拽文件到这里（<b>.html / .htm</b>）</div>
+            <div class="fz-sub">也支持 .zip 打包作品、.pdf、图片等格式</div>
+          </div>
+          <input type="file" id="fileInput" accept=".html,.htm,.zip,.pdf,.png,.jpg,.jpeg,.gif,.webp,.svg,.mp4,.pptx,.docx,.txt">
+          <div class="file-name" id="fileName">
+            <span class="fname"></span>
+            <button type="button" id="fileClear" aria-label="移除已选文件">移除</button>
+          </div>
+          <div class="hint">文件以 multipart/form-data 原样提交，不做 base64 编码。</div>
+        </div>
+
+        <div class="field">
+          <label for="urlInput">或填写作品链接</label>
+          <input type="url" id="urlInput" placeholder="https:// 作品在线地址" autocomplete="off">
+          <div class="hint">已发布到网上的作品（如 WorkBuddy、豆包等生成的分享链接）可直接粘贴到这里。上传文件与填写链接至少填写一项，也可以两项都填。</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn"><span class="spin"></span><span class="btn-txt">提交作品</span></button>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <p class="foot-note">提交成功后，可切换到 <a id="goGalleryNote">作品展示</a> 查看全部作品</p>
+  </section>
+
+  <!-- ================= 视图：作品展示 ================= -->
+  <section id="view-gallery" role="tabpanel" hidden>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="num" id="statTotal">—</div><div class="lbl">件作品已收录</div></div>
+      <div class="stat"><div class="num" id="statUnits">—</div><div class="lbl">个参与单位</div></div>
+      <div class="stat"><div class="num" id="statFiles">—</div><div class="lbl">件来自文件</div></div>
+      <div class="stat acc"><div class="num" id="statUrls">—</div><div class="lbl">件来自链接</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" id="searchInput" placeholder="搜索作品名称 / 学员姓名 / 单位" autocomplete="off">
+      </div>
+      <div class="seg" id="typeSeg">
+        <button type="button" data-type="all" class="active">全部</button>
+        <button type="button" data-type="file">文件作品</button>
+        <button type="button" data-type="url">链接作品</button>
+      </div>
+      <select class="sel" id="sortSel" aria-label="排序方式">
+        <option value="new">最新提交在前</option>
+        <option value="old">最早提交在前</option>
+        <option value="unit">按单位归集</option>
+        <option value="name">按姓名排序</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="autoRefresh" checked>自动刷新</label>
+      <button class="tool-btn" id="refreshBtn">立即刷新</button>
+      <button class="tool-btn ghost" id="exportBtn">导出名单</button>
+      <button class="tool-btn ghost" id="stageBtn">投屏模式</button>
+      <button class="tool-btn ghost" id="goSubmit">去提交作品</button>
+    </div>
+
+    <div class="filter-note" id="filterNote" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span id="filterNoteText"></span>
+    </div>
+
+    <div class="skeleton" id="skeleton">
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="grid" id="grid" hidden></div>
+
+    <div class="state" id="emptyState" hidden>
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <p id="emptyText">还没有作品提交，快来提交第一份作品吧。</p>
+      <button class="retry" id="emptyGo">去提交作品</button>
+    </div>
+    <div class="state" id="errorState" hidden>
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p id="errorMsg">作品加载失败，请检查网络后重试。</p>
+      <button class="retry" id="retryBtn">重新加载</button>
+    </div>
+  </section>
+
+  <!-- ================= 视图：课件下载 ================= -->
+  <section id="view-courseware" role="tabpanel" hidden>
+    <main class="card">
+      <div class="cw-head">
+        <h2>课件下载</h2>
+        <p>本次工作坊的两个课件，点击右侧按钮即可下载。</p>
+      </div>
+
+      <ul class="cw-list">
+        <li class="cw-item">
+          <span class="cw-no">01</span>
+          <div class="cw-info">
+            <div class="cw-name">从 PPT 到交互网页：AI 赋能课堂教学创新</div>
+            <div class="cw-sub">PDF 课件 · <span class="cw-size" data-src="courseware-1.pdf" data-fallback="16.2 MB">16.2 MB</span></div>
+          </div>
+          <a class="cw-btn" href="courseware-1.pdf" download="1.从PPT到交互网页：AI赋能课堂教学创新.pdf">下载</a>
+        </li>
+
+        <li class="cw-item">
+          <span class="cw-no">02</span>
+          <div class="cw-info">
+            <div class="cw-name">AI + QuickForm：数据驱动下的交互网页课件设计</div>
+            <div class="cw-sub">PDF 课件 · <span class="cw-size" data-src="courseware-2.pdf" data-fallback="17.4 MB">17.4 MB</span></div>
+          </div>
+          <a class="cw-btn" href="courseware-2.pdf" download="2.AI+QuickForm：数据驱动下的交互网页课件设计.pdf">下载</a>
+        </li>
+      </ul>
+
+      <p class="cw-tip">两个课件合计约 33 MB，建议在 WiFi 环境下下载。若浏览器没有自动保存，请在链接上点右键选择「链接存储为…」。</p>
+    </main>
+  </section>
+
+  <!-- ================= 视图：学习资料 ================= -->
+  <section id="view-resource" role="tabpanel" hidden>
+    <main class="card">
+      <div class="lr-head">
+        <h2>学习资料</h2>
+        <p>本次工作坊常用平台的入口，点击右侧「打开」按钮将在<b>新标签页</b>打开，不会离开本页。</p>
+      </div>
+
+      <ul class="lr-list">
+        <li class="lr-item">
+          <span class="lr-no">01</span>
+          <div class="lr-info">
+            <div class="lr-name">QuickForm 在线版</div>
+            <div class="lr-sub">在线创建问卷与表单、收集课堂数据的入口<br><span class="lr-host">quickform.cn</span></div>
+          </div>
+          <a class="lr-btn" href="https://quickform.cn/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+
+        <li class="lr-item">
+          <span class="lr-no">02</span>
+          <div class="lr-info">
+            <div class="lr-name">QuickForm 文档</div>
+            <div class="lr-sub">QuickForm 学习文档：功能用法与常见问题查询<br><span class="lr-host">docs.quickform.cc</span></div>
+          </div>
+          <a class="lr-btn" href="https://docs.quickform.cc/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+
+        <li class="lr-item">
+          <span class="lr-no">03</span>
+          <div class="lr-info">
+            <div class="lr-name">QuickForm 校园版（中鸣）</div>
+            <div class="lr-sub">校园版部署，本次工作坊的作品提交与学员留言数据就存放在这里<br><span class="lr-host">qf.zmrobo.com</span></div>
+          </div>
+          <a class="lr-btn" href="https://qf.zmrobo.com/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+
+        <li class="lr-item">
+          <span class="lr-no">04</span>
+          <div class="lr-info">
+            <div class="lr-name">中鸣 AI 平台（网页部署）</div>
+            <div class="lr-sub">中鸣人工智能教育平台，可把 AI 生成的网页作品部署到公网<br><span class="lr-host">ai.zmrobo.com</span></div>
+          </div>
+          <a class="lr-btn" href="https://ai.zmrobo.com/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+
+        <li class="lr-item">
+          <span class="lr-no">05</span>
+          <div class="lr-info">
+            <div class="lr-name">谢作如文集</div>
+            <div class="lr-sub">谢作如老师历年发表文章合集，信息技术教育实践参考<br><span class="lr-host">xzr.quickform.cc</span></div>
+          </div>
+          <a class="lr-btn" href="https://xzr.quickform.cc/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+
+        <li class="lr-item">
+          <span class="lr-no">06</span>
+          <div class="lr-info">
+            <div class="lr-name">QuickForm 案例展示</div>
+            <div class="lr-sub">QuickForm 作品案例集：用交互连接教学，用数据理解学习<br><span class="lr-host">quick.kjxs.site</span></div>
+          </div>
+          <a class="lr-btn" href="https://quick.kjxs.site/" target="_blank" rel="noopener noreferrer">打开</a>
+        </li>
+      </ul>
+
+      <p class="lr-tip">以上均为外部网站，链接由本页统一维护。若某个站点打不开，请先检查网络连接后重试；现场网络繁忙时也可能出现短暂无响应。</p>
+    </main>
+  </section>
+
+  <!-- ================= 视图：学员留言 ================= -->
+  <section id="view-message" role="tabpanel" hidden>
+
+    <main class="card mb-form-card">
+      <div class="mb-head">
+        <h2>学员留言</h2>
+        <p>写下你在学习过程中的<b>要求</b>或<b>疑惑</b>，提交后会同步显示在下方留言墙上。</p>
+      </div>
+
+      <form id="msgForm" novalidate>
+        <div class="field">
+          <label for="msgName">学员姓名<span class="req">*</span></label>
+          <input type="text" id="msgName" maxlength="40" placeholder="请输入您的姓名" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="msgUnit">单位<span class="req">*</span></label>
+          <input type="text" id="msgUnit" maxlength="80" placeholder="请输入所在学校 / 单位名称" autocomplete="organization">
+        </div>
+
+        <div class="field">
+          <label id="msgTypeLabel">留言类型</label>
+          <div class="seg" id="msgTypeSeg" role="group" aria-labelledby="msgTypeLabel">
+            <button type="button" data-type="学习要求" class="active">学习要求</button>
+            <button type="button" data-type="学习疑惑">学习疑惑</button>
+            <button type="button" data-type="其他">其他</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="msgText">留言内容<span class="req">*</span></label>
+          <textarea id="msgText" maxlength="500" rows="4" placeholder="例如：希望多讲讲 AI 生成内容在课堂上的合规使用；或者：不太理解大模型&#8220;提示词&#8221;该怎么设计…"></textarea>
+          <div class="hint"><span id="msgCount">0</span>/500 字。留言会公开显示，请勿填写身份证号、手机号等个人敏感信息。</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="msgBtn"><span class="spin"></span><span class="btn-txt">提交留言</span></button>
+
+        <div class="status" id="msgStatus" role="status" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <div class="mb-wall-head">
+      <h2>留言墙</h2>
+      <span class="mb-count" id="msgCountBadge"></span>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" id="msgSearchInput" placeholder="搜索留言内容 / 学员姓名 / 单位" autocomplete="off">
+      </div>
+      <select class="sel" id="msgSortSel" aria-label="排序方式">
+        <option value="new">最新留言在前</option>
+        <option value="old">最早留言在前</option>
+        <option value="type">按留言类型</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="msgAutoRefresh" checked>自动刷新</label>
+      <button class="tool-btn" id="msgRefreshBtn">立即刷新</button>
+      <button class="tool-btn ghost" id="msgExportBtn">导出留言</button>
+    </div>
+
+    <div class="filter-note" id="msgNote" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span id="msgNoteText"></span>
+    </div>
+
+    <div class="skeleton" id="msgSkeleton">
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+      <div class="sk"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="msg-list" id="msgList" hidden></div>
+
+    <div class="state" id="msgEmpty" hidden>
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <p id="msgEmptyText">还没有留言，欢迎写下你的第一个学习要求或疑惑。</p>
+      <button class="retry" id="msgGoWrite">去写留言</button>
+    </div>
+    <div class="state" id="msgError" hidden>
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p id="msgErrorText">留言加载失败，请检查网络后重试。</p>
+      <button class="retry" id="msgRetryBtn">重新加载</button>
+    </div>
+  </section>
+
+  <footer id="pageFooter">AI 赋能课堂 · 数智融合工作坊</footer>
+</div>
+
+<!-- ================= 预览弹层 ================= -->
+<div class="preview" id="preview" hidden role="dialog" aria-modal="true" aria-label="作品预览">
+  <div class="pv-panel">
+    <div class="pv-bar">
+      <div class="pv-title">
+        <div class="t" id="pvTitle">作品名称</div>
+        <div class="m" id="pvMeta">学员 · 单位</div>
+      </div>
+      <div class="pv-actions">
+        <button class="pv-btn" id="pvPrev" title="上一个（←）">← 上一个</button>
+        <button class="pv-btn" id="pvNext" title="下一个（→）">下一个 →</button>
+        <a class="pv-btn primary" id="pvOpen" href="#" target="_blank" rel="noopener noreferrer">新窗口打开 ↗</a>
+        <button class="pv-btn" id="pvClose" title="关闭（Esc）">关闭 ✕</button>
+      </div>
+    </div>
+    <div class="pv-body">
+      <iframe id="pvFrame" title="作品预览" referrerpolicy="no-referrer"></iframe>
+
+      <div class="pv-fallback" id="pvFallback" hidden>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        <h4 id="pvFallbackTitle">该作品无法在线预览</h4>
+        <p id="pvFallbackText">压缩包或其他格式需要下载后查看。</p>
+        <div class="pv-actions" style="justify-content:center">
+          <a class="pv-btn primary" id="pvFallbackOpen" href="#" target="_blank" rel="noopener noreferrer">下载 / 打开作品 ↗</a>
+        </div>
+      </div>
+
+      <div class="pv-warn" id="pvWarn" hidden>
+        <span id="pvWarnText">该站点可能禁止在页面内嵌显示。</span>
+        <a id="pvWarnOpen" href="#" target="_blank" rel="noopener noreferrer">在新窗口打开 ↗</a>
+        <button type="button" id="pvWarnClose">知道了</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   学员作品中心 —— 提交 + 展示
+   接口：QuickForm 任务 gt7vujc7em
+     POST {API}      提交（multipart/form-data，字段：title / student_name / unit / file / url）
+     GET  {API}      最近 3 条
+     GET  {API}/all  全部记录
+   字段：title / student_name / unit / attachment(相对路径) / url / submitted_at / _ip
+
+   留言本：QuickForm 任务 c0dqoy8ckk
+     POST {MSG_API}      提交留言（student_name / unit / message_type / message）
+     GET  {MSG_API}/all  全部留言
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  /* ============ 可配置项 ============ */
+  var API        = 'https://qf.zmrobo.com/api/gt7vujc7em';
+  var API_ALL    = API + '/all';
+  var SITE       = 'https://qf.zmrobo.com';   // 附件相对路径的站点前缀
+  var REFRESH_MS = 15000;                     // 自动刷新间隔（毫秒）
+  var PREVIEW_TIMEOUT = 4500;                 // 外链内嵌超时提示（毫秒）
+
+  var params   = new URLSearchParams(location.search);
+  var STAGE    = params.get('stage') === '1';               // 投屏模式
+  var LOAD_ALL = params.get('scope') !== 'recent';          // 默认加载全部
+
+  /* ============ 小工具 ============ */
+  function $(id){ return document.getElementById(id); }
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function pick(obj, keys){
+    for (var i = 0; i < keys.length; i++){
+      var v = obj[keys[i]];
+      if (v != null && String(v).trim() !== '') return String(v).trim();
+    }
+    return '';
+  }
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function safeHttpUrl(u){
+    if (!u) return '';
+    var t = String(u).trim();
+    if (!/^https?:\/\//i.test(t)) return '';
+    try {
+      var parsed = new URL(t);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+      return parsed.href;
+    } catch (e) { return ''; }
+  }
+  function attachmentUrl(att){
+    var t = String(att || '').trim();
+    if (!t) return '';
+    if (/^https?:\/\//i.test(t)) return safeHttpUrl(t);
+    if (t.charAt(0) === '/') return SITE + t;
+    return SITE + '/' + t;
+  }
+  function extOf(path){
+    var clean = String(path || '').split('?')[0].split('#')[0];
+    var m = clean.match(/\.([a-z0-9]+)$/i);
+    return m ? m[1].toLowerCase() : '';
+  }
+  function fmtTime(t){
+    var s = String(t || '').replace('T', ' ').replace(/Z$/, '');
+    if (s.length > 19) s = s.slice(0, 19);
+    return s;
+  }
+  function ordinal(n){ return String(n).padStart(2, '0'); }
+
+  var IMG_EXT  = ['png','jpg','jpeg','gif','webp','svg','bmp','avif'];
+  var VIEW_EXT = ['html','htm','pdf','txt','mp4','webm','mov'];
+  function kindOf(link, ext){
+    if (ext && IMG_EXT.indexOf(ext) >= 0) return 'img';
+    if (ext && (ext === 'html' || ext === 'htm')) return 'file';
+    if (ext && VIEW_EXT.indexOf(ext) >= 0) return 'file';
+    if (ext && ext === 'zip') return 'other';
+    if (ext) return 'other';
+    return link ? 'url' : 'other';
+  }
+  function canInline(kind, ext){
+    if (kind === 'img') return true;
+    if (kind === 'file') {
+      return ['html','htm','pdf','txt','mp4','webm','mov'].indexOf(ext) >= 0;
+    }
+    return false;
+  }
+  function kindLabel(kind){
+    return kind === 'img' ? '图片' : kind === 'file' ? '网页文件' : kind === 'url' ? '在线链接' : '文件';
+  }
+  function kindClass(kind){
+    return kind === 'img' ? 'kind-img' : kind === 'file' ? 'kind-file' : kind === 'url' ? 'kind-url' : 'kind-other';
+  }
+
+  /* ============ 全局状态 ============ */
+  var state = {
+    raw: [],            // 接口原始记录
+    items: [],          // 规范化 + 过滤后的记录
+    filtered: [],       // 当前筛选/排序后的记录
+    droppedInvalid: 0,  // 被判为空记录而跳过的条数
+    totalFromApi: 0,
+    taskTitle: '',
+    query: '',
+    type: 'all',
+    sort: 'new',
+    loaded: false,
+    autoTimer: null,
+    lastSignature: '',
+    pvIndex: -1
+  };
+
+  /* ============ 页内路由 ============ */
+  var VIEWS = ['submit', 'gallery', 'courseware', 'resource', 'message'];
+  var views = {}, tabs = {};
+  VIEWS.forEach(function(v){
+    views[v] = $('view-' + v);
+    tabs[v]  = $('tab-' + v);
+  });
+
+  function go(view){
+    if (VIEWS.indexOf(view) < 0) view = 'submit';
+    VIEWS.forEach(function(v){
+      views[v].hidden = v !== view;
+      tabs[v].classList.toggle('active', v === view);
+      tabs[v].setAttribute('aria-selected', v === view);
+    });
+    document.body.classList.toggle('gallery-view', view === 'gallery');
+    if (view === 'gallery' && !state.loaded) { state.loaded = true; load(true); }
+    if (view === 'message' && !msgState.loaded) { msgState.loaded = true; loadMsg(true); startMsgAuto(); }
+  }
+  function route(){
+    var h = location.hash.replace(/^#\/?/, '') || (STAGE ? 'gallery' : 'submit');
+    go(VIEWS.indexOf(h) >= 0 ? h : 'submit');
+  }
+  VIEWS.forEach(function(v){
+    tabs[v].addEventListener('click', function(){ location.hash = '#/' + v; });
+  });
+  $('goGalleryNote').addEventListener('click', function(){ location.hash = '#/gallery'; });
+  window.addEventListener('hashchange', route);
+
+  /* ============ 提交逻辑 ============ */
+  (function () {
+    var form = $('submitForm'), fileZone = $('fileZone'), fileInput = $('fileInput');
+    var fileName = $('fileName'), fileClear = $('fileClear'), urlInput = $('urlInput');
+    var btn = $('submitBtn'), btnTxt = btn.querySelector('.btn-txt'), status = $('status');
+
+    fileZone.addEventListener('click', function(){ fileInput.click(); });
+    fileZone.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fileInput.click(); }
+    });
+    ['dragover','dragenter'].forEach(function(ev){
+      fileZone.addEventListener(ev, function(e){ e.preventDefault(); fileZone.classList.add('drag'); });
+    });
+    ['dragleave','drop'].forEach(function(ev){
+      fileZone.addEventListener(ev, function(e){ e.preventDefault(); fileZone.classList.remove('drag'); });
+    });
+    fileZone.addEventListener('drop', function(e){
+      if (e.dataTransfer && e.dataTransfer.files.length) fileInput.files = e.dataTransfer.files;
+      showFile();
+    });
+    fileInput.addEventListener('change', showFile);
+    fileClear.addEventListener('click', function(){ fileInput.value = ''; showFile(); });
+
+    function showFile(){
+      if (fileInput.files.length){
+        var f = fileInput.files[0];
+        fileName.classList.add('show');
+        fileName.querySelector('.fname').textContent = f.name + '（' + (f.size / 1024).toFixed(0) + ' KB）';
+      } else {
+        fileName.classList.remove('show');
+        fileName.querySelector('.fname').textContent = '';
+      }
+    }
+
+    function showStatus(kind, html){
+      status.className = 'status show ' + kind;
+      var ic = kind === 'ok'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+      status.innerHTML = ic + '<span>' + html + '</span>';
+    }
+    function clearStatus(){ status.className = 'status'; status.innerHTML = ''; }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      clearStatus();
+
+      var title   = $('workTitle').value.trim();
+      var student = $('studentName').value.trim();
+      var unit    = $('workUnit').value.trim();
+
+      if (!title)   return showStatus('err', '请填写作品名称。');
+      if (!student) return showStatus('err', '请填写学员姓名。');
+      if (!unit)    return showStatus('err', '请填写单位。');
+
+      var hasFile = fileInput.files.length > 0;
+      var urlVal  = urlInput.value.trim();
+      var urlOk   = '';
+      if (urlVal){
+        urlOk = safeHttpUrl(urlVal);
+        if (!urlOk) return showStatus('err', '作品链接格式不正确，请以 http:// 或 https:// 开头。');
+      }
+      if (!hasFile && !urlOk) {
+        return showStatus('err', '请选择作品文件或填写作品链接（至少填写一项）。');
+      }
+
+      var fd = new FormData();
+      fd.append('title', title);
+      fd.append('student_name', student);
+      fd.append('unit', unit);
+      if (hasFile) fd.append('file', fileInput.files[0]);
+      if (urlOk)   fd.append('url', urlOk);
+
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btnTxt.textContent = '正在提交…';
+
+      fetch(API, { method: 'POST', body: fd })
+        .then(function(res){
+          return res.json().catch(function(){ return null; })
+            .then(function(data){ return { ok: res.ok, status: res.status, data: data }; });
+        })
+        .then(function(r){
+          if (r.ok && r.data && r.data.status === 'success'){
+            var att = r.data.attachment ? attachmentUrl(r.data.attachment) : '';
+            var parts = ['提交成功！作品已收录。'];
+            if (att) {
+              var ex = extOf(att);
+              var canSee = IMG_EXT.indexOf(ex) >= 0 || ex === 'html' || ex === 'htm' || ex === 'pdf';
+              parts.push(
+                '作品地址：<a href="' + esc(att) + '" target="_blank" rel="noopener noreferrer">' +
+                (canSee ? '点击查看' : '点击下载') + '</a>'
+              );
+            }
+            if (urlOk) {
+              parts.push('作品链接：<a href="' + esc(urlOk) + '" target="_blank" rel="noopener noreferrer">打开</a>');
+            }
+            parts.push('也可以切换到 <a href="#/gallery">作品展示</a> 查看全部作品。');
+            form.reset();
+            showFile();
+            showStatus('ok', parts.join(' '));
+          } else {
+            var msg = (r.data && (r.data.note || r.data.message)) || ('服务器返回错误（HTTP ' + r.status + '）');
+            showStatus('err', '提交失败：' + esc(msg) + ' 请稍后重试。');
+          }
+        })
+        .catch(function(){
+          showStatus('err', '网络连接失败，请检查网络后重试。若反复失败，可把作品链接直接发给现场老师。');
+        })
+        .finally(function(){
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          btnTxt.textContent = '提交作品';
+        });
+    });
+  })();
+
+  /* ============ 展示逻辑 ============ */
+  var grid = $('grid'), skeleton = $('skeleton'), emptyState = $('emptyState');
+  var errorState = $('errorState'), errorMsg = $('errorMsg'), filterNote = $('filterNote');
+
+  function normalize(s, i){
+    var attRaw = pick(s, ['attachment', 'file']);
+    var att    = attachmentUrl(attRaw);
+    var url    = safeHttpUrl(pick(s, ['url', 'link', 'href']));
+    var ext    = extOf(attRaw);
+    var kind   = kindOf(att || url, ext);
+    return {
+      title:   pick(s, ['title', 'work_name', '作品名称']) || '未命名作品',
+      author:  pick(s, ['student_name', 'author', '姓名', '学员姓名']),
+      unit:    pick(s, ['unit', 'school', 'org', 'organization', '单位']),
+      att:     att,
+      attRaw:  attRaw,
+      url:     url,
+      ext:     ext,
+      kind:    kind,
+      time:    fmtTime(pick(s, ['submitted_at', 'created_at', 'time'])),
+      ip:      pick(s, ['_ip', 'ip']),
+      seq:     i
+    };
+  }
+  function isValidRecord(it){
+    if (it.title && it.title !== '未命名作品') return true;
+    if (it.author) return true;
+    if (it.unit) return true;
+    if (it.att)   return true;
+    if (it.url)   return true;
+    return false;
+  }
+
+  function render(data){
+    var subs = (data && Array.isArray(data.submissions)) ? data.submissions : [];
+    state.raw = subs;
+    state.totalFromApi = data && data.total_submissions != null ? data.total_submissions : subs.length;
+    if (data && data.task_title) state.taskTitle = data.task_title;
+
+    var all = subs.map(normalize);
+    state.items = all.filter(isValidRecord);
+    state.droppedInvalid = all.length - state.items.length;
+
+    paintHeader();
+    paintStats();
+    paintNote();
+    applyFilter(true);
+  }
+
+  function paintHeader(){
+    if (state.taskTitle){
+      $('pageSub').textContent = state.taskTitle;
+      document.title = (STAGE ? '作品展示 · ' : '') + '学员作品中心 · ' + state.taskTitle;
+      $('pageFooter').textContent = state.taskTitle;
+    } else {
+      $('pageSub').textContent = '提交并展示学员作品';
+    }
+  }
+
+  function paintStats(){
+    var units = {}, files = 0, urls = 0;
+    state.items.forEach(function(it){
+      if (it.unit) units[it.unit] = 1;
+      if (it.att) files++;
+      if (it.url) urls++;
+    });
+    $('statTotal').textContent = state.items.length;
+    $('statUnits').textContent = Object.keys(units).length;
+    $('statFiles').textContent = files;
+    $('statUrls').textContent  = urls;
+  }
+
+  function paintNote(){
+    if (state.droppedInvalid > 0){
+      filterNote.hidden = false;
+      $('filterNoteText').textContent =
+        '已自动跳过 ' + state.droppedInvalid + ' 条无内容的空记录（接口总数 ' + state.totalFromApi + ' 条）。';
+    } else {
+      filterNote.hidden = true;
+    }
+  }
+
+  function applyFilter(scrollTop){
+    var q = state.query.toLowerCase();
+    var list = state.items.filter(function(it){
+      if (state.type === 'file' && !it.att) return false;
+      if (state.type === 'url'  && !it.url) return false;
+      if (!q) return true;
+      return (it.title + ' ' + it.author + ' ' + it.unit).toLowerCase().indexOf(q) >= 0;
+    });
+
+    list.sort(function(a, b){
+      if (state.sort === 'new') return a.time < b.time ? 1 : a.time > b.time ? -1 : 0;
+      if (state.sort === 'old') return a.time > b.time ? 1 : a.time < b.time ? -1 : 0;
+      if (state.sort === 'unit'){
+        var c = String(a.unit).localeCompare(String(b.unit), 'zh-CN');
+        if (c !== 0) return c;
+        return a.time < b.time ? 1 : -1;
+      }
+      if (state.sort === 'name') return String(a.author).localeCompare(String(b.author), 'zh-CN');
+      return 0;
+    });
+
+    state.filtered = list;
+    paintGrid();
+  }
+
+  function paintGrid(){
+    grid.innerHTML = '';
+    var list = state.filtered;
+
+    if (!list.length){
+      skeleton.hidden = true;
+      grid.hidden = true;
+      errorState.hidden = true;
+      emptyState.hidden = false;
+      $('emptyText').textContent = state.items.length
+        ? '没有符合条件的作品，试着换个关键词或切换筛选条件。'
+        : '还没有作品提交，快来提交第一份作品吧。';
+      $('emptyGo').hidden = state.items.length > 0;
+      return;
+    }
+
+    list.forEach(function(it, i){
+      grid.appendChild(makeCard(it, i));
+    });
+
+    skeleton.hidden = true;
+    emptyState.hidden = true;
+    errorState.hidden = true;
+    grid.hidden = false;
+  }
+
+  function makeCard(it, i){
+    var card = el('div', 'work-card');
+
+    // 图片作品显示缩略图
+    if (it.kind === 'img' && it.att){
+      var img = document.createElement('img');
+      img.className = 'thumb';
+      img.loading = 'lazy';
+      img.alt = it.title;
+      img.src = it.att;
+      img.addEventListener('error', function(){ img.remove(); });
+      card.appendChild(img);
+    }
+
+    var inner = el('div', 'inner');
+    var top = el('div', 'top');
+    top.appendChild(el('div', 'idx', 'NO.' + ordinal(i + 1)));
+    top.appendChild(el('span', 'kind-tag ' + kindClass(it.kind), kindLabel(it.kind)));
+    inner.appendChild(top);
+
+    inner.appendChild(el('h3', null, it.title));
+
+    var metaWrap = el('div');
+    if (it.author) metaWrap.appendChild(metaLine('学员', it.author));
+    if (it.unit)   metaWrap.appendChild(metaLine('单位', it.unit));
+    inner.appendChild(metaWrap);
+
+    var tm = el('div', 'time');
+    tm.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+    tm.appendChild(document.createTextNode(it.time || '已收录'));
+    inner.appendChild(tm);
+
+    var actions = el('div', 'actions');
+    var primary = canInline(it.kind, it.ext);
+
+    if (primary){
+      var pv = el('button', 'link-btn', '预览作品');
+      pv.type = 'button';
+      pv.addEventListener('click', function(){ openPreview(it); });
+      actions.appendChild(pv);
+      if (it.url && it.att){
+        var a2 = document.createElement('a');
+        a2.className = 'link-btn sec';
+        a2.href = it.url;
+        a2.target = '_blank';
+        a2.rel = 'noopener noreferrer';
+        a2.textContent = '链接 ↗';
+        actions.appendChild(a2);
+      }
+    } else if (it.att){
+      var dl = document.createElement('a');
+      dl.className = 'link-btn';
+      dl.href = it.att;
+      dl.target = '_blank';
+      dl.rel = 'noopener noreferrer';
+      dl.textContent = it.kind === 'other' ? '下载作品' : '打开作品';
+      actions.appendChild(dl);
+      if (it.url){
+        var a4 = document.createElement('a');
+        a4.className = 'link-btn sec';
+        a4.href = it.url;
+        a4.target = '_blank';
+        a4.rel = 'noopener noreferrer';
+        a4.textContent = '链接 ↗';
+        actions.appendChild(a4);
+      }
+    } else if (it.url){
+      var a5 = document.createElement('a');
+      a5.className = 'link-btn';
+      a5.href = it.url;
+      a5.target = '_blank';
+      a5.rel = 'noopener noreferrer';
+      a5.textContent = '打开作品 ↗';
+      actions.appendChild(a5);
+      var pv2 = el('button', 'link-btn sec', '内嵌试试');
+      pv2.type = 'button';
+      pv2.addEventListener('click', function(){ openPreview(it); });
+      actions.appendChild(pv2);
+    }
+
+    if (actions.childNodes.length) inner.appendChild(actions);
+    card.appendChild(inner);
+    return card;
+  }
+
+  function metaLine(k, v){
+    var p = el('div', 'meta');
+    p.appendChild(el('b', null, k + '：'));
+    p.appendChild(document.createTextNode(v));
+    return p;
+  }
+
+  /* ============ 预览弹层 ============ */
+  var pv = $('preview'), pvFrame = $('pvFrame'), pvFallback = $('pvFallback');
+  var pvWarn = $('pvWarn'), pvTimer = null;
+
+  function openPreview(it){
+    var idx = state.filtered.indexOf(it);
+    state.pvIndex = idx >= 0 ? idx : 0;
+    showPreviewAt(state.pvIndex);
+    pv.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePreview(){
+    pv.hidden = true;
+    pvFrame.src = 'about:blank';
+    document.body.style.overflow = '';
+    if (pvTimer) { clearTimeout(pvTimer); pvTimer = null; }
+  }
+
+  function showPreviewAt(i){
+    var list = state.filtered;
+    if (!list.length) return;
+    if (i < 0) i = list.length - 1;
+    if (i >= list.length) i = 0;
+    state.pvIndex = i;
+
+    var it = list[i];
+    $('pvTitle').textContent = it.title;
+    $('pvMeta').textContent  = [it.author ? '学员：' + it.author : '',
+                                it.unit ? '单位：' + it.unit : '',
+                                it.time].filter(Boolean).join('　·　');
+
+    var inline = canInline(it.kind, it.ext);
+    var primarySrc = it.att || it.url;
+
+    $('pvOpen').href = primarySrc || '#';
+    $('pvFallbackOpen').href = it.att || it.url || '#';
+    $('pvWarnOpen').href = it.url || it.att || '#';
+
+    $('pvPrev').disabled = list.length <= 1;
+    $('pvNext').disabled = list.length <= 1;
+    if (pvTimer) { clearTimeout(pvTimer); pvTimer = null; }
+    pvWarn.hidden = true;
+
+    if (inline && primarySrc){
+      pvFallback.hidden = true;
+      pvFrame.hidden = false;
+      pvFrame.src = primarySrc;
+      // 外链（非本站静态资源）可能被目标站点的 X-Frame-Options / CSP 拒绝
+      if (!it.att && it.url){
+        pvTimer = setTimeout(function(){ pvWarn.hidden = false; }, PREVIEW_TIMEOUT);
+      }
+    } else {
+      pvFrame.hidden = true;
+      pvFrame.src = 'about:blank';
+      pvFallback.hidden = false;
+      if (it.kind === 'other'){
+        $('pvFallbackTitle').textContent = '该作品需要下载后查看';
+        $('pvFallbackText').textContent = '压缩包等格式无法在页面内直接预览，请下载到电脑上解压打开。';
+      } else if (!primarySrc){
+        $('pvFallbackTitle').textContent = '该作品没有可预览的地址';
+        $('pvFallbackText').textContent = '提交记录里没有附件或链接。';
+      } else {
+        $('pvFallbackTitle').textContent = '该格式暂不支持内嵌预览';
+        $('pvFallbackText').textContent = '请点下面的按钮在新窗口打开或下载查看。';
+      }
+    }
+  }
+
+  $('pvClose').addEventListener('click', closePreview);
+  $('pvPrev').addEventListener('click', function(){ showPreviewAt(state.pvIndex - 1); });
+  $('pvNext').addEventListener('click', function(){ showPreviewAt(state.pvIndex + 1); });
+  $('pvWarnClose').addEventListener('click', function(){ pvWarn.hidden = true; });
+  pv.addEventListener('click', function(e){ if (e.target === pv) closePreview(); });
+  document.addEventListener('keydown', function(e){
+    if (pv.hidden) return;
+    if (e.key === 'Escape') closePreview();
+    else if (e.key === 'ArrowLeft')  showPreviewAt(state.pvIndex - 1);
+    else if (e.key === 'ArrowRight') showPreviewAt(state.pvIndex + 1);
+  });
+
+  /* ============ 数据加载 ============ */
+  function signatureOf(subs){
+    return subs.length + '|' + (subs.length ? String(subs[0].submitted_at) + String(subs[subs.length - 1].submitted_at) : '');
+  }
+
+  function load(first){
+    if (first){
+      skeleton.hidden = false;
+      grid.hidden = true;
+      emptyState.hidden = true;
+      errorState.hidden = true;
+    }
+    var url = LOAD_ALL ? API_ALL : API;
+    fetch(url, { method: 'GET', cache: 'no-store' })
+      .then(function(res){
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        var subs = (data && Array.isArray(data.submissions)) ? data.submissions : [];
+        var sig = signatureOf(subs);
+        // 静默更新：数据没变则不重绘，避免投屏画面闪烁
+        if (!first && sig === state.lastSignature) { paintStats(); return; }
+        state.lastSignature = sig;
+        render(data);
+      })
+      .catch(function(e){
+        if (first || !state.items.length){
+          skeleton.hidden = true;
+          grid.hidden = true;
+          emptyState.hidden = true;
+          errorState.hidden = false;
+          errorMsg.textContent = '作品加载失败（' + e.message + '），请检查网络后重试。';
+        }
+      });
+  }
+
+  function startAuto(){
+    stopAuto();
+    if ($('autoRefresh').checked){
+      state.autoTimer = setInterval(function(){ load(false); }, REFRESH_MS);
+    }
+  }
+  function stopAuto(){
+    if (state.autoTimer) { clearInterval(state.autoTimer); state.autoTimer = null; }
+  }
+
+  /* ============ 工具条事件 ============ */
+  $('searchInput').addEventListener('input', function(){
+    state.query = this.value.trim();
+    applyFilter();
+  });
+  $('typeSeg').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (!b) return;
+    state.type = b.dataset.type;
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function(x){
+      x.classList.toggle('active', x === b);
+    });
+    applyFilter();
+  });
+  $('sortSel').addEventListener('change', function(){
+    state.sort = this.value;
+    applyFilter();
+  });
+  $('refreshBtn').addEventListener('click', function(){ load(false); });
+  $('retryBtn').addEventListener('click', function(){ load(true); });
+  $('autoRefresh').addEventListener('change', startAuto);
+
+  $('stageBtn').addEventListener('click', function(){
+    var on = document.body.classList.toggle('stage-mode');
+    this.textContent = on ? '退出投屏' : '投屏模式';
+    if (on) {
+      // 投屏时默认展示全部作品
+      LOAD_ALL = true;
+      load(false);
+    }
+  });
+
+  $('exportBtn').addEventListener('click', function(){
+    if (!state.filtered.length) return;
+    var rows = [['序号','作品名称','学员姓名','单位','提交时间','类型','作品地址']];
+    state.filtered.forEach(function(it, i){
+      rows.push([
+        String(i + 1),
+        it.title,
+        it.author,
+        it.unit,
+        it.time,
+        kindLabel(it.kind),
+        it.att || it.url || ''
+      ]);
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(c){
+        var s = String(c == null ? '' : c);
+        return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }).join(',');
+    }).join('\r\n');
+
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '作品名单_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  });
+
+  $('goSubmit').addEventListener('click', function(){ location.hash = '#/submit'; });
+  $('emptyGo').addEventListener('click', function(){ location.hash = '#/submit'; });
+
+  /* ============ 课件大小探测（换文件后无需改代码） ============ */
+  (function () {
+    function fmtSize(bytes){
+      if (!bytes) return '';
+      var mb = bytes / 1048576;
+      return mb >= 1 ? mb.toFixed(1) + ' MB' : (bytes / 1024).toFixed(0) + ' KB';
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.cw-size'), function (node) {
+      var src = node.getAttribute('data-src');
+      if (!src) return;
+      fetch(src, { method: 'HEAD', cache: 'no-store' })
+        .then(function (r){ return r.ok ? r.headers.get('content-length') : null; })
+        .then(function (len){
+          var s = fmtSize(len && Number(len));
+          if (s) node.textContent = s;
+        })
+        .catch(function () { /* file:// 或离线时 HEAD 失败，保留预置值 */ });
+    });
+  })();
+
+  /* ============ 学员留言 ============ */
+  var MSG_API     = 'https://qf.zmrobo.com/api/c0dqoy8ckk';
+  var MSG_API_ALL = MSG_API + '/all';
+
+  var MSG_TYPES = ['学习要求', '学习疑惑', '其他'];
+  var MSG_TYPE_CLASS = { '学习要求': 'mt-req', '学习疑惑': 'mt-doubt', '其他': 'mt-other' };
+  var MSG_TEST_RE = /__wb_|__(probe|test)__/i;
+
+  var msgState = {
+    items: [], filtered: [], query: '', sort: 'new', type: '学习要求',
+    loaded: false, timer: null, lastSig: '', totalFromApi: 0, dropped: 0
+  };
+
+  var msgList = $('msgList'), msgSkeleton = $('msgSkeleton'), msgEmptyState = $('msgEmpty');
+  var msgErrorState = $('msgError'), msgNote = $('msgNote');
+
+  function msgTypeOf(v){
+    var t = String(v || '').trim();
+    return MSG_TYPES.indexOf(t) >= 0 ? t : '其他';
+  }
+  function normalizeMsg(s, i){
+    return {
+      name: pick(s, ['student_name', 'name', 'author', '姓名', '学员姓名']),
+      unit: pick(s, ['unit', 'school', 'org', 'organization', '单位']),
+      type: msgTypeOf(pick(s, ['message_type', 'type', 'category', '留言类型'])),
+      text: pick(s, ['message', 'content', 'text', '留言内容']),
+      time: fmtTime(pick(s, ['submitted_at', 'created_at', 'time'])),
+      seq: i
+    };
+  }
+  function isTestMsg(m){
+    return MSG_TEST_RE.test(m.text + ' ' + m.name + ' ' + m.unit);
+  }
+  function isValidMsg(m){
+    return !!(m.text || (m.name && m.unit));
+  }
+
+  function renderMsg(data, subs){
+    msgState.totalFromApi = (data && data.total_submissions != null) ? data.total_submissions : subs.length;
+    var all = subs.map(normalizeMsg);
+    msgState.items = all.filter(function(m){ return isValidMsg(m) && !isTestMsg(m); });
+    msgState.dropped = all.length - msgState.items.length;
+    paintMsgNote();
+    applyMsgFilter();
+  }
+
+  function paintMsgNote(){
+    if (msgState.dropped > 0){
+      msgNote.hidden = false;
+      $('msgNoteText').textContent =
+        '已自动跳过 ' + msgState.dropped + ' 条测试或空记录（接口总数 ' + msgState.totalFromApi + ' 条）。';
+    } else {
+      msgNote.hidden = true;
+    }
+  }
+
+  function applyMsgFilter(){
+    var q = msgState.query.toLowerCase();
+    var list = msgState.items.filter(function(m){
+      if (!q) return true;
+      return (m.text + ' ' + m.name + ' ' + m.unit).toLowerCase().indexOf(q) >= 0;
+    });
+    list.sort(function(a, b){
+      if (msgState.sort === 'new') return a.time < b.time ? 1 : a.time > b.time ? -1 : 0;
+      if (msgState.sort === 'old') return a.time > b.time ? 1 : a.time < b.time ? -1 : 0;
+      var c = String(a.type).localeCompare(String(b.type), 'zh-CN');
+      if (c !== 0) return c;
+      return a.time < b.time ? 1 : -1;
+    });
+    msgState.filtered = list;
+    paintMsgList();
+  }
+
+  function paintMsgList(){
+    msgList.innerHTML = '';
+    var list = msgState.filtered, total = msgState.items.length;
+
+    $('msgCountBadge').textContent = list.length === total
+      ? (total ? '共 ' + total + ' 条' : '')
+      : '筛出 ' + list.length + ' / ' + total + ' 条';
+
+    if (!list.length){
+      msgSkeleton.hidden = true;
+      msgList.hidden = true;
+      msgErrorState.hidden = true;
+      msgEmptyState.hidden = false;
+      $('msgEmptyText').textContent = total
+        ? '没有符合条件的留言，试着换个关键词。'
+        : '还没有留言，欢迎写下你的第一个学习要求或疑惑。';
+      $('msgGoWrite').hidden = total > 0;
+      return;
+    }
+
+    list.forEach(function(m, i){ msgList.appendChild(makeMsgCard(m, i)); });
+    msgSkeleton.hidden = true;
+    msgEmptyState.hidden = true;
+    msgErrorState.hidden = true;
+    msgList.hidden = false;
+  }
+
+  function makeMsgCard(m, i){
+    var card = el('article', 'msg-card');
+
+    var top = el('div', 'msg-top');
+    top.appendChild(el('span', 'msg-tag ' + (MSG_TYPE_CLASS[m.type] || 'mt-other'), m.type));
+    top.appendChild(el('span', 'msg-no', 'NO.' + ordinal(i + 1)));
+    top.appendChild(el('time', 'msg-time', m.time || '已收录'));
+    card.appendChild(top);
+
+    card.appendChild(el('p', 'msg-text', m.text || '（未填写留言内容）'));
+
+    var bits = [];
+    if (m.name) bits.push('学员：' + m.name);
+    if (m.unit) bits.push('单位：' + m.unit);
+    card.appendChild(el('div', 'msg-meta', bits.join('　·　') || '未署名'));
+    return card;
+  }
+
+  function loadMsg(first){
+    if (first){
+      msgSkeleton.hidden = false;
+      msgList.hidden = true;
+      msgEmptyState.hidden = true;
+      msgErrorState.hidden = true;
+    }
+    return fetch(MSG_API_ALL, { method: 'GET', cache: 'no-store' })
+      .then(function(res){
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        var subs = (data && Array.isArray(data.submissions)) ? data.submissions : [];
+        var sig = subs.length + '|' + (subs.length ? String(subs[0].submitted_at) + String(subs[subs.length - 1].submitted_at) : '');
+        if (!first && sig === msgState.lastSig) return;
+        msgState.lastSig = sig;
+        renderMsg(data, subs);
+      })
+      .catch(function(e){
+        if (first || !msgState.items.length){
+          msgSkeleton.hidden = true;
+          msgList.hidden = true;
+          msgEmptyState.hidden = true;
+          msgErrorState.hidden = false;
+          $('msgErrorText').textContent = '留言加载失败（' + e.message + '），请检查网络后重试。';
+        }
+      });
+  }
+
+  function startMsgAuto(){
+    stopMsgAuto();
+    if ($('msgAutoRefresh').checked){
+      msgState.timer = setInterval(function(){ loadMsg(false); }, REFRESH_MS);
+    }
+  }
+  function stopMsgAuto(){
+    if (msgState.timer){ clearInterval(msgState.timer); msgState.timer = null; }
+  }
+
+  /* ---------- 留言提交 ---------- */
+  (function () {
+    var form = $('msgForm'), btn = $('msgBtn'), btnTxt = btn.querySelector('.btn-txt'), status = $('msgStatus');
+    var textarea = $('msgText'), typeSeg = $('msgTypeSeg');
+
+    function setStatus(kind, html){
+      status.className = 'status show ' + kind;
+      var ic = kind === 'ok'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+      status.innerHTML = ic + '<span>' + html + '</span>';
+    }
+    function clearStatus(){ status.className = 'status'; status.innerHTML = ''; }
+
+    textarea.addEventListener('input', function(){ $('msgCount').textContent = textarea.value.length; });
+
+    typeSeg.addEventListener('click', function(e){
+      var b = e.target.closest('button');
+      if (!b) return;
+      msgState.type = b.dataset.type;
+      Array.prototype.forEach.call(this.querySelectorAll('button'), function(x){
+        x.classList.toggle('active', x === b);
+      });
+    });
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      clearStatus();
+
+      var name = $('msgName').value.trim();
+      var unit = $('msgUnit').value.trim();
+      var text = textarea.value.trim();
+
+      if (!name) return setStatus('err', '请填写学员姓名。');
+      if (!unit) return setStatus('err', '请填写单位。');
+      if (!text) return setStatus('err', '请填写留言内容。');
+
+      var fd = new FormData();
+      fd.append('student_name', name);
+      fd.append('unit', unit);
+      fd.append('message_type', msgState.type);
+      fd.append('message', text);
+
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btnTxt.textContent = '正在提交…';
+
+      fetch(MSG_API, { method: 'POST', body: fd })
+        .then(function(res){
+          return res.json().catch(function(){ return null; })
+            .then(function(d){ return { ok: res.ok, status: res.status, data: d }; });
+        })
+        .then(function(r){
+          if (r.ok && r.data && (r.data.status === 'success' || r.data.message)){
+            setStatus('ok', '留言已提交，感谢反馈！下方留言墙已同步更新。');
+            form.reset();
+            $('msgCount').textContent = '0';
+            msgState.lastSig = '';
+            loadMsg(false);
+          } else {
+            var msg = (r.data && (r.data.note || r.data.message)) || ('服务器返回错误（HTTP ' + r.status + '）');
+            setStatus('err', '提交失败：' + esc(msg) + ' 请稍后重试。');
+          }
+        })
+        .catch(function(){
+          setStatus('err', '网络连接失败，请检查网络后重试。');
+        })
+        .finally(function(){
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          btnTxt.textContent = '提交留言';
+        });
+    });
+  })();
+
+  /* ---------- 留言工具体事件 ---------- */
+  $('msgSearchInput').addEventListener('input', function(){
+    msgState.query = this.value.trim();
+    applyMsgFilter();
+  });
+  $('msgSortSel').addEventListener('change', function(){
+    msgState.sort = this.value;
+    applyMsgFilter();
+  });
+  $('msgRefreshBtn').addEventListener('click', function(){ msgState.lastSig = ''; loadMsg(false); });
+  $('msgRetryBtn').addEventListener('click', function(){ loadMsg(true); });
+  $('msgAutoRefresh').addEventListener('change', startMsgAuto);
+  $('msgGoWrite').addEventListener('click', function(){
+    var f = $('msgName');
+    if (f){ f.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(function(){ f.focus(); }, 260); }
+  });
+  $('msgExportBtn').addEventListener('click', function(){
+    if (!msgState.filtered.length) return;
+    var rows = [['序号', '留言类型', '留言内容', '学员姓名', '单位', '留言时间']];
+    msgState.filtered.forEach(function(m, i){
+      rows.push([String(i + 1), m.type, m.text, m.name, m.unit, m.time]);
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(c){
+        var t = String(c == null ? '' : c);
+        return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+      }).join(',');
+    }).join('\r\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '学员留言_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  });
+
+  /* 页头副标题：静默预取活动名称。
+     走根路径（负载最小，只含最近 3 条记录 + task_title），
+     这样直接打开「提交作品 / 课件下载 / 学习资料 / 学员留言」时，
+     页头显示的也是真实活动名，而不是一直挂着占位文案。 */
+  function loadTaskTitle(){
+    if (state.taskTitle) return;
+    fetch(API, { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (!d || !d.task_title) throw new Error('no title');
+        state.taskTitle = d.task_title;
+        paintHeader();
+      })
+      .catch(function(){
+        $('pageSub').textContent = '提交并展示学员作品';
+      });
+  }
+
+  /* ============ 启动 ============ */
+  if (STAGE){
+    document.body.classList.add('stage-mode');
+    $('stageBtn').textContent = '退出投屏';
+    tabs.submit.hidden = true;
+    tabs.courseware.hidden = true;
+    tabs.resource.hidden = true;
+    tabs.message.hidden = true;
+    $('goSubmit').hidden = true;
+    document.title = '作品展示 · ' + document.title;
+  }
+  route();
+  loadTaskTitle();
+  startAuto();
+  window.addEventListener('beforeunload', function(){ stopAuto(); stopMsgAuto(); });
+})();
+</script>
+</body>
+</html>

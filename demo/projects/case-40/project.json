@@ -1,0 +1,12 @@
+{
+  "id": "case-40",
+  "title": "格点多边形探究实验室",
+  "category": "exploration",
+  "description": "格点规律观测：围绕内部格点、边界格点、面积开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 40,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

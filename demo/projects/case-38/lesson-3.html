@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":38,"key":"case-38","title":"第20课 反馈控制有算法（5 课时）","category":"simulation","description":"经历算法诊断、阈值判断、自主仿真和反思，比较反馈控制的设计思路。","headline":"反馈算法实验簿","view":"flow","fields":[{"key":"threshold","label":"阈值"},{"key":"algorithm","label":"算法"},{"key":"result","label":"仿真结果"},{"key":"reflection","label":"反思"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"任务一 · 算法诊断"},{"file":"lesson-2.html","title":"任务二 · 八闽阈值速答"},{"file":"lesson-3.html","title":"任务三 · 自主设计与仿真"},{"file":"lesson-4.html","title":"任务四 · 对比反思"},{"file":"lesson-5.html","title":"微作业0 · 节水感知"}],"tasks":{"records":"cMr2KhdUMRE"},"mapping":{},"accent":"#3c697b","capture":true,"lesson":"任务三 · 自主设计与仿真"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务三 · 自主设计与仿真验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #eaf7e1, #d4e8c8);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+        }
+        .card {
+            background: #fcfef9;
+            border-radius: 48px;
+            padding: 28px 26px 32px;
+            box-shadow: 0 20px 40px rgba(60, 90, 40, 0.16);
+            border: 2px solid #c3d7b0;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .card::before {
+            content: "💻🌱";
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.06;
+            top: 0;
+            right: 0;
+            pointer-events: none;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px dashed #a7c494;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+        .avatar {
+            background: #d4e8c4;
+            border-radius: 100px;
+            padding: 6px 18px 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f3f10;
+            border: 2px solid #5f7a4b;
+            box-shadow: 0 4px 0 #8aaa78;
+        }
+        .avatar span {
+            font-size: 2rem;
+        }
+        .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f3b12;
+            background: #e6f0da;
+            padding: 4px 18px;
+            border-radius: 60px;
+            border: 2px solid #b1cb9a;
+        }
+        .badge {
+            background: #f5b342;
+            color: #2d401a;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 4px 14px;
+            border-radius: 60px;
+            border: 2px solid #c4882a;
+            margin-left: auto;
+        }
+        .step-indicator {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 10px 0 16px;
+            padding: 10px 14px;
+            background: #eef6e4;
+            border-radius: 60px;
+            border: 2px solid #b6cf9e;
+        }
+        .step-indicator .step-dot {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #3f622b;
+            padding: 4px 12px;
+            border-radius: 60px;
+            background: #dcefd0;
+            border: 2px solid #b1c99a;
+        }
+        .step-indicator .step-dot.active {
+            background: #4f8a3a;
+            color: white;
+            border-color: #2a5f1a;
+        }
+        .step-indicator .step-dot.done {
+            background: #79b85e;
+            color: white;
+            border-color: #3f7a2a;
+        }
+        .step-indicator .arrow {
+            color: #7f9d67;
+            font-weight: 700;
+        }
+
+        /* 对话气泡 */
+        .chat {
+            background: #f4fae8;
+            border-radius: 28px 28px 28px 6px;
+            padding: 14px 20px;
+            border: 2px solid #b8d0a3;
+            margin: 10px 0 18px;
+            position: relative;
+            z-index: 2;
+        }
+        .chat::before {
+            content: "👨‍💻";
+            position: absolute;
+            font-size: 26px;
+            left: -10px;
+            top: -10px;
+            background: #f4fae8;
+            border-radius: 50%;
+            padding: 2px;
+            border: 2px solid #b8d0a3;
+        }
+        .chat p {
+            font-size: 0.98rem;
+            line-height: 1.7;
+            color: #1d3313;
+        }
+        .chat strong {
+            color: #2a6a1a;
+        }
+
+        /* 步骤面板 */
+        .step-panel {
+            display: none;
+            background: #eef6e4;
+            border-radius: 32px;
+            padding: 20px 18px;
+            border: 2px solid #b6cf9e;
+            margin-top: 6px;
+            position: relative;
+            z-index: 2;
+        }
+        .step-panel.active {
+            display: block;
+        }
+        .step-panel .step-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1b3c0d;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-panel .step-title .num {
+            background: #4f8a3a;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        /* 条件选择 */
+        .cond-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .cond-item {
+            background: white;
+            border-radius: 60px;
+            padding: 8px 14px;
+            border: 2px solid #c6dbb2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .cond-item:hover {
+            border-color: #7fad66;
+            background: #f6ffe8;
+        }
+        .cond-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4f8a3a;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .cond-item .icon {
+            font-size: 1.2rem;
+        }
+        .cond-item .name {
+            font-weight: 600;
+            color: #1f3f10;
+            font-size: 0.9rem;
+        }
+        .cond-item .tag {
+            font-size: 0.65rem;
+            background: #d4e8c4;
+            padding: 0 8px;
+            border-radius: 30px;
+            color: #1f3f10;
+            margin-left: auto;
+        }
+        .crop-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 8px 0 4px;
+        }
+        .crop-select label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            border: 2px solid #c6dbb2;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1f3f10;
+        }
+        .crop-select label:hover {
+            border-color: #7fad66;
+        }
+        .crop-select input[type="radio"] {
+            accent-color: #4f8a3a;
+        }
+
+        /* 仿真场景 - 第二步展示 */
+        .sim-scene {
+            background: #1a2a16;
+            border-radius: 20px;
+            padding: 16px 18px;
+            border: 3px solid #4d7a3a;
+            min-height: 200px;
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .sim-scene .scene-label {
+            color: #8aaa78;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 100%;
+            border-bottom: 1px solid #3d5a30;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+        .sim-scene .plant-display {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 12px;
+            background: #243d1e;
+            border-radius: 16px;
+            border: 2px solid #3d5a30;
+        }
+        .sim-scene .plant-display .emoji {
+            font-size: 4rem;
+            display: block;
+        }
+        .sim-scene .plant-display .pname {
+            color: #b5e09a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .sim-scene .sensor-panel {
+            flex: 2;
+            min-width: 180px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 12px;
+            background: #0f1e0d;
+            border-radius: 16px;
+            padding: 12px 16px;
+            border: 1px solid #3d5a30;
+        }
+        .sim-scene .sensor-panel .sensor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #b5e09a;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            padding: 4px 0;
+            border-bottom: 1px solid #1e351a;
+        }
+        .sim-scene .sensor-panel .sensor-item .label {
+            color: #8aaa78;
+        }
+        .sim-scene .sensor-panel .sensor-item .value {
+            color: #7fc9ff;
+            font-weight: 700;
+        }
+        .sim-scene .sensor-panel .sensor-item .value.good {
+            color: #7fc9ff;
+        }
+        .sim-scene .sensor-panel .sensor-item .value.warn {
+            color: #f9a8a8;
+        }
+        .sim-scene .extra-conditions {
+            flex: 1;
+            min-width: 120px;
+            background: #0f1e0d;
+            border-radius: 16px;
+            padding: 10px 14px;
+            border: 1px solid #3d5a30;
+        }
+        .sim-scene .extra-conditions .ec-title {
+            color: #8aaa78;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .sim-scene .extra-conditions .ec-item {
+            color: #b5e09a;
+            font-size: 0.85rem;
+            padding: 3px 0;
+            border-bottom: 1px solid #1e351a;
+            display: flex;
+            justify-content: space-between;
+        }
+        .sim-scene .extra-conditions .ec-item .eclabel {
+            color: #8aaa78;
+        }
+        .sim-scene .extra-conditions .ec-item .ecval {
+            color: #f7c948;
+            font-weight: 600;
+        }
+
+        /* 代码框架 - 第三步 */
+        .code-box {
+            background: #1a2a16;
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 3px solid #4d7a3a;
+            margin: 8px 0 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #b5e09a;
+            line-height: 1.8;
+            overflow-x: auto;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+        .code-box .kw {
+            color: #f7c948;
+        }
+        .code-box .var {
+            color: #7fc9ff;
+        }
+        .code-box .num {
+            color: #f9a8a8;
+        }
+        .code-box .cmt {
+            color: #6a8a5a;
+        }
+        .code-box .str {
+            color: #b5e09a;
+        }
+        .code-box .code-blank {
+            display: inline-block;
+            border-bottom: 3px solid #f7c948;
+            min-width: 60px;
+            background: #0f1e0d;
+            padding: 0 6px;
+        }
+        .code-box .code-blank input {
+            border: none;
+            border-bottom: 3px solid #f7c948;
+            background: transparent;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f7c948;
+            width: 100%;
+            min-width: 50px;
+            outline: none;
+            padding: 0 4px;
+        }
+        .code-box .code-blank input:focus {
+            border-bottom-color: #7fc9ff;
+        }
+
+        /* 仿真报告 - 第四步 */
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .report-item {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 2px solid #c6dbb2;
+            text-align: center;
+        }
+        .report-item .big-num {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #1d4a0d;
+        }
+        .report-item .big-num.good {
+            color: #4f8a3a;
+        }
+        .report-item .big-num.warn {
+            color: #d4880f;
+        }
+        .report-item .big-num.bad {
+            color: #c0392b;
+        }
+        .report-item .lbl {
+            font-size: 0.85rem;
+            color: #3f622b;
+            margin-top: 2px;
+        }
+        .report-item .sub {
+            font-size: 0.75rem;
+            color: #6a8a5a;
+            margin-top: 4px;
+        }
+        .report-detail {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 2px solid #c6dbb2;
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #1d3313;
+            line-height: 1.8;
+        }
+        .report-detail .highlight {
+            background: #dcefcb;
+            padding: 0 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* 老陈点评 - 第五步 */
+        .laochen-comment {
+            background: #fdf6e3;
+            border-radius: 16px;
+            padding: 14px 18px;
+            border-left: 6px solid #d4880f;
+            margin: 10px 0;
+        }
+        .laochen-comment .lc-title {
+            font-weight: 700;
+            color: #7f5f0a;
+            font-size: 0.95rem;
+        }
+        .laochen-comment .lc-body {
+            color: #1d3313;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-top: 4px;
+        }
+        .laochen-comment .lc-body .suggestion {
+            background: #e8f0d8;
+            padding: 2px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 2px 0;
+            font-weight: 600;
+            color: #2a5f1a;
+        }
+
+        /* 自评 */
+        .self-eval {
+            background: #f6ffe8;
+            border-radius: 32px;
+            padding: 12px 16px;
+            border: 2px solid #b6cf9e;
+            margin: 12px 0 6px;
+        }
+        .self-eval .title-sm {
+            font-weight: 700;
+            color: #1f3f10;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .self-eval .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .self-eval .options label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: white;
+            padding: 4px 14px;
+            border-radius: 60px;
+            border: 2px solid #c6dbb2;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .self-eval .options label:hover {
+            border-color: #7fad66;
+        }
+        .self-eval .options input[type="radio"] {
+            accent-color: #4f8a3a;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+            justify-content: center;
+        }
+        .btn {
+            border-radius: 80px;
+            padding: 10px 28px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.06s linear;
+            border: 3px solid #92af7a;
+            background: #e3f2d4;
+            color: #1d3a0d;
+            box-shadow: 0 4px 0 #7f9d67;
+            border: none;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #7f9d67;
+        }
+        .btn-primary {
+            background: #79b85e;
+            border-color: #3f7a2a;
+            color: white;
+            box-shadow: 0 4px 0 #2a5f1a;
+            border: 3px solid #3f7a2a;
+        }
+        .btn-primary:active {
+            box-shadow: 0 1px 0 #2a5f1a;
+        }
+        .btn-success {
+            background: #4f8a3a;
+            border-color: #265a1a;
+            color: white;
+            box-shadow: 0 4px 0 #1e4614;
+            border: 3px solid #265a1a;
+        }
+        .btn-success:active {
+            box-shadow: 0 1px 0 #1e4614;
+        }
+        .btn-warning {
+            background: #f5b342;
+            border-color: #c4882a;
+            color: #2d401a;
+            box-shadow: 0 4px 0 #b07820;
+            border: 3px solid #c4882a;
+        }
+        .btn-warning:active {
+            box-shadow: 0 1px 0 #b07820;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 3px solid #7f9d67;
+            color: #1d3a0d;
+            box-shadow: 0 4px 0 #7f9d67;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #2a5f1a;
+            margin-top: 12px;
+            min-height: 24px;
+        }
+
+        .footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #427031;
+            border-top: 2px dotted #b3cd9b;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .footer span {
+            background: #e2efd3;
+            padding: 2px 14px;
+            border-radius: 60px;
+            border: 1px solid #aac092;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 650px) {
+            .cond-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+            .sim-scene .sensor-panel {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .badge {
+                margin-left: 0;
+                text-align: center;
+            }
+            .step-indicator .step-dot {
+                font-size: 0.65rem;
+                padding: 2px 8px;
+            }
+            .self-eval .options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    
+    <div class="card">
+        <div class="header">
+            <div class="avatar"><span>👨‍💻</span> 老陈</div>
+            <div class="title">⚙️ 自主设计 · 仿真验证</div>
+            <div class="badge">⏱ 10分钟</div>
+        </div>
+
+        
+        <div class="chat">
+            <p>
+                <strong>“我说你啊，先说说你打算怎么改？”</strong><br>
+                “你想想我们龙岩的太阳有多毒，蜜柚园里温度40度起步。<strong style="color:#2a6a1a;">你填的参数得对得起福建的天气！</strong>”
+            </p>
+        </div>
+
+        
+        <div class="step-indicator" id="stepIndicator">
+            <span class="step-dot active" data-step="1">① 选条件</span>
+            <span class="arrow">→</span>
+            <span class="step-dot" data-step="2">② 场景预览</span>
+            <span class="arrow">→</span>
+            <span class="step-dot" data-step="3">③ 填代码</span>
+            <span class="arrow">→</span>
+            <span class="step-dot" data-step="4">④ 仿真报告</span>
+            <span class="arrow">→</span>
+            <span class="step-dot" data-step="5">⑤ 老陈点评</span>
+        </div>
+
+        
+        <div class="step-panel active" id="step1">
+            <div class="step-title"><span class="num">1</span> 选择环境条件与作物</div>
+
+            <p style="font-weight:600; color:#1f3f10; font-size:0.95rem; margin-bottom:6px;">🌱 选择目标作物：</p>
+            <div class="crop-select" id="cropSelect">
+                <label><input type="radio" name="crop" value="香菇"> 🍄 古田香菇</label>
+                <label><input type="radio" name="crop" value="蜜柚" checked> 🍊 平和蜜柚</label>
+                <label><input type="radio" name="crop" value="草莓"> 🍓 福鼎草莓</label>
+                <label><input type="radio" name="crop" value="多肉"> 🌵 多肉植物</label>
+            </div>
+
+            <p style="font-weight:600; color:#1f3f10; font-size:0.95rem; margin:10px 0 6px;">🔍 选择环境条件（至少选3项，土壤湿度必选）：</p>
+            <div class="cond-grid" id="condGrid">
+                <label class="cond-item"><input type="checkbox" checked disabled> <span class="icon">🌱</span> <span class="name">土壤湿度</span> <span class="tag">必选</span></label>
+                <label class="cond-item"><input type="checkbox" value="B"> <span class="icon">🌤</span> <span class="name">天气预报</span></label>
+                <label class="cond-item"><input type="checkbox" value="C"> <span class="icon">☀️</span> <span class="name">光照强度</span></label>
+                <label class="cond-item"><input type="checkbox" value="D"> <span class="icon">🌡️</span> <span class="name">温度</span></label>
+                <label class="cond-item"><input type="checkbox" value="E"> <span class="icon">🌱</span> <span class="name">作物生长阶段</span></label>
+                <label class="cond-item"><input type="checkbox" value="F"> <span class="icon">🍂</span> <span class="name">季节变化</span></label>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="goToStep2">📋 确认选择 → 进入场景预览</button>
+                <button class="btn btn-outline" id="resetStep1">🔄 重置</button>
+            </div>
+            <div class="feedback" id="step1Feedback">💬 选择作物 + 至少3项条件（土壤湿度必选）</div>
+        </div>
+
+        
+        <div class="step-panel" id="step2">
+            <div class="step-title"><span class="num">2</span> 仿真场景预览</div>
+
+            <div class="sim-scene" id="simScene">
+                <div class="scene-label">🌿 智能灌溉仿真场景</div>
+
+                <div class="plant-display" id="plantDisplay">
+                    <span class="emoji">🍊</span>
+                    <span class="pname" id="plantName">平和蜜柚 · 膨果期</span>
+                </div>
+
+                <div class="sensor-panel" id="sensorPanel">
+                    <div class="sensor-item"><span class="label">🌱 土壤湿度</span> <span class="value" id="sensorHum">65%</span></div>
+                    <div class="sensor-item"><span class="label">☀️ 光照强度</span> <span class="value" id="sensorLight">850 lux</span></div>
+                    <div class="sensor-item"><span class="label">🌡️ 温度</span> <span class="value" id="sensorTemp">28°C</span></div>
+                    <div class="sensor-item"><span class="label">💧 当前状态</span> <span class="value" id="sensorStatus" style="color:#7fc9ff;">监测中</span></div>
+                </div>
+
+                <div class="extra-conditions" id="extraConditions">
+                    <div class="ec-title">📋 附加条件</div>
+                    <div class="ec-item"><span class="eclabel">🌤 天气预报</span> <span class="ecval" id="ecWeather">—</span></div>
+                    <div class="ec-item"><span class="eclabel">🌱 生长阶段</span> <span class="ecval" id="ecStage">膨果期</span></div>
+                    <div class="ec-item"><span class="eclabel">🍂 季节</span> <span class="ecval" id="ecSeason">夏季</span></div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px; font-size:0.9rem; color:#3f622b; background:#f6ffe8; padding:10px 16px; border-radius:16px; border:2px solid #b6cf9e;">
+                ✅ 已选条件：<span id="selectedCondsDisplay" style="font-weight:600; color:#1d4a0d;">土壤湿度</span>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-outline" id="backToStep1">← 返回修改</button>
+                <button class="btn btn-primary" id="goToStep3">✏️ 填写代码 →</button>
+            </div>
+            <div class="feedback" id="step2Feedback">💬 确认场景无误后，进入代码填写</div>
+        </div>
+
+        
+        <div class="step-panel" id="step3">
+            <div class="step-title"><span class="num">3</span> 填写代码框架</div>
+
+            <p style="font-size:0.9rem; color:#3f622b; margin-bottom:8px;">📌 基于教材图20.1，填写空白参数（阈值、灌溉决策等）</p>
+
+            <div class="code-box" id="codeBox">
+                <span class="cmt"># ========================</span><br>
+                <span class="cmt"># 智能灌溉算法（基于教材图20.1扩展）</span><br>
+                <span class="cmt"># 作物：</span><span class="var" id="codeCrop">平和蜜柚</span><br>
+                <span class="cmt"># 你勾选的环境条件：</span><span class="var" id="codeConds">土壤湿度</span><br>
+                <span class="cmt"># ========================</span><br><br>
+                <span class="cmt"># 显示土壤湿度（保留教材原代码）</span><br>
+                <span class="var">oled.print</span>(<span class="str">"土壤湿度："</span> + <span class="var">str</span>(<span class="var">hum</span>))<br><br>
+                <span class="cmt"># 【填空1】请填写土壤湿度上限值</span><br>
+                <span class="var">hum_max</span> = <span class="code-blank"><input type="text" id="code1" placeholder="?" style="width:60px;"></span> <span class="cmt"># 参考任务二作物上限</span><br><br>
+                <span class="cmt"># 【填空2】请填写土壤湿度下限值</span><br>
+                <span class="var">hum_min</span> = <span class="code-blank"><input type="text" id="code2" placeholder="?" style="width:60px;"></span> <span class="cmt"># 参考任务二作物基础下限</span><br><br>
+                <span class="cmt"># ===== 主判断逻辑（保留教材图20.1结构） =====</span><br>
+                <span class="kw">if</span> <span class="var">hum</span> <span class="kw">></span> <span class="var">hum_max</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">oled.print</span>(<span class="str">"</span><span class="code-blank"><input type="text" id="code3" placeholder="?" style="width:80px;"></span><span class="str">"</span>) <span class="cmt"># 【填空3】灌溉还是不灌溉？</span><br><br>
+                <span class="kw">elif</span> <span class="var">hum</span> <span class="kw">></span> <span class="var">hum_min</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># ↓↓ 以下分支根据你勾选的条件自动生成 ↓↓</span><br>
+                <span id="codeBranchB" class="hidden"><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># [若勾选B·天气预报]</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="str">"雨"</span> <span class="kw">in</span> <span class="var">tq</span>[<span class="num">0</span>] <span class="kw">or</span> <span class="str">"雨"</span> <span class="kw">in</span> <span class="var">tq</span>[<span class="num">1</span>]:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">oled.print</span>(<span class="str">"</span><span class="code-blank"><input type="text" id="code4" placeholder="?" style="width:80px;"></span><span class="str">"</span>) <span class="cmt"># 【填空4】下雨天应该？</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">oled.print</span>(<span class="str">"</span><span class="code-blank"><input type="text" id="code5" placeholder="?" style="width:80px;"></span><span class="str">"</span>) <span class="cmt"># 【填空5】不下雨应该？</span><br>
+                </span>
+                <span id="codeBranchC" class="hidden"><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># [若勾选C·光照强度] 对应教材表20.2核心知识点</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="var">lgt</span> <span class="kw">></span> <span class="num">1200</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="code-blank"><input type="text" id="code6" placeholder="?" style="width:60px;"></span> <span class="cmt"># 【填空6】强光下下限调整为？</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="code-blank"><input type="text" id="code7" placeholder="?" style="width:60px;"></span> <span class="cmt"># 【填空7】正常光照恢复下限？</span><br>
+                </span>
+                <span id="codeBranchD" class="hidden"><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># [若勾选D·温度]</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="var">temp</span> <span class="kw">></span> <span class="num">30</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="var">hum_min</span> + <span class="code-blank"><input type="text" id="code8" placeholder="?" style="width:50px;"></span> <span class="cmt"># 【填空8】高温时下限加多少？</span><br>
+                </span>
+                <span id="codeBranchE" class="hidden"><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># [若勾选E·作物生长阶段]</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="var">stage</span> <span class="kw">==</span> <span class="str">"膨果期"</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="code-blank"><input type="text" id="code9" placeholder="?" style="width:60px;"></span> <span class="cmt"># 【填空9】膨果期下限</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">elif</span> <span class="var">stage</span> <span class="kw">==</span> <span class="str">"转色期"</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="code-blank"><input type="text" id="code10" placeholder="?" style="width:60px;"></span> <span class="cmt"># 【填空10】转色期下限</span><br>
+                </span>
+                <span id="codeBranchF" class="hidden"><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># [若勾选F·季节变化]</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="var">season</span> <span class="kw">==</span> <span class="str">"冬季"</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">hum_min</span> = <span class="var">hum_min</span> - <span class="code-blank"><input type="text" id="code11" placeholder="?" style="width:50px;"></span> <span class="cmt"># 【填空11】冬季减少多少？</span><br>
+                </span>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">oled.print</span>(<span class="str">"</span><span class="code-blank"><input type="text" id="code12" placeholder="?" style="width:80px;"></span><span class="str">"</span>) <span class="cmt"># 【填空12】湿度太低应该？</span><br><br>
+                <span class="cmt"># ===== 执行器控制（保留教材图20.2原代码） =====</span><br>
+                <span class="kw">if</span> <span class="var">需要灌溉</span>:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">M1</span> = <span class="var">parrot</span>(<span class="var">parrot.M1</span>)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">M1.speed</span>(<span class="num">100</span>)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">time.sleep</span>(<span class="code-blank"><input type="text" id="code13" placeholder="?" style="width:50px;"></span>) <span class="cmt"># 【填空13】灌溉持续秒数</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="var">M1.speed</span>(<span class="num">0</span>)
+            </div>
+
+            <div style="font-size:0.85rem; color:#3f622b; background:#f6ffe8; padding:8px 14px; border-radius:12px; border:1px solid #b6cf9e; margin-bottom:8px;">
+                📝 共13个填空，请根据任务二的作物阈值数据填写
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-outline" id="backToStep2">← 返回场景</button>
+                <button class="btn btn-success" id="runSimulation">▶ 运行仿真</button>
+            </div>
+            <div class="feedback" id="step3Feedback">💬 填写所有空白后，点击"运行仿真"</div>
+        </div>
+
+        
+        <div class="step-panel" id="step4">
+            <div class="step-title"><span class="num">4</span> 仿真数据报告</div>
+
+            <div class="report-grid">
+                <div class="report-item">
+                    <div class="big-num" id="reportWaterRate">—</div>
+                    <div class="lbl">💧 节水率</div>
+                    <div class="sub">目标 ≥80%</div>
+                </div>
+                <div class="report-item">
+                    <div class="big-num" id="reportHealth">—</div>
+                    <div class="lbl">🌿 作物健康度</div>
+                    <div class="sub">目标 100%</div>
+                </div>
+                <div class="report-item">
+                    <div class="big-num" id="reportGrade">—</div>
+                    <div class="lbl">📊 综合评级</div>
+                    <div class="sub" id="reportGradeSub">待评估</div>
+                </div>
+            </div>
+
+            <div class="report-detail" id="reportDetail">
+                <strong>📋 仿真详情</strong><br>
+                <span id="reportDetailText">运行仿真后显示详细数据……</span>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-outline" id="backToStep3">← 修改代码</button>
+                <button class="btn btn-primary" id="goToStep5">📤 提交老陈点评 →</button>
+            </div>
+            <div class="feedback" id="step4Feedback">💬 查看报告后，提交给老陈点评</div>
+        </div>
+
+        
+        <div class="step-panel" id="step5">
+            <div class="step-title"><span class="num">5</span> 老陈点评 · 改进建议</div>
+
+            <div class="laochen-comment" id="laochenComment">
+                <div class="lc-title">👨‍💻 老陈说：</div>
+                <div class="lc-body" id="laochenBody">
+                    等待提交仿真报告……
+                </div>
+            </div>
+
+            <div style="background:white; border-radius:16px; padding:14px 18px; border:2px solid #c6dbb2; margin:10px 0;">
+                <p style="font-weight:700; color:#1f3f10;">📌 改进建议：</p>
+                <div id="improveSuggestions" style="font-size:0.9rem; color:#1d3313; line-height:1.8; margin-top:4px;">
+                    提交报告后，老陈会给出具体改进建议……
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-warning" id="applyImprove">🔄 采纳建议 · 重新仿真</button>
+                <button class="btn btn-outline" id="resetAllBtn">🔄 全部重置</button>
+            </div>
+
+            
+            <div class="self-eval">
+                <span class="title-sm">🧠 我与“老陈”的对话深度：</span>
+                <div class="options">
+                    <label><input type="radio" name="depth" value="A"> 🌟🌟🌟 接受建议，体现在第2轮代码中</label>
+                    <label><input type="radio" name="depth" value="B"> 🌟🌟 听懂建议，未完全落实</label>
+                    <label><input type="radio" name="depth" value="C" checked> 🌟 仅基础对话</label>
+                </div>
+            </div>
+
+            <div class="feedback" id="step5Feedback">💬 根据建议改进后，可再次运行仿真</div>
+        </div>
+
+        
+        <div class="footer">
+            <span>🌿 任务三 · 自主设计与仿真</span>
+            <span>👨‍💻 与“老陈”对话</span>
+            <span>📖 教材 P96-98 图20.1-20.3</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ========== 状态管理 ==========
+        const state = {
+            crop: '蜜柚',
+            cropEmoji: '🍊',
+            cropName: '平和蜜柚 · 膨果期',
+            conds: ['土壤湿度'],
+            condsFull: ['土壤湿度'],
+            codeFilled: {},
+            simRun: false,
+            waterRate: 0,
+            health: 0,
+            grade: '—',
+            improvements: [],
+            round: 1,
+            laochenAdvice: ''
+        };
+
+        // 作物数据
+        const cropData = {
+            '香菇': { emoji: '🍄', name: '古田香菇 · 出菇期', baseMin: 90, max: 95, strongMin: 92 },
+            '蜜柚': { emoji: '🍊', name: '平和蜜柚 · 膨果期', baseMin: 70, max: 85, strongMin: 78 },
+            '草莓': { emoji: '🍓', name: '福鼎草莓', baseMin: 70, max: 80, strongMin: 75 },
+            '多肉': { emoji: '🌵', name: '多肉植物', baseMin: 20, max: 40, strongMin: 22 }
+        };
+
+        // ========== DOM引用 ==========
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step5 = document.getElementById('step5');
+        const dots = document.querySelectorAll('.step-dot');
+
+        const condCheckboxes = document.querySelectorAll('#condGrid input[type="checkbox"]:not([disabled])');
+        const cropRadios = document.querySelectorAll('input[name="crop"]');
+
+        // 场景
+        const plantEmoji = document.querySelector('#plantDisplay .emoji');
+        const plantName = document.getElementById('plantName');
+        const sensorHum = document.getElementById('sensorHum');
+        const sensorLight = document.getElementById('sensorLight');
+        const sensorTemp = document.getElementById('sensorTemp');
+        const sensorStatus = document.getElementById('sensorStatus');
+        const ecWeather = document.getElementById('ecWeather');
+        const ecStage = document.getElementById('ecStage');
+        const ecSeason = document.getElementById('ecSeason');
+        const selectedCondsDisplay = document.getElementById('selectedCondsDisplay');
+
+        // 代码
+        const codeCrop = document.getElementById('codeCrop');
+        const codeConds = document.getElementById('codeConds');
+        const codeInputs = document.querySelectorAll('.code-box .code-blank input');
+        const codeBranchB = document.getElementById('codeBranchB');
+        const codeBranchC = document.getElementById('codeBranchC');
+        const codeBranchD = document.getElementById('codeBranchD');
+        const codeBranchE = document.getElementById('codeBranchE');
+        const codeBranchF = document.getElementById('codeBranchF');
+
+        // 报告
+        const reportWaterRate = document.getElementById('reportWaterRate');
+        const reportHealth = document.getElementById('reportHealth');
+        const reportGrade = document.getElementById('reportGrade');
+        const reportGradeSub = document.getElementById('reportGradeSub');
+        const reportDetailText = document.getElementById('reportDetailText');
+
+        // 老陈
+        const laochenBody = document.getElementById('laochenBody');
+        const improveSuggestions = document.getElementById('improveSuggestions');
+
+        // 反馈
+        const feedbacks = {
+            step1: document.getElementById('step1Feedback'),
+            step2: document.getElementById('step2Feedback'),
+            step3: document.getElementById('step3Feedback'),
+            step4: document.getElementById('step4Feedback'),
+            step5: document.getElementById('step5Feedback')
+        };
+
+        // ========== 工具函数 ==========
+        function showStep(step) {
+            [step1, step2, step3, step4, step5].forEach((el, i) => {
+                el.classList.toggle('active', i + 1 === step);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active', 'done');
+                if (i + 1 === step) dot.classList.add('active');
+                else if (i + 1 < step) dot.classList.add('done');
+            });
+        }
+
+        function getSelectedCrop() {
+            for (let r of cropRadios) {
+                if (r.checked) return r.value;
+            }
+            return '蜜柚';
+        }
+
+        function getSelectedConds() {
+            const names = ['土壤湿度'];
+            const full = ['土壤湿度'];
+            condCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    const label = cb.closest('.cond-item').querySelector('.name').textContent;
+                    names.push(label);
+                    full.push(label);
+                }
+            });
+            return { names, full };
+        }
+
+        function getSensorValues() {
+            const crop = getSelectedCrop();
+            const data = cropData[crop] || cropData['蜜柚'];
+            const hum = Math.round(50 + Math.random() * 40);
+            const light = Math.round(500 + Math.random() * 1200);
+            const temp = Math.round(22 + Math.random() * 18);
+            const conds = getSelectedConds().names;
+            let weather = '晴';
+            if (conds.includes('天气预报')) {
+                weather = Math.random() > 0.6 ? '晴转多云' : (Math.random() > 0.5 ? '小雨' : '晴');
+            }
+            let stage = '膨果期';
+            if (conds.includes('作物生长阶段')) {
+                stage = Math.random() > 0.5 ? '膨果期' : '转色期';
+            }
+            let season = '夏季';
+            if (conds.includes('季节变化')) {
+                season = Math.random() > 0.6 ? '夏季' : (Math.random() > 0.5 ? '秋季' : '春季');
+            }
+            return { hum, light, temp, weather, stage, season, cropData: data };
+        }
+
+        function updateScene() {
+            const crop = getSelectedCrop();
+            const data = cropData[crop];
+            const conds = getSelectedConds().names;
+            const sensors = getSensorValues();
+
+            plantEmoji.textContent = data.emoji;
+            plantName.textContent = data.name;
+            codeCrop.textContent = data.name;
+
+            sensorHum.textContent = sensors.hum + '%';
+            sensorLight.textContent = sensors.light + ' lux';
+            sensorTemp.textContent = sensors.temp + '°C';
+
+            // 状态判断
+            let status = '🌱 正常';
+            let statusColor = '#7fc9ff';
+            if (sensors.hum < 40) { status = '⚠️ 偏干'; statusColor = '#f9a8a8'; } else if (sensors.hum > 85) { status = '💧 过湿'; statusColor = '#f9a8a8'; }
+            sensorStatus.textContent = status;
+            sensorStatus.style.color = statusColor;
+
+            // 附加条件
+            ecWeather.textContent = conds.includes('天气预报') ? sensors.weather : '—';
+            ecStage.textContent = conds.includes('作物生长阶段') ? sensors.stage : '—';
+            ecSeason.textContent = conds.includes('季节变化') ? sensors.season : '—';
+
+            // 显示已选条件
+            selectedCondsDisplay.textContent = conds.join('、');
+            codeConds.textContent = conds.join('、');
+
+            // 显示/隐藏代码分支
+            codeBranchB.classList.toggle('hidden', !conds.includes('天气预报'));
+            codeBranchC.classList.toggle('hidden', !conds.includes('光照强度'));
+            codeBranchD.classList.toggle('hidden', !conds.includes('温度'));
+            codeBranchE.classList.toggle('hidden', !conds.includes('作物生长阶段'));
+            codeBranchF.classList.toggle('hidden', !conds.includes('季节变化'));
+
+            // 存储当前传感器数据供仿真使用
+            state.sensorData = sensors;
+            state.crop = crop;
+            state.conds = conds;
+        }
+
+        // ========== 仿真引擎 ==========
+        function runSimulation() {
+            const conds = state.conds || ['土壤湿度'];
+            const crop = state.crop || '蜜柚';
+            const data = cropData[crop];
+            const sensors = state.sensorData || getSensorValues();
+
+            // 读取代码填空
+            const codeValues = {};
+            codeInputs.forEach(inp => {
+                const val = inp.value.trim();
+                codeValues[inp.id] = val || '未填';
+            });
+
+            // 解析阈值
+            const humMax = parseFloat(codeValues.code1) || data.max;
+            const humMin = parseFloat(codeValues.code2) || data.baseMin;
+            let dynamicMin = humMin;
+
+            // 动态调整
+            if (conds.includes('光照强度') && sensors.light > 1200) {
+                const strongVal = parseFloat(codeValues.code6) || data.strongMin;
+                dynamicMin = strongVal;
+            }
+            if (conds.includes('温度') && sensors.temp > 30) {
+                const addVal = parseFloat(codeValues.code8) || 5;
+                dynamicMin += addVal;
+            }
+            if (conds.includes('作物生长阶段') && sensors.stage === '膨果期') {
+                const stageVal = parseFloat(codeValues.code9) || data.baseMin;
+                dynamicMin = stageVal;
+            } else if (conds.includes('作物生长阶段') && sensors.stage === '转色期') {
+                const stageVal = parseFloat(codeValues.code10) || 50;
+                dynamicMin = stageVal;
+            }
+            if (conds.includes('季节变化') && sensors.season === '冬季') {
+                const subVal = parseFloat(codeValues.code11) || 5;
+                dynamicMin -= subVal;
+            }
+
+            // 决策
+            const hum = sensors.hum;
+            let irrigate = false;
+            let reason = '';
+
+            if (hum > humMax) {
+                irrigate = false;
+                reason = '湿度超过上限，不灌溉';
+            } else if (hum > dynamicMin) {
+                // 中间区域
+                if (conds.includes('天气预报') && sensors.weather.includes('雨')) {
+                    irrigate = false;
+                    reason = '天气预报有雨，不灌溉';
+                } else {
+                    irrigate = true;
+                    reason = '湿度在阈值之间，需要灌溉';
+                }
+            } else {
+                irrigate = true;
+                reason = '湿度低于下限，需要灌溉';
+            }
+
+            // 计算节水率和健康度
+            const baseWater = 100;
+            let waterUsed = 0;
+            if (irrigate) {
+                const duration = parseFloat(codeValues.code13) || 5;
+                waterUsed = 20 + duration * 2 + Math.random() * 10;
+            } else {
+                waterUsed = 5 + Math.random() * 8;
+            }
+            const waterRate = Math.round(((baseWater - waterUsed) / baseWater) * 100);
+
+            // 健康度
+            let health = 100;
+            if (hum < 20) health -= 30;
+            else if (hum < 30) health -= 15;
+            else if (hum > 90) health -= 10;
+            if (sensors.temp > 35) health -= 10;
+            if (sensors.light > 1500) health -= 5;
+            if (!irrigate && hum < dynamicMin - 10) health -= 20;
+            health = Math.max(0, Math.min(100, health + Math.random() * 5));
+
+            // 评级
+            let grade, gradeSub;
+            if (waterRate >= 80 && health >= 95) { grade = 'A'; gradeSub = '🌟 优秀！'; } else if (waterRate >= 60 && health >= 80) { grade = 'B'; gradeSub = '👍 良好，继续改进'; } else if (waterRate >= 40 && health >= 60) { grade = 'C'; gradeSub = '📈 合格，需优化'; } else { grade = 'D'; gradeSub = '⚠️ 需要大幅改进'; }
+
+            // 保存结果
+            state.waterRate = waterRate;
+            state.health = Math.round(health);
+            state.grade = grade;
+            state.gradeSub = gradeSub;
+            state.simRun = true;
+            state.codeValues = codeValues;
+            state.irrigate = irrigate;
+            state.reason = reason;
+
+            // 更新报告
+            reportWaterRate.textContent = waterRate + '%';
+            reportHealth.textContent = Math.round(health) + '%';
+            reportGrade.textContent = grade;
+            reportGradeSub.textContent = gradeSub;
+
+            // 颜色
+            ['reportWaterRate', 'reportHealth'].forEach(id => {
+                const el = document.getElementById(id);
+                const val = parseFloat(el.textContent);
+                el.className = 'big-num';
+                if (val >= 80) el.classList.add('good');
+                else if (val >= 60) el.classList.add('warn');
+                else el.classList.add('bad');
+            });
+
+            reportDetailText.innerHTML = `
+                <strong>作物：</strong>${cropData[crop].name}<br>
+                <strong>土壤湿度：</strong>${hum}% &nbsp;|&nbsp; <strong>上限：</strong>${humMax}% &nbsp;|&nbsp; <strong>下限：</strong>${dynamicMin}%<br>
+                <strong>决策：</strong>${irrigate ? '💧 启动水泵' : '⏸ 不灌溉'} &nbsp;|&nbsp; ${reason}<br>
+                <strong>用水量：</strong>${waterUsed.toFixed(1)} 吨 &nbsp;|&nbsp; <strong>节水率：</strong>${waterRate}%<br>
+                <strong>健康度：</strong>${Math.round(health)}% &nbsp;|&nbsp; <strong>${gradeSub}</strong>
+            `;
+
+            // 生成老陈点评
+            generateLaochenComment(waterRate, health, grade, codeValues);
+
+            feedbacks.step3.textContent = '✅ 仿真完成！查看报告 → 提交老陈点评';
+            feedbacks.step3.style.color = '#1d4a0d';
+
+            showStep(4);
+        }
+
+        // ========== 老陈点评 ==========
+        function generateLaochenComment(waterRate, health, grade, codeValues) {
+            let advice = [];
+            let body = '';
+
+            // 先肯定
+            body += `“我说你啊，<strong>先说优点</strong>——你这13个填空敢动手，比那些不敢填的强多了！`;
+
+            // 挑刺
+            if (waterRate < 80) {
+                advice.push('💧 节水率偏低，目标≥80%。检查填空6（强光下限）是否根据光照动态调整了？');
+            }
+            if (health < 90) {
+                advice.push('🌿 健康度不足，检查阈值设置是否合理，避免过干或过湿。');
+            }
+            if (codeValues.code6 && codeValues.code6 === codeValues.code2) {
+                advice.push('☀️ 填空6（强光下限）和基础下限相同——这就白选光照了！强光时应该提高下限值。');
+            }
+            if (!codeValues.code1 || codeValues.code1 === '未填') {
+                advice.push('📝 填空1（上限值）未填，建议参考任务二作物上限数据。');
+            }
+            if (!codeValues.code2 || codeValues.code2 === '未填') {
+                advice.push('📝 填空2（下限值）未填，建议参考任务二作物基础下限。');
+            }
+
+            // 特定建议
+            if (state.conds.includes('光照强度') && parseFloat(codeValues.code6) < 70) {
+                advice.push('☀️ 福建夏天光照强，填空6建议填78（蜜柚膨果期强光下限），让算法更合理。');
+            }
+            if (state.conds.includes('温度') && parseFloat(codeValues.code8) < 3) {
+                advice.push('🌡️ 福建夏天蒸发量大，填空8建议加5-8，太保守效果不佳。');
+            }
+            if (state.conds.includes('作物生长阶段') && parseFloat(codeValues.code9) < 60) {
+                advice.push('🌱 膨果期需水量大，填空9建议参考任务二数据（蜜柚膨果期70%）。');
+            }
+
+            if (advice.length === 0 && waterRate >= 80 && health >= 90) {
+                advice.push('🎉 整体不错！可以试试选更多条件（如天气预报、季节变化）进一步优化节水率。');
+                body += `<br><br><strong>问题不大，但还有提升空间：</strong>`;
+            } else if (advice.length === 0) {
+                advice.push('📊 数据基本合理，建议微调阈值参数，追求更高节水率。');
+                body += `<br><br><strong>嗯，还行，但可以更好：</strong>`;
+            } else {
+                body += `<br><br><strong>但问题也不少：</strong>`;
+            }
+
+            body += `<br>${advice.map(a => '• ' + a).join('<br>')}`;
+
+            if (waterRate >= 80 && health >= 95) {
+                body += `<br><br>🎉 <strong>不过你这份做得不错！可以当我徒弟了！</strong>`;
+            } else {
+                body += `<br><br>📌 <strong>赶紧去改一改，再跑一次给我看！</strong>`;
+            }
+
+            laochenBody.innerHTML = body;
+            improveSuggestions.innerHTML = advice.map(a => '• ' + a).join('<br>') || '🎉 暂无改进建议，继续保持！';
+
+            state.laochenAdvice = advice;
+            state.improvements = advice;
+        }
+
+        // ========== 事件绑定 ==========
+
+        // 步骤导航
+        document.getElementById('goToStep2').addEventListener('click', function() {
+            const conds = getSelectedConds();
+            if (conds.names.length < 3) {
+                feedbacks.step1.textContent = '⚠️ 至少选择3项条件（土壤湿度必选）！';
+                feedbacks.step1.style.color = '#c0392b';
+                return;
+            }
+            state.conds = conds.names;
+            state.condsFull = conds.full;
+            updateScene();
+            showStep(2);
+            feedbacks.step2.textContent = '✅ 场景已生成，确认无误后进入代码填写';
+            feedbacks.step2.style.color = '#1d4a0d';
+        });
+
+        document.getElementById('backToStep1').addEventListener('click', function() {
+            showStep(1);
+        });
+
+        document.getElementById('goToStep3').addEventListener('click', function() {
+            showStep(3);
+            feedbacks.step3.textContent = '💬 填写所有空白后，点击"运行仿真"';
+            feedbacks.step3.style.color = '#2a5f1a';
+        });
+
+        document.getElementById('backToStep2').addEventListener('click', function() {
+            showStep(2);
+        });
+
+        document.getElementById('runSimulation').addEventListener('click', function() {
+            // 检查是否填写了关键空
+            let filled = 0;
+            codeInputs.forEach(inp => { if (inp.value.trim() !== '') filled++; });
+            if (filled < 5) {
+                feedbacks.step3.textContent = '⚠️ 至少填写5个关键参数（如上限、下限、决策等）再运行！';
+                feedbacks.step3.style.color = '#c0392b';
+                return;
+            }
+            runSimulation();
+        });
+
+        document.getElementById('backToStep3').addEventListener('click', function() {
+            showStep(3);
+        });
+
+        document.getElementById('goToStep5').addEventListener('click', function() {
+            if (!state.simRun) {
+                feedbacks.step4.textContent = '⚠️ 请先运行仿真！';
+                feedbacks.step4.style.color = '#c0392b';
+                return;
+            }
+            showStep(5);
+            feedbacks.step5.textContent = '💬 查看老陈建议，改进后点击"采纳建议·重新仿真"';
+            feedbacks.step5.style.color = '#2a5f1a';
+        });
+
+        // 采纳建议 · 重新仿真
+        document.getElementById('applyImprove').addEventListener('click', function() {
+            state.round++;
+            // 自动填一些建议值（不直接给答案，而是引导）
+            const advice = state.improvements || [];
+            let hint = '';
+            if (advice.some(a => a.includes('填空6'))) {
+                hint += '💡 提示：蜜柚膨果期强光下限建议填78。';
+            }
+            if (advice.some(a => a.includes('填空8'))) {
+                hint += '💡 提示：高温时下限建议加5-8。';
+            }
+            if (advice.some(a => a.includes('填空9'))) {
+                hint += '💡 提示：膨果期下限参考任务二数据。';
+            }
+            feedbacks.step5.textContent = `🔄 第${state.round}轮仿真准备就绪 ${hint ? '— ' + hint : ''}`;
+            feedbacks.step5.style.color = '#1d4a0d';
+
+            // 重新生成场景数据
+            updateScene();
+            // 回到步骤3
+            showStep(3);
+            feedbacks.step3.textContent = `🔄 第${state.round}轮，根据老陈建议修改代码后重新运行`;
+            feedbacks.step3.style.color = '#1d4a0d';
+
+            // 保留之前填写的值，但清空反馈
+        });
+
+        // 重置
+        document.getElementById('resetStep1').addEventListener('click', function() {
+            condCheckboxes.forEach(cb => cb.checked = false);
+            document.querySelector('input[name="crop"][value="蜜柚"]').checked = true;
+            feedbacks.step1.textContent = '🔄 已重置，重新选择吧！';
+            feedbacks.step1.style.color = '#2a5f1a';
+        });
+
+        document.getElementById('resetAllBtn').addEventListener('click', function() {
+            condCheckboxes.forEach(cb => cb.checked = false);
+            document.querySelector('input[name="crop"][value="蜜柚"]').checked = true;
+            codeInputs.forEach(inp => inp.value = '');
+            state.simRun = false;
+            state.round = 1;
+            reportWaterRate.textContent = '—';
+            reportHealth.textContent = '—';
+            reportGrade.textContent = '—';
+            reportGradeSub.textContent = '待评估';
+            reportDetailText.textContent = '运行仿真后显示详细数据……';
+            laochenBody.innerHTML = '等待提交仿真报告……';
+            improveSuggestions.innerHTML = '提交报告后，老陈会给出具体改进建议……';
+            document.querySelector('input[name="depth"][value="C"]').checked = true;
+            showStep(1);
+            feedbacks.step1.textContent = '🔄 已全部重置，重新开始吧！';
+            feedbacks.step1.style.color = '#2a5f1a';
+            updateScene();
+        });
+
+        // 作物切换时更新场景
+        cropRadios.forEach(r => {
+            r.addEventListener('change', function() {
+                if (this.checked) updateScene();
+            });
+        });
+
+        condCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                // 不做自动更新，等用户点击确认
+            });
+        });
+
+        // 初始化
+        updateScene();
+        showStep(1);
+
+        // 处理代码输入框自动填充提示（不提供答案，只做格式提醒）
+        console.log('任务三 · 自主设计与仿真验证已加载');
+    })();
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

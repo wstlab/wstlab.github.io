@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":34,"key":"case-34","title":"丝绸之路 · 跨学科思维工坊","category":"creation","description":"丝路思想网络：围绕主题、导图节点、观点开展交互学习，在数据大屏中回看记录。","headline":"丝路思想网络","view":"wall","fields":[{"key":"topic","label":"主题"},{"key":"nodes","label":"导图节点"},{"key":"opinion","label":"观点"},{"key":"content","label":"内容"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"sfCV84wNnBQ"},"mapping":{"6urjbm59rn":"sfCV84wNnBQ"},"accent":"#916749","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>丝绸之路 · 跨学科思维工坊 | 真正可视化思维导图 + 金点子启发</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script src="/projects/shared/vendor/55ad8e2f266fdc0e.js"></script>
+    
+    <script src="/projects/shared/vendor/d599aafcd4b89ac3.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe6;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            color: #2d3e2b;
+            padding: 24px 20px;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #fffef8;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8b5a2b, #5c3a1a);
+            color: white;
+            padding: 1.4rem 2rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.9rem; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        .header p { opacity: 0.9; font-size: 0.9rem; }
+
+        .main-panel { padding: 1.8rem 2rem 1rem 2rem; }
+
+        /* 登录卡片 */
+        .login-card {
+            background: #fef5e6;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid #eedbc0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+        .group-selector, .student-id { flex: 1; min-width: 180px; }
+        .group-selector label, .student-id label {
+            font-weight: 600;
+            color: #7b4a2e;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 60px;
+            border: 1px solid #e2cfb0;
+            background: white;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .enter-btn {
+            background: #a76933;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .enter-btn:hover { background: #8b521f; transform: translateY(-2px); }
+        .user-badge {
+            background: #e9dbc9;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            color: #5d3a1e;
+        }
+
+        /* 双栏布局 */
+        .discussion-workspace {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            margin: 1.5rem 0 1rem;
+        }
+        .discussion-area {
+            flex: 1.2;
+            min-width: 280px;
+            background: #fff;
+            border-radius: 1.2rem;
+            border: 1px solid #f0e2ce;
+            padding: 1rem 1.2rem;
+        }
+        .mindmap-area {
+            flex: 2;
+            min-width: 360px;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            border: 1px solid #f0e2ce;
+            padding: 1rem;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-left: 5px solid #c28142;
+            padding-left: 12px;
+            margin-bottom: 16px;
+        }
+        .group-topic {
+            background: #fff2e2;
+            border-radius: 40px;
+            padding: 4px 14px;
+            display: inline-block;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+        .opinion-list {
+            max-height: 320px;
+            overflow-y: auto;
+            background: #fefcf8;
+            border-radius: 1rem;
+            padding: 6px;
+            margin-bottom: 16px;
+        }
+        .opinion-card {
+            background: white;
+            border-left: 4px solid #e6b87e;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .opinion-meta {
+            font-size: 0.7rem;
+            color: #b47c48;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .opinion-text { font-size: 0.9rem; line-height: 1.4; word-break: break-word; }
+        .input-opinion { display: flex; gap: 8px; margin-top: 8px; }
+        .input-opinion textarea {
+            flex: 1;
+            border-radius: 20px;
+            border: 1px solid #e2cfb0;
+            padding: 8px 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #b8834b;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .tool-btn {
+            background: #efe2cf;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .tool-btn i { margin-right: 4px; }
+        .gold-idea {
+            background: #f3cd81;
+            color: #5a3a1a;
+            font-weight: bold;
+            border: 1px solid #e7b45a;
+        }
+        .mindmap-container {
+            width: 100%;
+            height: 380px;
+            background: #ffffff;
+            border-radius: 1rem;
+            margin: 12px 0;
+            border: 1px solid #ede3d2;
+        }
+        .chat-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: flex-end;
+        }
+        footer {
+            background: #f3ebdf;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #816a4a;
+        }
+        @media (max-width: 860px) {
+            .discussion-workspace { flex-direction: column; }
+            .mindmap-container { height: 320px; }
+        }
+        .switch-group-btn {
+            background: none;
+            border: none;
+            color: #9b6a3c;
+            text-decoration: underline;
+            margin-left: 12px;
+            cursor: pointer;
+        }
+        /* 写作模态框 */
+        dialog {
+            border: none;
+            border-radius: 2rem;
+            width: 90vw;
+            max-width: 1100px;
+            padding: 0;
+            background: #fffaf2;
+        }
+        dialog::backdrop { background: rgba(0,0,0,0.4); }
+        .modal-header {
+            background: #a76933;
+            padding: 12px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 2rem 2rem 0 0;
+        }
+        .writing-panel { display: flex; flex-wrap: wrap; gap: 16px; padding: 20px; }
+        .editor-col { flex: 1; min-width: 240px; }
+        .preview-col { flex: 1; background: white; border-radius: 24px; padding: 12px; border: 1px solid #eddabc; max-height: 460px; overflow: auto; }
+        textarea.markdown-input { width: 100%; height: 300px; border-radius: 20px; padding: 12px; border: 1px solid #e0cfb0; font-family: monospace; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <h1><i class="fas fa-road"></i> 丝绸之路 · 跨学科思维工坊</h1>
+        <p>历史 | 地理 | 艺术 | 文学 | 一带一路 | 金点子启发 + 真正可视化思维导图(ECharts树图)</p>
+    </div>
+    <div class="main-panel">
+        
+        <div class="login-card" id="loginPanel">
+            <div class="group-selector">
+                <label><i class="fas fa-users"></i> 探索小组</label>
+                <select id="groupSelect">
+                    <option value="丝路历史人物">🏛 丝路历史人物（历史人文）</option>
+                    <option value="丝路美食传承">🍜 丝路美食传承</option>
+                    <option value="陆上丝路地理">🗺 陆上丝路地理（地理）</option>
+                    <option value="海上丝绸之路">⚓ 海上丝绸之路（地理）</option>
+                    <option value="丝路历史">📜 丝路历史（历史）</option>
+                    <option value="丝路与一带一路">🤝 丝路与一带一路（道德与法治）</option>
+                    <option value="丝路艺术之音乐">🎵 丝路艺术之音乐（音乐）</option>
+                    <option value="丝路艺术之美术">🎨 丝路艺术之美术（美术）</option>
+                    <option value="丝路建筑">🏛 丝路建筑（建筑）</option>
+                    <option value="丝路文学">📖 丝路文学（语文诗歌）</option>
+                </select>
+            </div>
+            <div class="student-id">
+                <label><i class="fas fa-id-card"></i> 学号/昵称</label>
+                <input type="text" id="studentIdInput" placeholder="例: S2024001 或 李思源" maxlength="30">
+            </div>
+            <button class="enter-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> 进入工坊</button>
+            <div id="userStatus" class="user-badge"><i class="fas fa-user-clock"></i> 未登录</div>
+        </div>
+
+        
+        <div id="discussionContainer" style="display: none;">
+            <div class="discussion-workspace">
+                
+                <div class="discussion-area">
+                    <div class="section-title"><i class="fas fa-comments"></i> 小组共研 · 观点碰撞</div>
+                    <div><span class="group-topic" id="currentGroupTopic"></span> <span id="groupMemberBadge"></span></div>
+                    <div id="opinionsList" class="opinion-list">✨ 登录后即可参与</div>
+                    <div class="input-opinion">
+                        <textarea id="newOpinion" rows="2" placeholder="分享跨学科见解、史料或灵感..."></textarea>
+                        <button id="submitOpinionBtn" class="btn-primary"><i class="fas fa-paper-plane"></i> 发表</button>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <button id="goldenIdeaBtn" class="tool-btn gold-idea"><i class="fas fa-lightbulb"></i> ✨ 金点子 · 启发思路</button>
+                    </div>
+                </div>
+
+                
+                <div class="mindmap-area">
+                    <div class="section-title"><i class="fas fa-project-diagram"></i> 在线思维导图 (基于讨论自动生成)</div>
+                    <div id="mindmapChart" class="mindmap-container"></div>
+                    <div class="chat-tools">
+                        <button id="refreshMindmapBtn" class="tool-btn"><i class="fas fa-sync-alt"></i> 刷新导图</button>
+                        <button id="openWriteModalBtn" class="tool-btn"><i class="fas fa-file-alt"></i> 在线写作(简报/海报)</button>
+                        <button id="submitToServerBtn" class="tool-btn" style="background:#c28142; color:white;"><i class="fas fa-cloud-upload-alt"></i> 提交讨论至教师</button>
+                    </div>
+                    <div style="font-size: 11px; margin-top: 8px; color:#b99262; text-align:center;"><i class="fas fa-chalkboard-user"></i> 树形结构：中心主题为小组名，分支为每位同学的核心观点摘要</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer><i class="fas fa-globe"></i> 所有讨论实时保存至浏览器 | 金点子启发思路 | 真正树形思维导图(ECharts) | 一键提交教师端</footer>
+</div>
+
+
+<dialog id="writingModal">
+    <div class="modal-header">
+        <span><i class="fas fa-feather-alt"></i> 创意工坊：PPT/网页/电子小报/海报 (Markdown语法)</span>
+        <button id="closeWritingModal" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
+    </div>
+    <div class="writing-panel">
+        <div class="editor-col">
+            <textarea id="markdownEditor" class="markdown-input" placeholder="# 丝绸之路 探究简报\n\n**小组成员：** 你的名字\n\n## 核心观点\n- 丝路促进文明互鉴\n\n![丝路](https://placehold.co/600x400/edd7b5/5a3e22?text=Silk+Road)"></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap:wrap;">
+                <button id="exportHtmlBtn" class="tool-btn"><i class="fas fa-file-code"></i> 导出为网页</button>
+                <button id="copyHtmlBtn" class="tool-btn"><i class="far fa-copy"></i> 复制HTML</button>
+                <button id="saveDraftBtn" class="tool-btn"><i class="fas fa-save"></i> 保存草稿</button>
+            </div>
+        </div>
+        <div class="preview-col">
+            <div id="previewContent" style="word-break: break-word;"></div>
+        </div>
+    </div>
+</dialog>
+
+<script>
+    // ---------- 全局数据 ----------
+    let groupDiscussions = {};      // { groupName: [ {studentId, text, timestamp} ] }
+    let currentUser = { group: null, studentId: null, isLoggedIn: false };
+    let mindmapChart = null;        // echarts 实例
+
+    const allGroups = ["丝路历史人物","丝路美食传承","陆上丝路地理","海上丝绸之路","丝路历史","丝路与一带一路","丝路艺术之音乐","丝路艺术之美术","丝路建筑","丝路文学"];
+
+    // 初始化 localStorage
+    function loadData() {
+        const stored = localStorage.getItem("silkroad_mindmap_data");
+        if(stored) {
+            groupDiscussions = JSON.parse(stored);
+        } else {
+            groupDiscussions = {};
+            allGroups.forEach(g => { groupDiscussions[g] = []; });
+            // 示例预置数据
+            groupDiscussions["丝路历史人物"].push({ studentId: "研学助手", text: "张骞出使西域，开辟丝路通道", timestamp: new Date().toISOString() });
+            groupDiscussions["丝路历史人物"].push({ studentId: "历史小学者", text: "班超再通西域，加强汉朝治理", timestamp: new Date().toISOString() });
+            groupDiscussions["丝路美食传承"].push({ studentId: "美食探索者", text: "胡饼、葡萄、石榴丰富了中原饮食", timestamp: new Date().toISOString() });
+        }
+        persistData();
+    }
+    function persistData() {
+        localStorage.setItem("silkroad_mindmap_data", JSON.stringify(groupDiscussions));
+    }
+
+    // 渲染左侧观点列表
+    function renderOpinions() {
+        if(!currentUser.isLoggedIn) return;
+        const group = currentUser.group;
+        const opinions = groupDiscussions[group] || [];
+        const container = document.getElementById("opinionsList");
+        if(opinions.length === 0) {
+            container.innerHTML = '<div style="color:#b48a5c; text-align:center; padding:20px;">✨ 暂无观点，点击「金点子」获得启发 ✨</div>';
+            return;
+        }
+        container.innerHTML = opinions.map(op => `
+            <div class="opinion-card">
+                <div class="opinion-meta"><span><i class="fas fa-user-graduate"></i> ${escapeHtml(op.studentId)}</span><span>${new Date(op.timestamp).toLocaleTimeString()}</span></div>
+                <div class="opinion-text">${escapeHtml(op.text)}</div>
+            </div>
+        `).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 发表观点
+    function addOpinion(text) {
+        if(!currentUser.isLoggedIn) { alert("请先登录小组"); return false; }
+        if(!text.trim()) { alert("观点不能为空"); return false; }
+        const group = currentUser.group;
+        if(!groupDiscussions[group]) groupDiscussions[group] = [];
+        groupDiscussions[group].push({
+            studentId: currentUser.studentId,
+            text: text.trim(),
+            timestamp: new Date().toISOString()
+        });
+        persistData();
+        renderOpinions();
+        renderMindmap();   // 每次发表后自动更新思维导图
+        return true;
+    }
+
+    // 核心：生成 ECharts 树形图数据（真正的思维导图）
+    function buildTreeData() {
+        const group = currentUser.group;
+        const opinions = groupDiscussions[group] || [];
+        if(opinions.length === 0) {
+            return {
+                name: group,
+                children: [{ name: "暂无讨论观点", value: "发表你的见解" }]
+            };
+        }
+        // 根节点：小组主题
+        let root = {
+            name: group,
+            children: [],
+            itemStyle: { color: "#b8834b" }
+        };
+        // 为了避免孩子过多导致拥挤，使用 children 列表：每个成员的最新观点作为一个节点，但为了展现讨论精华，将每个成员一条或若干条合并?
+        // 为了清晰，我们将每条观点作为一个叶子节点，按学生归组展示更符合讨论思维。
+        // 更好方式：学生作为二级分支，观点作为三级。
+        const studentMap = new Map(); // studentId -> { name: studentId, children: [] }
+        opinions.forEach(op => {
+            if(!studentMap.has(op.studentId)) {
+                studentMap.set(op.studentId, { name: op.studentId, children: [] });
+            }
+            const studentNode = studentMap.get(op.studentId);
+            // 每条观点独立展示，限定长度
+            let shortText = op.text.length > 38 ? op.text.slice(0, 38) + "…" : op.text;
+            studentNode.children.push({ name: shortText, value: op.text });
+        });
+        // 将学生节点转为数组
+        root.children = Array.from(studentMap.values()).map(node => {
+            return {
+                name: node.name,
+                children: node.children,
+                itemStyle: { color: "#d9a066" }
+            };
+        });
+        if(root.children.length === 0) {
+            root.children = [{ name: "等待更多讨论" }];
+        }
+        return root;
+    }
+
+    // 渲染思维导图 (echarts 树图)
+    function renderMindmap() {
+        if(!currentUser.isLoggedIn) return;
+        const dom = document.getElementById("mindmapChart");
+        if(!dom) return;
+        if(mindmapChart) {
+            mindmapChart.dispose();
+        }
+        mindmapChart = echarts.init(dom);
+        const treeData = buildTreeData();
+        const option = {
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove',
+                formatter: function(params) {
+                    if(params.data.value) return `<strong>${params.name}</strong><br/>${params.data.value}`;
+                    return `<strong>${params.name}</strong>`;
+                }
+            },
+            series: [{
+                type: 'tree',
+                data: [treeData],
+                layout: 'orthogonal',
+                orient: 'LR',
+                symbol: 'circle',
+                symbolSize: 16,
+                edgeShape: 'curve',
+                edgeLabel: { fontSize: 10 },
+                initialTreeDepth: 2,
+                roam: true,
+                expandAndCollapse: true,
+                label: {
+                    position: 'left',
+                    verticalAlign: 'middle',
+                    align: 'right',
+                    fontSize: 11,
+                    fontWeight: 'normal',
+                    color: '#4a2e1a',
+                    offset: [5,0]
+                },
+                leaves: { label: { position: 'right', align: 'left', offset: [5,0] } },
+                itemStyle: {
+                    borderWidth: 1.5,
+                    color: '#c28142'
+                },
+                lineStyle: { color: '#dbb282', width: 1.5, curveness: 0.5 }
+            }]
+        };
+        // 根据浏览器宽度微调
+        mindmapChart.setOption(option);
+        mindmapChart.on('click', function(params) {
+            if(params.data && params.data.value) {
+                // 轻提示显示完整观点
+                alert("💡 观点详情：\n" + params.data.value);
+            }
+        });
+    }
+
+    // 金点子生成器
+    function generateGoldenIdea() {
+        if(!currentUser.isLoggedIn) { alert("请先登录小组"); return; }
+        const group = currentUser.group;
+        const ideaMap = {
+            "丝路历史人物": "💡 金点子：除了张骞、班超，马可波罗和伊本·白图泰在丝路上扮演什么角色？去查一下分享给组员。",
+            "丝路美食传承": "🍇 金点子：讨论一下「胡饼」和现代馕的关联，或者葡萄酒的传入如何影响古代贵族饮食。",
+            "陆上丝路地理": "🏔 金点子：天山、帕米尔高原如何影响路线选择？绘制简单路线图并描述气候变化对商队的影响。",
+            "海上丝绸之路": "🌊 金点子：从广州、泉州出发，瓷器外销到东非，哪些沉船考古证实了海上丝路的繁荣？",
+            "丝路历史": "📜 金点子：唐朝的开放政策对丝路贸易起到什么作用？不同宗教的传播路线如何交织？",
+            "丝路与一带一路": "🤝 金点子：古代丝路精神与“一带一路”五通（政策沟通、设施联通等）有何关联？举一个实例。",
+            "丝路艺术之音乐": "🎵 金点子：琵琶、筚篥、箜篌如何沿着丝路传入？找一首融合丝路元素的现代音乐作品推荐。",
+            "丝路艺术之美术": "🎨 金点子：敦煌壁画中的「飞天」形象融合了哪些文化特色？或者讨论一下犍陀罗艺术。",
+            "丝路建筑": "🏛 金点子：伊斯兰建筑风格如何影响喀什古城？对比长安城与撒马尔罕城市规划。",
+            "丝路文学": "📖 金点子：以「丝路·驼铃」为题写两句诗，或者分享王维、岑参边塞诗中的西域意象。"
+        };
+        let idea = ideaMap[group] || "✨ 从贸易、科技、文化融合角度思考丝路影响，试着提出一个独特问题与同学讨论。";
+        document.getElementById("newOpinion").value = idea;
+        document.getElementById("newOpinion").focus();
+    }
+
+    // 提交数据到 quickform
+    async function submitToTeacher() {
+        if(!currentUser.isLoggedIn) { alert("请先登录后提交"); return; }
+        const payload = {
+            group: currentUser.group,
+            studentId: currentUser.studentId,
+            timestamp: new Date().toISOString(),
+            all_discussions_json: JSON.stringify(groupDiscussions[currentUser.group] || []),
+            action: "丝绸之路跨学科讨论提交"
+        };
+        try {
+            const res = await fetch("https://qf.kjxs.site/api/sfCV84wNnBQ", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert("✅ 成功提交讨论数据至教师端！");
+        } catch(err) {
+            alert("网络问题，数据已本地保存，稍后可重试。");
+        }
+    }
+
+    // 登录
+    function login() {
+        const group = document.getElementById("groupSelect").value;
+        const studentId = document.getElementById("studentIdInput").value.trim();
+        if(!studentId) { alert("请输入学号或昵称"); return; }
+        currentUser = { group, studentId, isLoggedIn: true };
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("discussionContainer").style.display = "block";
+        document.getElementById("currentGroupTopic").innerHTML = `<i class="fas fa-tent"></i> ${group}`;
+        document.getElementById("groupMemberBadge").innerHTML = `<i class="fas fa-id-badge"></i> ${studentId} <button id="switchGroupBtn" class="switch-group-btn"><i class="fas fa-arrows-spin"></i> 切换小组</button>`;
+        renderOpinions();
+        renderMindmap();   // 初始渲染思维导图
+        const switchBtn = document.getElementById("switchGroupBtn");
+        if(switchBtn) switchBtn.onclick = () => { if(confirm("切换小组将返回登录页，所有讨论已保存")) location.reload(); };
+    }
+
+    // ---------- 写作模态框逻辑 ----------
+    const modal = document.getElementById("writingModal");
+    const markdownEditor = document.getElementById("markdownEditor");
+    const previewDiv = document.getElementById("previewContent");
+    function updatePreview() { if(marked) previewDiv.innerHTML = marked.parse(markdownEditor.value); }
+    document.getElementById("openWriteModalBtn").onclick = () => {
+        if(!currentUser.isLoggedIn){ alert("请先登录小组"); return; }
+        markdownEditor.value = `# ${currentUser.group} · 丝路创作\n\n**作者：${currentUser.studentId}**\n\n## 探究总结\n- 通过小组讨论获得灵感...\n\n![丝绸之路](https://placehold.co/600x400/e9d5b0/6b4423?text=SilkRoad)`;
+        updatePreview();
+        modal.showModal();
+    };
+    document.getElementById("closeWritingModal").onclick = () => modal.close();
+    document.getElementById("exportHtmlBtn").onclick = () => {
+        const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>丝路作品</title><style>body{background:#faf0e1; padding:2rem;}</style></head><body>${marked.parse(markdownEditor.value)}</body></html>`;
+        const blob = new Blob([htmlContent], {type:"text/html"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `silkroad_${currentUser.group}_创意.html`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+    document.getElementById("copyHtmlBtn").onclick = () => {
+        const rich = marked.parse(markdownEditor.value);
+        navigator.clipboard.writeText(rich).then(()=>alert("HTML已复制，可粘贴到PPT或文档编辑"));
+    };
+    document.getElementById("saveDraftBtn").onclick = () => {
+        localStorage.setItem("writing_draft_"+currentUser.studentId, markdownEditor.value);
+        alert("草稿已保存本地");
+    };
+    markdownEditor.addEventListener("input", updatePreview);
+
+    // 绑定其他事件
+    document.getElementById("loginBtn").onclick = login;
+    document.getElementById("submitOpinionBtn").onclick = () => {
+        const txt = document.getElementById("newOpinion").value;
+        if(addOpinion(txt)) document.getElementById("newOpinion").value = "";
+    };
+    document.getElementById("goldenIdeaBtn").onclick = generateGoldenIdea;
+    document.getElementById("refreshMindmapBtn").onclick = () => { if(currentUser.isLoggedIn) renderMindmap(); else alert("未登录"); };
+    document.getElementById("submitToServerBtn").onclick = submitToTeacher;
+
+    // 初始化
+    loadData();
+    window.addEventListener("resize", () => { if(mindmapChart) mindmapChart.resize(); });
+</script>
+</body>
+</html>

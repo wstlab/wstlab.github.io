@@ -1,0 +1,12 @@
+{
+  "id": "case-46",
+  "title": "智能控制分类挑战（连续量 vs 开关量）",
+  "category": "programming",
+  "description": "控制量分类图：围绕得分、正确率、分类结果开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 46,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

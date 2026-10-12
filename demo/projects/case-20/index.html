@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":20,"key":"case-20","title":"浙江地图打卡","category":"activities","description":"浙江足迹地图：围绕城市、地点、见闻开展交互学习，在数据大屏中回看记录。","headline":"浙江足迹地图","view":"map","fields":[{"key":"city","label":"城市"},{"key":"location","label":"地点"},{"key":"content","label":"见闻"},{"key":"message","label":"感想"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开打卡地图"}],"tasks":{"records":"nZddl4Qj9BX"},"mapping":{"lci74dzfvv":"nZddl4Qj9BX"},"accent":"#8463a2","capture":false,"lesson":"打开打卡地图"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏔️ 浙江景点打卡地图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4A90D9;
+            --secondary: #67C23A;
+            --accent: #E6A23C;
+            --danger: #F56C6C;
+            --bg: #f0f7ff;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #e0e8f0;
+            --shadow: 0 4px 20px rgba(74, 144, 217, 0.15);
+            --radius: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: shimmer 8s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            position: relative;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Map Section */
+        .map-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        /* Spots Grid */
+        .spots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* Spot Card */
+        .spot-card {
+            background: linear-gradient(145deg, #ffffff, #f8fbff);
+            border-radius: var(--radius);
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .spot-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(74, 144, 217, 0.25);
+            border-color: var(--primary);
+        }
+
+        .spot-card:hover::before {
+            opacity: 1;
+        }
+
+        .spot-card.checked-in {
+            background: linear-gradient(145deg, #e8f5e9, #f1f8e9);
+            border-color: var(--secondary);
+        }
+
+        .spot-card.checked-in::before {
+            opacity: 1;
+            background: linear-gradient(90deg, var(--secondary), #81c784);
+        }
+
+        /* Spot Icon */
+        .spot-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            font-size: 50px;
+            line-height: 80px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .spot-card:nth-child(odd) .spot-icon {
+            animation-delay: -1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .spot-card:hover .spot-icon {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .spot-name {
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .spot-location {
+            font-size: 0.85em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .checkin-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 500;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s;
+        }
+
+        .spot-card.checked-in .checkin-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Check-in Records Section */
+        .records-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .records-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .record-card {
+            background: linear-gradient(135deg, #fff9e6, #fff3cd);
+            border-radius: var(--radius);
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+            position: relative;
+        }
+
+        .record-spot {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .record-name {
+            color: var(--text-light);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .record-mood {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(230, 162, 60, 0.2);
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .record-text {
+            color: var(--text);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .record-time {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.75em;
+            color: #999;
+        }
+
+        .no-records {
+            text-align: center;
+            color: var(--text-light);
+            padding: 60px 20px;
+            font-size: 1.1em;
+        }
+
+        .no-records-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            padding: 35px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-icon {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            color: var(--text-light);
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95em;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .mood-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mood-option {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        .mood-option:hover {
+            border-color: var(--primary);
+            background: rgba(74, 144, 217, 0.05);
+        }
+
+        .mood-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #5a9de8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 217, 0.35);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: #eeeeee;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: var(--text-light);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: var(--text);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 500;
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .stats-bar {
+                gap: 20px;
+            }
+
+            .spots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .spot-icon {
+                width: 65px;
+                height: 65px;
+                font-size: 38px;
+                line-height: 65px;
+            }
+
+            .records-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 25px;
+            }
+        }
+
+        /* Confetti Animation */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1500;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="header">
+        <h1>🗺️ 浙江省景点打卡地图</h1>
+        <p>探索诗画江南，留下你的足迹 ✨</p>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="totalSpots">10</div>
+                <div class="stat-label">精选景点</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="checkedCount">0</div>
+                <div class="stat-label">已打卡</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="progressPercent">0%</div>
+                <div class="stat-label">完成度</div>
+            </div>
+        </div>
+    </header>
+
+    
+    <main class="container">
+        
+        <section class="map-section">
+            <h2 class="section-title">📍 景点列表（按地理位置排列）</h2>
+            <div class="spots-grid" id="spotsGrid"></div>
+        </section>
+
+        
+        <section class="records-section">
+            <h2 class="section-title">📝 我的打卡记录</h2>
+            <div class="records-grid" id="recordsGrid">
+                <div class="no-records">
+                    <div class="no-records-icon">📭</div>
+                    <p>还没有打卡记录哦~<br>点击上方景点开始你的旅行！</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon">🏞️</div>
+                <h3 class="modal-title" id="modalTitle">景点打卡</h3>
+                <p class="modal-subtitle" id="modalLocation">浙江省 · XX市</p>
+            </div>
+
+            <form id="checkinForm" onsubmit="submitCheckin(event)">
+                <div class="form-group">
+                    <label class="form-label">✏️ 你的名字</label>
+                    <input type="text" class="form-input" id="inputName" placeholder="输入你的名字或昵称" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">😊 此刻心情</label>
+                    <div class="mood-options" id="moodOptions">
+                        <span class="mood-option" data-mood="😄 超开心">😄 超开心</span>
+                        <span class="mood-option" data-mood="🥰 满足感">🥰 满足感</span>
+                        <span class="mood-option" data-mood="😌 悠闲自在">😌 悠闲自在</span>
+                        <span class="mood-option" data-mood="🤩 震撼惊叹">🤩 震撼惊叹</span>
+                        <span class="mood-option" data-mood="💪 充满活力">💪 充满活力</span>
+                        <span class="mood-option" data-mood="🧘 平静放松">🧘 平静放松</span>
+                        <span class="mood-option" data-mood="❤️ 温馨幸福">❤️ 温馨幸福</span>
+                        <span class="mood-option" data-mood="🌟 不虚此行">🌟 不虚此行</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📖 写点什么吧...</label>
+                    <textarea class="form-textarea" id="inputText" placeholder="记录此刻的感受、见闻、或者对这里想说的话..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">✨ 完成打卡</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <div class="toast" id="toast"></div>
+
+    
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+        // 浙江省十大著名景点数据（按地理从北到南排列）
+        const spots = [
+            {
+                id: 'xihu',
+                name: '西湖',
+                location: '杭州市',
+                icon: '🏞️',
+                desc: '人间天堂，淡妆浓抹总相宜'
+            },
+            {
+                id: 'wuzhen',
+                name: '乌镇',
+                location: '嘉兴市',
+                icon: '🏘️',
+                desc: '江南水乡，枕水人家'
+            },
+            {
+                id: 'moganshan',
+                name: '莫干山',
+                location: '湖州市',
+                icon: '⛰️',
+                desc: '清凉世界，避暑胜地'
+            },
+            {
+                id: 'luxunguli',
+                name: '鲁迅故里',
+                location: '绍兴市',
+                icon: '📚',
+                desc: '从百草园到三味书屋'
+            },
+            {
+                id: 'putuoshan',
+                name: '普陀山',
+                location: '舟山市',
+                icon: '🛕',
+                desc: '海天佛国，观音道场'
+            },
+            {
+                id: 'hengdian',
+                name: '横店影视城',
+                location: '金华市',
+                icon: '🎬',
+                desc: '东方好莱坞，穿越古今'
+            },
+            {
+                id: 'yandangshan',
+                name: '雁荡山',
+                location: '温州市',
+                icon: '🗻',
+                desc: '海上名山，寰中绝胜'
+            },
+            {
+                id: 'jianglangshan',
+                name: '江郎山',
+                location: '衢州市',
+                icon: '🧗',
+                desc: '丹霞奇峰，三爿石'
+            },
+            {
+                id: 'tiantaishan',
+                name: '天台山',
+                location: '台州市',
+                icon: '🏯',
+                desc: '佛宗道源，山水神秀'
+            },
+            {
+                id: 'guyanhuaxiang',
+                name: '古堰画乡',
+                location: '丽水市',
+                icon: '🎨',
+                desc: '巴比松油画，瓯江画廊'
+            }
+        ];
+
+        // API 地址
+        const API_URL = 'https://qf.kjxs.site/api/nZddl4Qj9BX';
+        const API_ALL_URL = API_URL + '/all';
+
+        // 内存中的打卡记录（从 API 获取）
+        let allRecords = [];
+
+        let currentSpotId = null;
+        let selectedMood = '';
+
+        // ========== API 操作 ==========
+
+        // 从 API 获取所有打卡记录
+        async function fetchRecords() {
+            try {
+                showToast('⏳ 正在加载打卡记录...');
+                const response = await fetch(API_ALL_URL);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const data = await response.json();
+                allRecords = (data.submissions || []).reverse(); // 最新在前
+                return true;
+            } catch (err) {
+                console.error('❌ 获取打卡记录失败:', err);
+                showToast('⚠️ 获取记录失败，请检查网络');
+                return false;
+            }
+        }
+
+        // 向 API 提交打卡数据
+        async function postRecord(record) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record)
+            });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return await response.json().catch(() => null);
+        }
+
+        // ========== 页面渲染 ==========
+
+        // 初始化：从 API 加载数据后渲染
+        document.addEventListener('DOMContentLoaded', async () => {
+            initMoodSelection();
+            const ok = await fetchRecords();
+            if (ok) {
+                renderSpots();
+                renderRecords();
+                updateStats();
+            }
+        });
+
+        // 渲染景点卡片
+        function renderSpots() {
+            const grid = document.getElementById('spotsGrid');
+            const checkedSpotIds = new Set(allRecords.map(r => r.spotId));
+
+            grid.innerHTML = spots.map(spot => `
+                <div class="spot-card ${checkedSpotIds.has(spot.id) ? 'checked-in' : ''}"
+                     onclick="openModal('${spot.id}')"
+                     data-spot-id="${spot.id}">
+                    <div class="spot-icon">${spot.icon}</div>
+                    <div class="spot-name">${spot.name}</div>
+                    <div class="spot-location">📍 ${spot.location}</div>
+                    <span class="checkin-badge">✓ 已打卡</span>
+                </div>
+            `).join('');
+        }
+
+        // 渲染打卡记录列表
+        function renderRecords() {
+            const grid = document.getElementById('recordsGrid');
+
+            if (allRecords.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-records">
+                        <div class="no-records-icon">📭</div>
+                        <p>还没有打卡记录哦~<br>点击上方景点开始你的旅行！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = allRecords.map(record => `
+                <div class="record-card">
+                    <span class="record-time">${record.submitted_at || record.time}</span>
+                    <div class="record-spot">${record.spotIcon || '📍'} ${record.spotName} · ${record.spotLocation}</div>
+                    <div class="record-name">👤 ${record.name}</div>
+                    <span class="record-mood">${record.mood}</span>
+                    ${record.text ? `<div class="record-text">"${record.text}"</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // 更新顶部统计数字
+        function updateStats() {
+            const uniqueSpots = new Set(allRecords.map(r => r.spotId)).size;
+            document.getElementById('checkedCount').textContent = uniqueSpots;
+            document.getElementById('progressPercent').textContent =
+                Math.round((uniqueSpots / spots.length) * 100) + '%';
+        }
+
+        // ========== 弹窗交互 ==========
+
+        function openModal(spotId) {
+            currentSpotId = spotId;
+            const spot = spots.find(s => s.id === spotId);
+
+            document.getElementById('modalIcon').textContent = spot.icon;
+            document.getElementById('modalTitle').textContent = `${spot.icon} ${spot.name} 打卡`;
+            document.getElementById('modalLocation').textContent = `浙江省 · ${spot.location}`;
+
+            // 检查是否已打卡，预填已有信息
+            const existing = allRecords.find(r => r.spotId === spotId);
+            if (existing) {
+                document.getElementById('inputName').value = existing.name || '';
+                document.getElementById('inputText').value = existing.text || '';
+                selectedMood = '';
+                document.querySelectorAll('.mood-option').forEach(opt => {
+                    opt.classList.toggle('selected', opt.dataset.mood === existing.mood);
+                    if (opt.dataset.mood === existing.mood) selectedMood = existing.mood;
+                });
+            } else {
+                document.getElementById('checkinForm').reset();
+                selectedMood = '';
+                document.querySelectorAll('.mood-option').forEach(opt => opt.classList.remove('selected'));
+            }
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            currentSpotId = null;
+        }
+
+        // 心情选择
+        function initMoodSelection() {
+            document.querySelectorAll('.mood-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.mood-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedMood = option.dataset.mood;
+                });
+            });
+        }
+
+        // ========== 提交打卡 ==========
+
+        async function submitCheckin(e) {
+            e.preventDefault();
+
+            if (!selectedMood) {
+                showToast('请选择一个心情哦~ 😊');
+                return;
+            }
+
+            const name = document.getElementById('inputName').value.trim();
+            const text = document.getElementById('inputText').value.trim();
+            const spot = spots.find(s => s.id === currentSpotId);
+
+            const record = {
+                spotId: currentSpotId,
+                spotName: spot.name,
+                spotIcon: spot.icon,
+                spotLocation: spot.location,
+                name: name,
+                mood: selectedMood,
+                text: text,
+                time: new Date().toLocaleString('zh-CN')
+            };
+
+            // 提交到 API
+            try {
+                showToast('⏳ 正在提交...');
+                const result = await postRecord(record);
+                console.log('✅ 打卡成功:', result);
+
+                // 提交成功后重新从 API 获取最新数据
+                await fetchRecords();
+                closeModal();
+                renderSpots();
+                renderRecords();
+                updateStats();
+                createConfetti();
+                showToast(`🎉 ${spot.name}打卡成功！`);
+            } catch (err) {
+                console.error('❌ 提交失败:', err);
+                showToast(`❌ 提交失败: ${err.message}`);
+            }
+        }
+
+        // ========== 工具函数 ==========
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // 庆祝彩带效果
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+
+                const shapes = ['50%', '0%', '30%'];
+                confetti.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3500);
+        }
+
+        // 点击遮罩关闭
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') {
+                closeModal();
+            }
+        });
+
+        // ESC 键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":37,"key":"case-37","title":"编码与解码的应用（4 课时）","category":"programming","description":"依次体验计算机、图像、声音和文字符号编码，保存各课时的学习证据。","headline":"编码作品实验室","view":"flow","fields":[{"key":"totalScore","label":"总分"},{"key":"taskAnswers","label":"编码答案"},{"key":"retries","label":"尝试次数"},{"key":"pixelData","label":"像素编码"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"① 计算机编码之旅"},{"file":"lesson-2.html","title":"② 图像编码设计师"},{"file":"lesson-3.html","title":"③ 声音编码设计师"},{"file":"lesson-4.html","title":"④ 文字符号编码设计师"}],"tasks":{"records":"TR2T7uOoqYR"},"mapping":{"6r3hj8caqg":"TR2T7uOoqYR"},"accent":"#416d89","capture":true,"lesson":"④ 文字符号编码设计师"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字符号编码设计师 - 编码大师挑战</title>
+    <style>
+        /* ========== 样式完整（与原完全一致） ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary-light: #F5E8C8;
+            --primary-medium: #E6D5B8;
+            --primary-dark: #D4C1A7;
+            --accent-orange: #D2691E;
+            --accent-gold: #D4A76A;
+            --accent-cream: #FFF9E6;
+            --text-dark: #5C4B37;
+            --text-medium: #8B7355;
+            --text-light: #3C2A21;
+            --background-light: #FFFDF5;
+            --background-medium: #F9F5EB;
+            --background-dark: #F0E6D6;
+            --success-color: #8F7B5E;
+            --warning-color: #B5651D;
+            --border-color: #D4C1A7;
+        }
+        
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(245, 232, 200, 0.9) 0%, rgba(245, 232, 200, 0.7) 90%),
+                radial-gradient(circle at 90% 80%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--background-medium);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent-orange), var(--accent-gold), var(--accent-orange));
+            border-radius: 15px 15px 0 0;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: var(--text-light);
+            border-left: 5px solid var(--accent-orange);
+            padding-left: 20px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .subhead {
+            color: var(--text-medium);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            padding-left: 25px;
+        }
+        
+        .card {
+            background: var(--background-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(210, 105, 30, 0.1);
+            border-color: var(--accent-orange);
+        }
+        
+        .card h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .cipher-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 5px;
+            background: var(--background-dark);
+            border-radius: 12px;
+        }
+        
+        .cipher-item {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        
+        .cipher-item .char {
+            font-weight: bold;
+            color: var(--accent-orange);
+            font-size: 1.1rem;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .cipher-item input {
+            flex: 1;
+            padding: 6px 8px;
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            text-align: center;
+        }
+        
+        .cipher-item button {
+            background: #B5651D;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        
+        .cipher-item button:hover {
+            background: #8B4513;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--primary-medium));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(210, 105, 30, 0.2);
+        }
+        
+        .btn-small {
+            padding: 6px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .result-area {
+            background: var(--background-dark);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent-orange);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        textarea, .input-text {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--background-light);
+            font-family: monospace;
+            font-size: 1rem;
+            resize: vertical;
+            margin: 10px 0;
+        }
+        
+        textarea:focus, input:focus {
+            border-color: var(--accent-orange);
+            outline: none;
+            box-shadow: 0 0 5px rgba(210, 105, 30, 0.2);
+        }
+        
+        .note {
+            background: var(--background-dark);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-top: 15px;
+        }
+        
+        .flex-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--success-color);
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-back:hover {
+            background: #7a684c;
+            transform: translateY(-2px);
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-color), transparent);
+            margin: 25px 0;
+        }
+        
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 650px) {
+            body { padding: 15px; }
+            .container { padding: 20px; }
+            .cipher-table { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔣 文字符号编码设计师</h1>
+    <div class="subhead">创建你自己的密码本 · 用符号、数字或二进制传递秘密信息</div>
+    
+    
+    <div class="card">
+        <h2>📖 挑战一 · 我的密码本</h2>
+        <p>下面是为常用字母和汉字预设的编码映射。你可以<strong>直接修改任何编码</strong>（支持任意字符，如数字、表情、图形符号），打造专属密码本！</p>
+        <div id="cipherContainer" class="cipher-table"></div>
+        <div class="flex-buttons">
+            <button class="btn btn-small" onclick="window.addNewChar()">➕ 添加新字符</button>
+            <button class="btn btn-small" onclick="window.resetDefaultCipher()">↺ 重置默认密码本</button>
+            <button class="btn btn-small" onclick="window.exportCipher()">📤 导出密码本</button>
+            <button class="btn btn-small" onclick="window.importCipher()">📥 导入密码本</button>
+        </div>
+        <div class="note">💡 提示：编码可以是任意字符串，例如数字“01”、表情“🐱”、图形符号“★”甚至一段文字。编码越短，信息传递效率越高！</div>
+    </div>
+    
+    
+    <div class="card">
+        <h2>✉️ 挑战二 · 信息编码与解码</h2>
+        <div class="mode-switch">
+            <button class="btn btn-small" id="encodeModeBtn" onclick="window.setMode('encode')" style="background: var(--accent-orange);">📝 编码模式</button>
+            <button class="btn btn-small" id="decodeModeBtn" onclick="window.setMode('decode')">🔓 解码模式</button>
+        </div>
+        <div id="encodePanel">
+            <p>📤 输入你想加密的文字：</p>
+            <textarea id="inputText" rows="2" placeholder="例如：HELLO 或 你好世界"></textarea>
+            <button class="btn" onclick="window.performEncode()">✨ 编码为密码文</button>
+            <div id="encodeResult" class="result-area" style="display: none;"></div>
+        </div>
+        <div id="decodePanel" style="display: none;">
+            <p>🔐 输入密码文（编码间用空格分隔）：</p>
+            <textarea id="decodeText" rows="2" placeholder="例如：101 1010 1101 1101 10"></textarea>
+            <button class="btn" onclick="window.performDecode()">🔓 解码为原文</button>
+            <div id="decodeResult" class="result-area" style="display: none;"></div>
+        </div>
+        <div class="note">🧠 思考：如果编码是“01”，解码时如何区分“0 1”和“01”？可以设计更高效的编码，如哈夫曼编码。</div>
+    </div>
+    
+    
+    <div class="card">
+        <h2>🏆 挑战三 · 设计你的编码系统</h2>
+        <p>尝试设计一套全新的编码方案：</p>
+        <ul style="margin-left: 30px; margin-top: 10px;">
+            <li><strong>最精简</strong>：用最短的编码表示26个字母（如摩斯电码）</li>
+            <li><strong>最安全</strong>：创建只有你和朋友能看懂的秘密符号</li>
+            <li><strong>最有趣</strong>：用表情符号或图形编码一句话</li>
+        </ul>
+        <div class="flex-buttons">
+            <button class="btn btn-small" onclick="window.loadMorseCode()">📡 加载摩斯电码示例</button>
+            <button class="btn btn-small" onclick="window.loadFunSymbolCipher()">🎉 加载趣味符号示例</button>
+            <button class="btn btn-small" onclick="window.clearAllCipher()">🗑️ 清空密码本（从零设计）</button>
+        </div>
+        <div class="note">✨ 进阶玩法：设计完成后，导出密码本分享给同学，让他们解码信息！</div>
+    </div>
+    
+    <hr>
+    <div style="text-align: center;">
+        <a href="index.html" class="btn btn-back" style="text-decoration: none;">← 返回主页面</a>
+    </div>
+</div>
+
+<script>
+    // 默认密码本
+    let cipher = {
+        'A': '101', 'B': '1101', 'C': '1000', 'D': '1001', 'E': '10',
+        'F': '1110', 'G': '1100', 'H': '1010', 'I': '1011', 'J': '1111',
+        'K': '10001', 'L': '10010', 'M': '10011', 'N': '10101', 'O': '10110',
+        'P': '10111', 'Q': '11001', 'R': '11010', 'S': '11011', 'T': '11100',
+        'U': '11101', 'V': '11110', 'W': '11111', 'X': '100001', 'Y': '100010', 'Z': '100011',
+        '你': '101010', '我': '101011', '他': '101100', '好': '101101', '吗': '101110',
+        '的': '101111', '是': '110000', '不': '110001', '了': '110010', '一': '110011'
+    };
+    
+    let currentMode = 'encode';
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+    
+    function renderCipher() {
+        const container = document.getElementById('cipherContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        Object.keys(cipher).sort((a,b) => a.localeCompare(b)).forEach(ch => {
+            const div = document.createElement('div');
+            div.className = 'cipher-item';
+            div.innerHTML = `
+                <div class="char">${escapeHtml(ch)}</div>
+                <input type="text" class="cipher-code" data-char="${escapeHtml(ch)}" value="${escapeHtml(cipher[ch])}" placeholder="编码">
+                <button onclick="window.removeChar('${escapeHtml(ch)}')">🗑️</button>
+            `;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('.cipher-code').forEach(input => {
+            input.addEventListener('change', e => {
+                const ch = input.dataset.char;
+                let newCode = input.value.trim();
+                if (!newCode) { alert("编码不能为空"); input.value = cipher[ch]; return; }
+                let dup = Object.keys(cipher).find(k => k !== ch && cipher[k] === newCode);
+                if (dup) { alert(`编码 "${newCode}" 已被字符 "${dup}" 使用`); input.value = cipher[ch]; return; }
+                cipher[ch] = newCode;
+            });
+        });
+    }
+    
+    window.addNewChar = function() {
+        let newChar = prompt("请输入新字符:");
+        if (!newChar || cipher[newChar]) { alert("字符已存在或无效"); return; }
+        let code = prompt(`请输入“${newChar}”的编码:`, "111000");
+        if (!code) return;
+        if (Object.values(cipher).includes(code)) { alert("编码已被使用"); return; }
+        cipher[newChar] = code;
+        renderCipher();
+    };
+    
+    window.removeChar = function(ch) {
+        if (confirm(`删除“${ch}”？`)) { delete cipher[ch]; renderCipher(); }
+    };
+    
+    window.resetDefaultCipher = function() {
+        if (confirm("重置默认密码本？")) {
+            cipher = {
+                'A': '101', 'B': '1101', 'C': '1000', 'D': '1001', 'E': '10',
+                'F': '1110', 'G': '1100', 'H': '1010', 'I': '1011', 'J': '1111',
+                'K': '10001', 'L': '10010', 'M': '10011', 'N': '10101', 'O': '10110',
+                'P': '10111', 'Q': '11001', 'R': '11010', 'S': '11011', 'T': '11100',
+                'U': '11101', 'V': '11110', 'W': '11111', 'X': '100001', 'Y': '100010', 'Z': '100011',
+                '你': '101010', '我': '101011', '他': '101100', '好': '101101', '吗': '101110',
+                '的': '101111', '是': '110000', '不': '110001', '了': '110010', '一': '110011'
+            };
+            renderCipher();
+        }
+    };
+    
+    window.exportCipher = function() {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(cipher, null, 2)], {type: 'application/json'}));
+        a.download = 'my_cipher.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+    
+    window.importCipher = function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if (typeof imported === 'object') { cipher = imported; renderCipher(); alert("导入成功"); }
+                    else alert("格式错误");
+                } catch(err) { alert("解析失败"); }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    };
+    
+    window.clearAllCipher = function() {
+        if (confirm("清空所有映射？")) { cipher = {}; renderCipher(); }
+    };
+    
+    window.loadMorseCode = function() {
+        if (confirm("加载摩斯电码示例？")) {
+            const morse = {
+                'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....',
+                'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.',
+                'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+                'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+                '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'
+            };
+            let newCipher = {};
+            for (let k in cipher) if (k.length > 1) newCipher[k] = cipher[k];
+            for (let k in morse) newCipher[k] = morse[k];
+            cipher = newCipher;
+            renderCipher();
+            alert("摩斯电码已加载");
+        }
+    };
+    
+    // ========== 全新趣味符号：丰富且100%兼容 ==========
+    window.loadFunSymbolCipher = function() {
+        if (confirm("加载趣味符号示例：为字母分配动物/物品符号，数字使用彩色圆圈，汉字使用有趣表情。所有符号均可在任何设备显示。确定吗？")) {
+            // 字母映射（26个有趣的基础符号，全部为单字符，广泛支持）
+            const letterSymbols = [
+                '🐜', '🐻', '🐱', '🐶', '🦅', '🐟', '🐐', '🐴', '🦎', '🐧',
+                '🐨', '🦁', '🐭', '📘', '🦉', '🐧', '❓', '🐇', '🐍', '🐯',
+                '☂️', '🎻', '🐳', '❌', '💛', '🦓'
+            ];
+            const letterMap = {};
+            for (let i = 0; i < 26; i++) {
+                let upper = String.fromCharCode(65 + i);
+                let lower = String.fromCharCode(97 + i);
+                letterMap[upper] = letterSymbols[i];
+                letterMap[lower] = letterSymbols[i];
+            }
+            // 数字映射：带圈数字 + 星星等
+            const digitMap = {
+                '0': '⓪', '1': '①', '2': '②', '3': '③', '4': '④',
+                '5': '⑤', '6': '⑥', '7': '⑦', '8': '⑧', '9': '⑨'
+            };
+            // 汉字映射：每个汉字不同且有趣
+            const chineseMap = {
+                '你': '😊', '我': '😎', '他': '👦', '好': '👍', '吗': '❓',
+                '的': '🔹', '是': '✅', '不': '🚫', '了': '✔️', '一': '①',
+                '爱': '❤️', '坏': '👎', '编码': '💻', '我们': '👥', '他们': '👥',
+                '大家': '👥', '什么': '❓', '怎么': '❓', '有': '➕', '没': '➖',
+                '大': '🐘', '小': '🐭', '多': '🔢', '少': '🔢', '高': '⬆️',
+                '低': '⬇️', '快': '⚡', '慢': '🐢'
+            };
+            // 其他未定义字符的备用池（有趣且兼容）
+            const fallbackPool = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
+                                   '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🐴',
+                                   '🐺', '🐗', '🐫', '🦒', '🐘', '🦏', '🦛', '🐊', '🦑', '🐙'];
+            let newCipher = {};
+            for (let key in cipher) {
+                if (key.length === 1) {
+                    if (letterMap[key]) newCipher[key] = letterMap[key];
+                    else if (digitMap[key]) newCipher[key] = digitMap[key];
+                    else {
+                        // 标点等：取哈希
+                        let idx = (key.charCodeAt(0) % fallbackPool.length);
+                        newCipher[key] = fallbackPool[idx];
+                    }
+                } else {
+                    if (chineseMap[key]) newCipher[key] = chineseMap[key];
+                    else {
+                        let idx = (key.charCodeAt(0) % fallbackPool.length);
+                        newCipher[key] = fallbackPool[idx];
+                    }
+                }
+            }
+            cipher = newCipher;
+            renderCipher();
+            alert("已替换为趣味符号！现在字母都是小动物，汉字都有独特表情，且全部兼容。");
+        }
+    };
+    
+    window.performEncode = function() {
+        const text = document.getElementById('inputText').value;
+        const resDiv = document.getElementById('encodeResult');
+        if (!text.trim()) { resDiv.style.display = 'block'; resDiv.innerHTML = '❌ 请输入文字'; return; }
+        let result = [], unknown = [];
+        for (let ch of text) {
+            let match = cipher[ch] || cipher[ch.toUpperCase()];
+            if (!match) { unknown.push(ch); result.push(`?${ch}?`); }
+            else result.push(match);
+        }
+        if (unknown.length) resDiv.innerHTML = `⚠️ 未知字符：${unknown.join(', ')}<br>密码文：${result.join(' ')}`;
+        else resDiv.innerHTML = `✅ 编码成功！<br>原文：${text}<br>密码文：<strong>${result.join(' ')}</strong>`;
+        resDiv.style.display = 'block';
+    };
+    
+    window.performDecode = function() {
+        const encoded = document.getElementById('decodeText').value.trim();
+        const resDiv = document.getElementById('decodeResult');
+        if (!encoded) { resDiv.style.display = 'block'; resDiv.innerHTML = '❌ 请输入密码文'; return; }
+        const tokens = encoded.split(/\s+/);
+        const reverse = {};
+        for (let [ch, code] of Object.entries(cipher)) {
+            if (reverse[code]) { resDiv.innerHTML = `⚠️ 重复编码“${code}”`; resDiv.style.display = 'block'; return; }
+            reverse[code] = ch;
+        }
+        let decoded = [], unknown = [];
+        for (let t of tokens) {
+            if (reverse[t]) decoded.push(reverse[t]);
+            else { unknown.push(t); decoded.push(`?${t}?`); }
+        }
+        if (unknown.length) resDiv.innerHTML = `⚠️ 未知编码：${unknown.join(', ')}<br>解码结果：${decoded.join('')}`;
+        else resDiv.innerHTML = `✅ 解码成功！<br>密码文：${encoded}<br>原文：<strong>${decoded.join('')}</strong>`;
+        resDiv.style.display = 'block';
+    };
+    
+    window.setMode = function(mode) {
+        currentMode = mode;
+        document.getElementById('encodePanel').style.display = mode === 'encode' ? 'block' : 'none';
+        document.getElementById('decodePanel').style.display = mode === 'decode' ? 'block' : 'none';
+        const encodeBtn = document.getElementById('encodeModeBtn');
+        const decodeBtn = document.getElementById('decodeModeBtn');
+        if (mode === 'encode') {
+            encodeBtn.style.background = 'var(--accent-orange)';
+            decodeBtn.style.background = 'linear-gradient(to bottom, var(--accent-orange), var(--primary-dark))';
+        } else {
+            encodeBtn.style.background = 'linear-gradient(to bottom, var(--accent-orange), var(--primary-dark))';
+            decodeBtn.style.background = 'var(--accent-orange)';
+        }
+    };
+    
+    window.addEventListener('DOMContentLoaded', () => {
+        renderCipher();
+        setMode('encode');
+    });
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

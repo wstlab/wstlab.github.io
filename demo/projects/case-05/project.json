@@ -1,0 +1,12 @@
+{
+  "id": "case-05",
+  "title": "在线打字练习",
+  "category": "practice",
+  "description": "选择教师发布的文章开展打字练习，回看速度、准确率与练习时长。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 5,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

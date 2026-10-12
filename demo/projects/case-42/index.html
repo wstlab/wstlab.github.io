@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":42,"key":"case-42","title":"推理题（环形/四边形卡片）","category":"exploration","description":"卡片推理档案：围绕任务、得分、尝试次数开展交互学习，在数据大屏中回看记录。","headline":"卡片推理档案","view":"flow","fields":[{"key":"task","label":"任务"},{"key":"score","label":"得分"},{"key":"attempts","label":"尝试次数"},{"key":"answers","label":"推理答案"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"环形卡片挑战端"},{"file":"lesson-2.html","title":"四边形卡片推理"}],"tasks":{"records":"LlvQ21bBEAE"},"mapping":{"pgow8bbtrp":"LlvQ21bBEAE"},"accent":"#327a72","capture":false,"lesson":"环形卡片挑战端"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>环形卡片推理 · 学生挑战端</title>
+    <style>
+        :root {
+            --bg: #0f131f;
+            --surface: rgba(25, 30, 45, 0.9);
+            --gold: #d4a574;
+            --gold-light: #f0d6b8;
+            --accent: #c89460;
+            --text: #e0ddda;
+            --text-secondary: #9aa0b8;
+            --card-back-bg: linear-gradient(145deg, #1e2a45, #16203a);
+            --radius-lg: 2rem;
+            --radius-md: 1rem;
+            --radius-sm: 0.8rem;
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+            --diff-color: #f0b84d;
+            --error-color: #e0556a;
+            --success-color: #5cb878;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(150deg, #1a1f2e 0%, #0b0f1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 1rem;
+            color: var(--text);
+        }
+
+        /* 登录页面 */
+        .login-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-icon { font-size: 3.5rem; margin-bottom: 0.5rem; }
+        .login-container h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f0d6b8, #d4a574);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            margin-bottom: 0.4rem;
+        }
+        .login-subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.8rem; letter-spacing: 1px; }
+        .login-form { display: flex; flex-direction: column; gap: 1.1rem; text-align: left; }
+        .login-form label { font-size: 0.82rem; font-weight: 600; color: #c0b8a8; letter-spacing: 1px; display: flex; align-items: center; gap: 0.4rem; }
+        .login-form input, .login-form select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #1e2335;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 0.8rem;
+            color: #f0e0c0;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .login-form input:focus, .login-form select:focus { border-color: var(--gold); box-shadow: 0 0 18px rgba(212, 167, 116, 0.2); }
+        .login-form select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d4a574' fill='none' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+        .login-form .error-msg { color: var(--error-color); font-size: 0.75rem; min-height: 1rem; letter-spacing: 0.5px; }
+        .btn-login {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, #c89460, #b07d42);
+            border: none;
+            border-radius: 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f1508;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(180, 120, 50, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-login:hover { background: linear-gradient(135deg, #e0b880, #c89460); transform: translateY(-2px); }
+
+        /* 游戏主页面布局 */
+        .app-layout {
+            display: flex;
+            gap: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .main-panel {
+            flex: 1 1 620px;
+            min-width: 380px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: var(--shadow);
+            padding: 1.6rem 1.5rem 1.8rem;
+        }
+        .side-panel {
+            flex: 0 0 320px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: var(--shadow);
+            padding: 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-width: 300px;
+        }
+        .side-panel h3 { text-align: center; color: var(--gold); letter-spacing: 2px; font-size: 1rem; margin-bottom: 0.2rem; }
+
+        .timer-box {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.7rem 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #f0c060;
+            border: 1px solid rgba(200, 160, 100, 0.25);
+        }
+        .timer-box.warning { color: #f08070; animation: pulse-warn 0.8s ease-in-out infinite; }
+        @keyframes pulse-warn { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+
+        .score-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #c0b8a8; }
+        .score-row span:last-child { font-weight: 700; color: #f0dbb0; }
+        .record-stats { font-size: 0.78rem; color: #a09888; display: flex; flex-direction: column; gap: 0.25rem; }
+        .cloud-status { font-size: 0.7rem; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .radar-container { display: flex; justify-content: center; margin: 0.3rem 0; }
+        canvas#radarCanvas { width: 240px; height: 240px; }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .welcome-text { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #f0d6b8, #d4a574); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .range-row { display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.03); padding: 0.4rem 0.9rem; border-radius: 2rem; flex-wrap: wrap; font-size: 0.8rem; }
+        .range-row input { width: 60px; background: #1e2335; border: 1px solid #4a5068; border-radius: 6px; color: #f0e0c0; padding: 0.25rem 0.4rem; text-align: center; }
+        .btn-sm {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--gold);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.78rem;
+            transition: 0.25s;
+        }
+        .btn-sm:hover { background: rgba(255, 255, 255, 0.14); border-color: var(--gold); }
+        .btn-advanced { background: rgba(255, 180, 60, 0.12); border-color: rgba(255, 180, 60, 0.45); color: #f0b84d; }
+        .btn-advanced:hover { background: rgba(255, 180, 60, 0.25); }
+        .btn-logout { background: rgba(255, 100, 100, 0.1); border-color: rgba(255, 100, 100, 0.3); color: #f08070; }
+        .btn-logout:hover { background: rgba(255, 100, 100, 0.2); }
+
+        .circle-stage {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            margin: 20px auto 1.5rem;
+            aspect-ratio: 1/1;
+            background: radial-gradient(circle at 50% 50%, rgba(40,35,28,0.75), rgba(28,24,18,0.85));
+            border-radius: 50%;
+            box-shadow: inset 0 0 55px rgba(0,0,0,0.6), 0 8px 28px rgba(0,0,0,0.5);
+            border: 2px solid rgba(200,170,120,0.28);
+        }
+        .circle-stage.advanced-mode { border-color: rgba(255,180,60,0.6); box-shadow: inset 0 0 55px rgba(0,0,0,0.6), 0 0 35px rgba(255,180,60,0.2); }
+
+        .card-node {
+            position: absolute;
+            width: 64px;
+            height: 82px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            perspective: 700px;
+        }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; border-radius: 10px; }
+        .card-node.flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+        .card-back { background: var(--card-back-bg); border: 2px solid rgba(180,150,110,0.35); }
+        .card-back .back-letter { font-size: 2rem; font-weight: 800; color: rgba(210,180,140,0.85); }
+        .card-front { background: #fef9f0; border: 2px solid #d4a574; transform: rotateY(180deg); color: #2c2416; }
+        .card-front .number { font-size: 1.6rem; font-weight: 800; }
+        .card-node.selected-max .card-back { border: 3px solid #f0b84d; box-shadow: 0 0 22px #f0b84d88; }
+        .card-node.selected-max::before { content: "👑"; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; z-index: 10; pointer-events: none; }
+
+        .lines-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .sum-point { cursor: pointer; pointer-events: auto; }
+        .sum-circle { fill: #1e2335; stroke: #b4945a; stroke-width: 1.6; }
+        .sum-circle.diff { stroke: var(--diff-color); stroke-width: 2.2; fill: #2a1f10; }
+        .sum-text { fill: #efdbb0; font-size: 0.26rem; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+
+        .tasks-panel { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
+        .task-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.05); border-radius: var(--radius-md); padding: 0.75rem 0.9rem; }
+        .task-card h3 { font-size: 0.88rem; color: var(--gold); margin-bottom: 0.5rem; }
+        .max-buttons { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
+        .max-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.18);
+            border-radius: 2rem;
+            padding: 0.3rem 0.9rem;
+            font-weight: 600;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.76rem;
+        }
+        .max-btn.active { background: var(--gold); border-color: var(--gold); color: #1a1208; box-shadow: 0 0 12px #d4a57455; }
+        .sort-display { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+        .sort-slot { background: #1e2335; border-radius: 7px; padding: 0.25rem 0.7rem; font-weight: 700; color: #f0e0c0; min-width: 2rem; text-align: center; font-size: 0.85rem; }
+        .number-inputs { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+        .input-group { display: flex; flex-direction: column; align-items: center; }
+        .input-group input { width: 54px; padding: 0.35rem; text-align: center; background: #1e2335; border: 1px solid #4a5068; border-radius: 7px; color: #f0e0c0; font-weight: 700; }
+        .input-group label { font-size: 0.7rem; color: #b0a090; }
+        .btn-task { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); color: var(--gold); padding: 0.35rem 0.9rem; border-radius: 2rem; font-weight: 600; cursor: pointer; font-size: 0.75rem; }
+        .btn-task:disabled { opacity: 0.4; cursor: not-allowed; }
+        .feedback-inline { font-size: 0.75rem; margin-top: 0.25rem; min-height: 1.1rem; }
+        .feedback-inline.correct { color: #7ed89a; }
+        .feedback-inline.incorrect { color: #f5a0a8; }
+        .btn-reveal {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #c89460, #b07d42);
+            border: none;
+            border-radius: 3rem;
+            padding: 0.8rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1f1508;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-reveal:disabled { opacity: 0.45; cursor: not-allowed; }
+        .final-result { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; }
+
+        @media (max-width: 800px) {
+            .app-layout { flex-direction: column; align-items: center; }
+            .card-node { width: 50px; height: 66px; }
+            .card-back .back-letter { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="login-container" id="loginPage">
+        <div class="login-icon">🔮</div>
+        <h1>环形卡片推理</h1>
+        <p class="login-subtitle">数学游艺会 · 学生挑战端</p>
+        <div class="login-form">
+            <div>
+                <label for="studentName">👤 姓名</label>
+                <input type="text" id="studentName" placeholder="请输入演示称呼" maxlength="20" autocomplete="off">
+                <div class="error-msg" id="nameError"></div>
+            </div>
+            <div>
+                <label for="studentClass">🏫 班级</label>
+                <select id="studentClass"><option value="">-- 请选择班级 --</option><option value="1">1 班</option><option value="2">2 班</option><option value="3">3 班</option><option value="4">4 班</option><option value="5">5 班</option><option value="6">6 班</option><option value="7">7 班</option><option value="8">8 班</option><option value="9">9 班</option><option value="10">10 班</option><option value="11">11 班</option><option value="12">12 班</option><option value="13">13 班</option><option value="14">14 班</option><option value="15">15 班</option><option value="16">16 班</option><option value="17">17 班</option><option value="18">18 班</option><option value="19">19 班</option><option value="20">20 班</option><option value="21">21 班</option><option value="22">22 班</option><option value="23">23 班</option><option value="24">24 班</option></select>
+                <div class="error-msg" id="classError"></div>
+            </div>
+            <button class="btn-login" id="btnLogin">🚀 开始挑战</button>
+        </div>
+    </div>
+
+    
+    <div class="app-layout" id="gamePage" style="display:none;">
+        <div class="main-panel">
+            <div class="header-row">
+                <div class="welcome-text" id="welcomeText">👋 欢迎挑战推理！</div>
+                <div class="range-row">
+                    <label>范围</label>
+                    <input type="number" id="minInput" value="1" min="-100" max="100">
+                    <span>~</span>
+                    <input type="number" id="maxInput" value="50" min="-99" max="200">
+                    <button class="btn-sm" id="btnStartGame">▶ 开始</button>
+                    <button class="btn-sm" id="btnResetGame">↺ 重置</button>
+                    <button class="btn-sm btn-advanced" id="btnAdvancedMode">🚀 游戏升级</button>
+                    <button class="btn-sm btn-logout" id="btnLogout">🚪 退出</button>
+                </div>
+            </div>
+            <div class="circle-stage" id="circleStage">
+                <svg class="lines-svg" id="linesSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="tasks-panel">
+                <div class="task-card">
+                    <h3>🏆 任务一：哪张卡片最大？（30分）</h3>
+                    <div class="max-buttons" id="maxButtons">
+                        <button class="max-btn" data-card="A">A</button>
+                        <button class="max-btn" data-card="B">B</button>
+                        <button class="max-btn" data-card="C">C</button>
+                        <button class="max-btn" data-card="D">D</button>
+                        <button class="max-btn" data-card="E">E</button>
+                        <button class="btn-task" id="btnSubmitTask1">✔ 提交</button>
+                    </div>
+                    <div class="feedback-inline" id="task1Feedback"></div>
+                </div>
+                <div class="task-card">
+                    <h3>📊 任务二：从大到小排序（30分）</h3>
+                    <div class="sort-display" id="sortDisplay"><span class="sort-slot">?</span> <span style="color:#b4945a;">&gt;</span> <span class="sort-slot">?</span> <span style="color:#b4945a;">&gt;</span> <span class="sort-slot">?</span> <span style="color:#b4945a;">&gt;</span> <span class="sort-slot">?</span> <span style="color:#b4945a;">&gt;</span> <span class="sort-slot">?</span></div>
+                    <div style="display:flex;gap:0.4rem;">
+                        <button class="btn-task" id="btnClearSort" disabled="">🗑 清空</button>
+                        <button class="btn-task" id="btnSubmitTask2" disabled="">✔ 提交排序</button>
+                    </div>
+                    <div class="feedback-inline" id="task2Feedback"></div>
+                </div>
+                <div class="task-card">
+                    <h3>🔢 任务三：推算数字（40分，每空8分）</h3>
+                    <div class="number-inputs" id="numberInputs">
+                        <div class="input-group"><label>A</label><input type="number" id="inputA" placeholder="?"></div>
+                        <div class="input-group"><label>B</label><input type="number" id="inputB" placeholder="?"></div>
+                        <div class="input-group"><label>C</label><input type="number" id="inputC" placeholder="?"></div>
+                        <div class="input-group"><label>D</label><input type="number" id="inputD" placeholder="?"></div>
+                        <div class="input-group"><label>E</label><input type="number" id="inputE" placeholder="?"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-reveal" id="btnReveal">✨ 呈 现 答 案 ✨</button>
+            <div class="final-result" id="finalResult"></div>
+        </div>
+
+        <div class="side-panel">
+            <h3>📋 答题记录</h3>
+            <div class="timer-box" id="timerBox">15:00</div>
+            <div class="score-row"><span>任务一得分</span><span id="score1">--</span></div>
+            <div class="score-row"><span>任务二得分</span><span id="score2">--</span></div>
+            <div class="score-row"><span>任务三得分</span><span id="score3">--</span></div>
+            <div class="score-row" style="border-top:1px solid rgba(255,255,255,0.12);margin-top:0.2rem;padding-top:0.4rem;">
+                <span>🌟 总得分</span><span id="totalScore" style="font-size:1.1rem;color:#f0c060;">--</span>
+            </div>
+            <div class="record-stats">
+                <div>提交总次数：<strong id="totalAttempts">0</strong></div>
+                <div>错误次数：<strong id="totalErrors">0</strong></div>
+                <div>总耗时：<strong id="elapsedTime">0秒</strong></div>
+            </div>
+            <div class="cloud-status">
+                ☁️ 云端状态：<span id="cloudStatus">就绪</span>
+                <button class="btn-sm" id="testCloudBtn" style="margin-left:8px; padding:0.2rem 0.6rem;">🔌 测试</button>
+            </div>
+            <div class="radar-container">
+                <canvas id="radarCanvas" width="240" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            // ==================== 配置 ====================
+            const QUICKFORM_URL = 'https://qf.kjxs.site/api/LlvQ21bBEAE';   // 新的云端接口
+            const LABELS = ['A', 'B', 'C', 'D', 'E'];
+            const TOTAL_TIME = 15 * 60;
+
+            // 学生信息
+            let studentName = '';
+            let studentClass = '';
+
+            // 游戏状态
+            let secret = [], sums = [], sumRevealed = [false,false,false,false,false];
+            let selectedMax = null, sortOrder = [];
+            let gameStarted = false, gameOver = false, task1Locked = false, task2Locked = false;
+            let task1Attempts = 0, task2Attempts = 0;
+            let task1Score = 0, task2Score = 0, task3Score = 0;
+            let timeRemaining = TOTAL_TIME, timerInterval = null, finalSubmitted = false;
+            let isAdvancedMode = false;
+            let diffIndex = -1, diffValue = 0;
+
+            // DOM 元素
+            const loginPage = document.getElementById('loginPage');
+            const gamePage = document.getElementById('gamePage');
+            const studentNameInput = document.getElementById('studentName');
+            const studentClassSelect = document.getElementById('studentClass');
+            const nameError = document.getElementById('nameError');
+            const classError = document.getElementById('classError');
+            const btnLogin = document.getElementById('btnLogin');
+            const welcomeText = document.getElementById('welcomeText');
+            const btnLogout = document.getElementById('btnLogout');
+            const circleStage = document.getElementById('circleStage');
+            const linesSvg = document.getElementById('linesSvg');
+            const maxButtons = document.getElementById('maxButtons');
+            const sortDisplay = document.getElementById('sortDisplay');
+            const btnSubmitTask1 = document.getElementById('btnSubmitTask1');
+            const btnSubmitTask2 = document.getElementById('btnSubmitTask2');
+            const btnClearSort = document.getElementById('btnClearSort');
+            const btnReveal = document.getElementById('btnReveal');
+            const finalResult = document.getElementById('finalResult');
+            const btnStartGame = document.getElementById('btnStartGame');
+            const btnResetGame = document.getElementById('btnResetGame');
+            const btnAdvancedMode = document.getElementById('btnAdvancedMode');
+            const minInput = document.getElementById('minInput');
+            const maxInput = document.getElementById('maxInput');
+            const task1Feedback = document.getElementById('task1Feedback');
+            const task2Feedback = document.getElementById('task2Feedback');
+            const timerBox = document.getElementById('timerBox');
+            const score1El = document.getElementById('score1');
+            const score2El = document.getElementById('score2');
+            const score3El = document.getElementById('score3');
+            const totalScoreEl = document.getElementById('totalScore');
+            const totalAttemptsEl = document.getElementById('totalAttempts');
+            const totalErrorsEl = document.getElementById('totalErrors');
+            const elapsedTimeEl = document.getElementById('elapsedTime');
+            const radarCanvas = document.getElementById('radarCanvas');
+            const ctx = radarCanvas.getContext('2d');
+            const cloudStatusSpan = document.getElementById('cloudStatus');
+            const testCloudBtn = document.getElementById('testCloudBtn');
+
+            const numberInputs = {
+                A: document.getElementById('inputA'),
+                B: document.getElementById('inputB'),
+                C: document.getElementById('inputC'),
+                D: document.getElementById('inputD'),
+                E: document.getElementById('inputE'),
+            };
+
+            // 生成班级下拉框
+            function initClassSelect() {
+                studentClassSelect.innerHTML = '<option value="">-- 请选择班级 --</option>';
+                for (let i = 1; i <= 24; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i + ' 班';
+                    studentClassSelect.appendChild(option);
+                }
+            }
+
+            // 云端状态显示
+            function updateCloudStatus(status, msg) {
+                if (cloudStatusSpan) {
+                    const color = (status === '成功') ? '#5cb878' : ((status === '测试') ? '#f0b84d' : '#e0556a');
+                    cloudStatusSpan.innerHTML = `<span style="color:${color}">${status}</span> ${msg}`;
+                    setTimeout(() => {
+                        if (cloudStatusSpan.innerText.includes(msg)) cloudStatusSpan.innerText = '就绪';
+                    }, 4000);
+                }
+            }
+
+            // 发送数据到云端（带详细错误反馈）
+            async function sendToQuickForm(data) {
+                try {
+                    const response = await fetch(QUICKFORM_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors',
+                        body: JSON.stringify(data)
+                    });
+                    if (response.ok) {
+                        console.log('✅ 数据已提交到QuickForm', data);
+                        updateCloudStatus('成功', `任务${data.任务编号}已提交`);
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('❌ QuickForm提交失败:', error.message);
+                    let errMsg = error.message;
+                    if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) errMsg = '网络错误或CORS拦截';
+                    updateCloudStatus('失败', `${errMsg}`);
+                    alert(`云端提交失败：${errMsg}\n请检查网络连接，如持续失败请联系老师。`);
+                }
+            }
+
+            // 生成题目签名 (A数字B数字C数字...)
+            function getQuestionSignature() {
+                if (secret && secret.length === 5) {
+                    return secret.map((val, idx) => LABELS[idx] + val).join('');
+                }
+                return '';
+            }
+
+            // 构建答题记录
+            function getAnswerRecord(taskId, attemptCount, isCorrect, score) {
+                const elapsed = TOTAL_TIME - timeRemaining;
+                const t1s = task1Locked ? task1Score : (task1Attempts > 0 ? Math.max(30 - task1Attempts * 5, -99) : 0);
+                const t2s = task2Locked ? task2Score : (task2Attempts > 0 ? Math.max(30 - task2Attempts * 5, -99) : 0);
+                const t3s = finalSubmitted ? task3Score : 0;
+                const tAttempts = task1Attempts + task2Attempts + (finalSubmitted ? 1 : 0);
+                const tErrors = (task1Locked ? Math.max(task1Attempts - 1, 0) : task1Attempts) +
+                    (task2Locked ? Math.max(task2Attempts - 1, 0) : task2Attempts) +
+                    (finalSubmitted ? (5 - (task3Score / 8)) : 0);
+                return {
+                    姓名: studentName,
+                    班级: studentClass + '班',
+                    任务编号: taskId,
+                    任务名称: taskId === 1 ? '猜最大值' : (taskId === 2 ? '排序' : '推算数字'),
+                    提交次数: attemptCount,
+                    本次是否正确: isCorrect ? '正确' : '错误',
+                    任务得分: score,
+                    总提交次数: tAttempts,
+                    总错误次数: tErrors,
+                    任务一得分: t1s,
+                    任务二得分: t2s,
+                    任务三得分: t3s,
+                    总得分: t1s + t2s + t3s,
+                    总耗时秒: elapsed,
+                    游戏模式: isAdvancedMode ? '升级' : '普通',
+                    数字范围: minInput.value + '~' + maxInput.value,
+                    题目签名: getQuestionSignature(),
+                    时间戳: new Date().toLocaleString('zh-CN')
+                };
+            }
+
+            function sendTaskSubmit(taskId, isCorrect, score) {
+                const record = getAnswerRecord(taskId, taskId===1 ? task1Attempts : (taskId===2 ? task2Attempts : 1), isCorrect, score);
+                sendToQuickForm(record);
+            }
+
+            // 随机生成5个不重复数字
+            function randomDistinctNumbers(count, min, max) {
+                if (max - min + 1 < count) return null;
+                const arr = [];
+                for (let i = min; i <= max; i++) arr.push(i);
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr.slice(0, count);
+            }
+
+            function stopTimer() { if (timerInterval) clearInterval(timerInterval); timerInterval = null; }
+            function updateTimerDisplay() {
+                const m = Math.floor(timeRemaining / 60), s = timeRemaining % 60;
+                timerBox.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                timerBox.classList.toggle('warning', timeRemaining <= 60);
+            }
+
+            function drawRadar() {
+                const w = radarCanvas.width, h = radarCanvas.height, cx = w/2, cy = h/2, maxR = 95, axes = 5;
+                ctx.clearRect(0,0,w,h);
+                const t1s = task1Locked ? task1Score : (task1Attempts>0 ? Math.max(30-task1Attempts*5,-99):0);
+                const t2s = task2Locked ? task2Score : (task2Attempts>0 ? Math.max(30-task2Attempts*5,-99):0);
+                const t3s = finalSubmitted ? task3Score : 0;
+                const raw = [t1s, t2s, t3s, t1s+t2s+t3s, 100 - (task1Attempts+task2Attempts)*8];
+                const percs = raw.map((v,i)=> Math.max(v / [30,30,40,100,100][i] * 100, 0));
+                for (let r=1;r<=4;r++) {
+                    ctx.beginPath();
+                    for (let i=0;i<axes;i++) {
+                        const angle = -Math.PI/2 + i*2*Math.PI/axes;
+                        const x = cx + maxR*(r/4)*Math.cos(angle), y = cy + maxR*(r/4)*Math.sin(angle);
+                        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+                    }
+                    ctx.closePath();
+                    ctx.strokeStyle = 'rgba(200,170,130,0.15)'; ctx.stroke();
+                }
+                for (let i=0;i<axes;i++) {
+                    const angle = -Math.PI/2 + i*2*Math.PI/axes;
+                    ctx.beginPath();
+                    ctx.moveTo(cx,cy);
+                    ctx.lineTo(cx+maxR*Math.cos(angle), cy+maxR*Math.sin(angle));
+                    ctx.strokeStyle = 'rgba(200,170,130,0.25)'; ctx.stroke();
+                }
+                ctx.beginPath();
+                for(let i=0;i<axes;i++) {
+                    const angle = -Math.PI/2 + i*2*Math.PI/axes;
+                    const val = Math.min(percs[i],100)/100;
+                    const x = cx + maxR*val*Math.cos(angle), y = cy + maxR*val*Math.sin(angle);
+                    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(212,167,116,0.22)'; ctx.fill();
+                ctx.strokeStyle = '#f0b84d'; ctx.lineWidth = 2; ctx.stroke();
+            }
+
+            function updateSidePanel() {
+                const t1s = task1Locked ? task1Score : (task1Attempts>0?Math.max(30-task1Attempts*5,-99):0);
+                const t2s = task2Locked ? task2Score : (task2Attempts>0?Math.max(30-task2Attempts*5,-99):0);
+                const t3s = finalSubmitted ? task3Score : 0;
+                score1El.textContent = task1Locked ? task1Score+'分' : (task1Attempts>0?'提交中...':'--');
+                score2El.textContent = task2Locked ? task2Score+'分' : (task2Attempts>0?'提交中...':'--');
+                score3El.textContent = finalSubmitted ? task3Score+'分' : '--';
+                totalScoreEl.textContent = finalSubmitted ? (t1s+t2s+t3s)+'分' : '--';
+                totalAttemptsEl.textContent = task1Attempts+task2Attempts+(finalSubmitted?1:0);
+                const errs = (task1Locked?Math.max(task1Attempts-1,0):task1Attempts)+(task2Locked?Math.max(task2Attempts-1,0):task2Attempts)+(finalSubmitted?(5-(task3Score/8)):0);
+                totalErrorsEl.textContent = errs;
+                elapsedTimeEl.textContent = (TOTAL_TIME - timeRemaining)+'秒';
+                drawRadar();
+            }
+
+            function revealAll() {
+                document.querySelectorAll('.card-node').forEach((c,i)=>setTimeout(()=>c.classList.add('flipped'), i*100));
+                sumRevealed = [true,true,true,true,true];
+                for(let i=0;i<5;i++) { const el = document.getElementById('sumText'+i); if(el) updateSumText(el,i); }
+                const realMax = LABELS[secret.indexOf(Math.max(...secret))];
+                const maxCard = circleStage.querySelector(`.card-node[data-label="${realMax}"]`);
+                if(maxCard) maxCard.style.filter = 'drop-shadow(0 0 18px gold)';
+            }
+
+            function showFinalFeedback() {
+                const realMax = LABELS[secret.indexOf(Math.max(...secret))];
+                const realSorted = [...secret].sort((a,b)=>b-a).map(n=>LABELS[secret.indexOf(n)]);
+                const t1c = task1Locked && selectedMax === realMax;
+                const t2c = task2Locked && sortOrder.join(',') === realSorted.join(',');
+                let h = '';
+                h += `<div style="padding:0.4rem 0.6rem;border-left:4px solid ${t1c?'#5cb878':'#e0556a'};background:rgba(255,255,255,0.03);border-radius:0 0.5rem 0.5rem 0;">任务一：${t1c?'✅正确 '+task1Score+'分':'❌ 最大值是'+realMax+'（'+Math.max(...secret)+'）'}</div>`;
+                h += `<div style="padding:0.4rem 0.6rem;border-left:4px solid ${t2c?'#5cb878':'#e0556a'};background:rgba(255,255,255,0.03);border-radius:0 0.5rem 0.5rem 0;">任务二：${t2c?'✅正确 '+task2Score+'分':'❌ 正确排序：'+realSorted.join(' > ')}</div>`;
+                h += `<div style="padding:0.4rem 0.6rem;border-left:4px solid ${task3Score===40?'#5cb878':'#e0556a'};background:rgba(255,255,255,0.03);border-radius:0 0.5rem 0.5rem 0;">任务三：${task3Score}分（正确${task3Score/8}/5空）</div>`;
+                const total = task1Score + task2Score + task3Score;
+                h += `<div style="text-align:center;font-size:1.1rem;margin-top:0.3rem;">🌟 总分：<strong>${total}</strong>/100 ${total===100?'🏆 完美！':''}</div>`;
+                finalResult.innerHTML = h;
+            }
+
+            function autoSubmit() {
+                if(gameOver || finalSubmitted) return;
+                if(!task1Locked) { task1Score = task1Attempts>0?Math.max(30-task1Attempts*5,-99):0; task1Locked=true; }
+                if(!task2Locked) { task2Score = task2Attempts>0?Math.max(30-task2Attempts*5,-99):0; task2Locked=true; }
+                let correct3=0;
+                LABELS.forEach(l=>{ if(parseInt(numberInputs[l].value)===secret[LABELS.indexOf(l)]) correct3++; });
+                task3Score = correct3*8;
+                finalSubmitted = true; gameOver = true;
+                revealAll(); updateSidePanel(); showFinalFeedback();
+                sendTaskSubmit(3, correct3===5, task3Score);
+            }
+
+            function startNewGame() {
+                const minv = parseInt(minInput.value), maxv = parseInt(maxInput.value);
+                if(isNaN(minv)||isNaN(maxv)||minv>=maxv) { alert('无效范围'); return; }
+                const nums = randomDistinctNumbers(5, minv, maxv);
+                if(!nums) { alert('范围数字不足5个'); return; }
+                secret = nums;
+                sums = [secret[0]+secret[1], secret[1]+secret[2], secret[2]+secret[3], secret[3]+secret[4], secret[4]+secret[0]];
+                diffIndex=-1; diffValue=0; sumRevealed=[false,false,false,false,false]; selectedMax=null; sortOrder=[];
+                task1Locked=task2Locked=false; task1Attempts=task2Attempts=0; task1Score=task2Score=task3Score=0;
+                gameOver=false; gameStarted=true; finalSubmitted=false; timeRemaining=TOTAL_TIME;
+                stopTimer(); updateTimerDisplay();
+                minInput.disabled=true; maxInput.disabled=true; btnStartGame.textContent='🔄 重新开始';
+                document.querySelectorAll('.max-btn').forEach(b=>b.classList.remove('active'));
+                task1Feedback.textContent=task2Feedback.textContent=''; finalResult.innerHTML='';
+                Object.values(numberInputs).forEach(inp=>{ inp.value=''; inp.disabled=false; });
+                btnReveal.disabled=true; btnSubmitTask1.disabled=false; btnSubmitTask2.disabled=true; btnClearSort.disabled=true;
+                renderCardsAndLines(); updateSortDisplay(); updateCardSelectionUI(); updateSidePanel();
+                timerInterval = setInterval(()=>{ timeRemaining--; updateTimerDisplay(); updateSidePanel(); if(timeRemaining<=0) { stopTimer(); autoSubmit(); } }, 1000);
+            }
+
+            function resetGame() {
+                stopTimer(); gameStarted=false; gameOver=false; task1Locked=task2Locked=false;
+                task1Attempts=task2Attempts=0; task1Score=task2Score=task3Score=0; finalSubmitted=false;
+                secret=[]; diffIndex=-1; sumRevealed=[false,false,false,false,false]; selectedMax=null; sortOrder=[];
+                minInput.disabled=false; maxInput.disabled=false; btnStartGame.textContent='▶ 开始';
+                circleStage.querySelectorAll('.card-node').forEach(c=>c.remove()); linesSvg.innerHTML='';
+                updateSortDisplay(); updateSidePanel();
+            }
+
+            function renderCardsAndLines() {
+                circleStage.querySelectorAll('.card-node').forEach(c=>c.remove());
+                const radius=50, center=50, angles=[-90,-18,54,126,198];
+                for(let i=0;i<5;i++) {
+                    const a = angles[i]*Math.PI/180;
+                    const x = center+radius*Math.cos(a), y = center+radius*Math.sin(a);
+                    const card = document.createElement('div');
+                    card.className='card-node'; card.setAttribute('data-index',i); card.setAttribute('data-label',LABELS[i]);
+                    card.style.left = x+'%'; card.style.top = y+'%';
+                    card.innerHTML = `<div class="card-inner"><div class="card-face card-back"><span class="back-letter">${LABELS[i]}</span></div><div class="card-face card-front"><span class="number">${secret[i]}</span><span style="font-size:0.6rem;">卡片${LABELS[i]}</span></div></div>`;
+                    card.addEventListener('click',()=>onCardClick(i));
+                    circleStage.appendChild(card);
+                }
+                drawLines(angles, radius, center);
+            }
+
+            function drawLines(angles, radius, center) {
+                linesSvg.innerHTML='';
+                for(let i=0;i<5;i++) {
+                    const j = (i+1)%5;
+                    const a1 = angles[i]*Math.PI/180, a2 = angles[j]*Math.PI/180;
+                    const x1 = center+radius*Math.cos(a1), y1 = center+radius*Math.sin(a1);
+                    const x2 = center+radius*Math.cos(a2), y2 = center+radius*Math.sin(a2);
+                    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+                    line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+                    line.setAttribute('stroke','rgba(200,170,120,0.35)'); line.setAttribute('stroke-width','1.1');
+                    linesSvg.appendChild(line);
+                    const mx = (x1+x2)/2, my = (y1+y2)/2;
+                    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+                    g.setAttribute('class','sum-point'); g.setAttribute('data-sum-index',i);
+                    g.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSum(i); });
+                    const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+                    circ.setAttribute('cx',mx); circ.setAttribute('cy',my); circ.setAttribute('r',8);
+                    circ.classList.add('sum-circle'); if(isAdvancedMode && i===diffIndex) circ.classList.add('diff');
+                    g.appendChild(circ);
+                    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+                    txt.setAttribute('x',mx); txt.setAttribute('y',my); txt.setAttribute('class','sum-text'); txt.setAttribute('id','sumText'+i);
+                    updateSumText(txt,i);
+                    g.appendChild(txt); linesSvg.appendChild(g);
+                }
+            }
+
+            function updateSumText(el, idx) {
+                el.innerHTML='';
+                if(isAdvancedMode && idx===diffIndex) {
+                    el.innerHTML = `<tspan class="diff-label">差</tspan><tspan>=${diffValue}</tspan>`;
+                } else {
+                    el.innerHTML = `<tspan>S</tspan><tspan class="subscript">${idx+1}</tspan>${sumRevealed[idx]?`=${sums[idx]}`:''}`;
+                }
+            }
+
+            function toggleSum(i) {
+                if (!gameStarted || gameOver) return;
+                if (isAdvancedMode) {
+                    if (diffIndex === i) { alert('此位置显示差值，不可操作。'); return; }
+                    if (diffIndex !== -1 && sumRevealed[i]) { alert('升级模式：已显示的和不能隐藏。'); return; }
+                    if (diffIndex === -1) {
+                        const revealedCount = sumRevealed.filter(v => v).length;
+                        if (sumRevealed[i]) { alert('升级模式：已显示的和不能隐藏。'); return; }
+                        if (revealedCount < 4) { sumRevealed[i] = true; } else {
+                            diffIndex = i;
+                            const nextIdx = (i + 1) % 5;
+                            diffValue = Math.abs(secret[nextIdx] - secret[i]);
+                            sumRevealed[i] = false;
+                            const el = document.getElementById('sumText' + i);
+                            if (el) updateSumText(el, i);
+                            const circ = document.querySelector(`.sum-point[data-sum-index="${i}"] .sum-circle`);
+                            if (circ) circ.classList.add('diff');
+                            return;
+                        }
+                    } else {
+                        if (sumRevealed[i]) { alert('升级模式：已显示的和不能隐藏。'); return; }
+                        const revealedCount = sumRevealed.filter(v => v).length;
+                        if (revealedCount >= 4) { alert('升级模式：最多只能查看4个和！'); return; }
+                        sumRevealed[i] = true;
+                    }
+                } else { sumRevealed[i] = !sumRevealed[i]; }
+                const el = document.getElementById('sumText' + i);
+                if (el) updateSumText(el, i);
+            }
+            function onCardClick(idx) {
+                if(!gameStarted||gameOver||task2Locked) return;
+                if(!task1Locked) { alert('请先完成任务一！'); return; }
+                const label = LABELS[idx];
+                if(sortOrder.includes(label)) { alert('该卡片已在排序中'); return; }
+                if(sortOrder.length>=5) { alert('排序已满'); return; }
+                if(label === selectedMax) { alert('最大值已在首位'); return; }
+                sortOrder.push(label);
+                updateSortDisplay();
+            }
+            function updateSortDisplay() {
+                let html='';
+                for(let i=0;i<5;i++) html += `<span class="sort-slot">${sortOrder[i]||'?'}</span>${i<4?' <span style="color:#b4945a;">></span> ':''}`;
+                sortDisplay.innerHTML=html;
+            }
+            function updateCardSelectionUI() {
+                circleStage.querySelectorAll('.card-node').forEach(c=>c.classList.toggle('selected-max', c.dataset.label===selectedMax && !gameOver));
+            }
+            function activateTask2() { sortOrder = [selectedMax]; updateSortDisplay(); btnSubmitTask2.disabled=false; btnClearSort.disabled=false; task2Feedback.textContent=''; task2Feedback.className='feedback-inline'; checkRevealBtn(); }
+            function checkRevealBtn() { btnReveal.disabled = !(task1Locked&&task2Locked); }
+
+            // 事件绑定
+            btnLogin.addEventListener('click',()=>{
+                const name = studentNameInput.value.trim();
+                const cls = studentClassSelect.value;
+                if(!name){ nameError.textContent='请输入演示称呼'; return; } else nameError.textContent='';
+                if(!cls){ classError.textContent='请选择班级'; return; } else classError.textContent='';
+                studentName=name; studentClass=cls;
+                welcomeText.textContent=`👋 欢迎 ${studentName} 同学（${studentClass}班）挑战推理！`;
+                loginPage.style.display='none'; gamePage.style.display='flex'; resetGame();
+            });
+            btnLogout.addEventListener('click',()=>{ stopTimer(); loginPage.style.display='flex'; gamePage.style.display='none'; studentNameInput.value=''; studentClassSelect.value=''; nameError.textContent=''; classError.textContent=''; });
+            btnStartGame.addEventListener('click',startNewGame);
+            btnResetGame.addEventListener('click',resetGame);
+            btnAdvancedMode.addEventListener('click',()=>{ isAdvancedMode=!isAdvancedMode; btnAdvancedMode.textContent=isAdvancedMode?'🔄 普通模式':'🚀 游戏升级'; btnAdvancedMode.classList.toggle('btn-advanced',isAdvancedMode); circleStage.classList.toggle('advanced-mode',isAdvancedMode); resetGame(); });
+            maxButtons.addEventListener('click',(e)=>{
+                if(!gameStarted||gameOver||task1Locked) return;
+                if(e.target.classList.contains('max-btn')){
+                    const card = e.target.dataset.card;
+                    selectedMax = selectedMax===card ? null : card;
+                    document.querySelectorAll('.max-btn').forEach(b=>b.classList.remove('active'));
+                    if(selectedMax) e.target.classList.add('active');
+                    updateCardSelectionUI();
+                }
+            });
+            btnSubmitTask1.addEventListener('click',()=>{
+                if(!gameStarted||gameOver||task1Locked) return;
+                if(!selectedMax){ task1Feedback.textContent='请先选择卡片'; task1Feedback.className='feedback-inline incorrect'; return; }
+                task1Attempts++;
+                const realMax = LABELS[secret.indexOf(Math.max(...secret))];
+                const correct = selectedMax===realMax;
+                if(correct){
+                    task1Locked=true;
+                    task1Score = Math.max(30-(task1Attempts-1)*5,-99);
+                    task1Feedback.textContent=`✅ 正确！得分：${task1Score}分`;
+                    task1Feedback.className='feedback-inline correct';
+                    btnSubmitTask1.disabled=true;
+                    activateTask2();
+                } else {
+                    task1Feedback.textContent=`❌ 不对（已提交${task1Attempts}次）`;
+                    task1Feedback.className='feedback-inline incorrect';
+                }
+                updateSidePanel();
+                sendTaskSubmit(1, correct, task1Score);
+            });
+            btnSubmitTask2.addEventListener('click',()=>{
+                if(!gameStarted||gameOver||task2Locked) return;
+                if(!task1Locked) { alert('请先完成任务一'); return; }
+                if(sortOrder.length<5){ alert('请填满5个排序位置'); return; }
+                task2Attempts++;
+                const realSorted = [...secret].sort((a,b)=>b-a).map(n=>LABELS[secret.indexOf(n)]);
+                const correct = sortOrder.join(',') === realSorted.join(',');
+                if(correct){
+                    task2Locked=true;
+                    task2Score = Math.max(30-(task2Attempts-1)*5,-99);
+                    task2Feedback.textContent=`✅ 正确！得分：${task2Score}分`;
+                    task2Feedback.className='feedback-inline correct';
+                    btnSubmitTask2.disabled=true; btnClearSort.disabled=true;
+                } else {
+                    task2Feedback.textContent=`❌ 排序有误（已提交${task2Attempts}次）`;
+                    task2Feedback.className='feedback-inline incorrect';
+                }
+                checkRevealBtn(); updateSidePanel(); sendTaskSubmit(2, correct, task2Score);
+            });
+            btnClearSort.addEventListener('click',()=>{ if(!task2Locked) sortOrder = (task1Locked&&selectedMax)?[selectedMax]:[]; updateSortDisplay(); });
+            btnReveal.addEventListener('click',()=>{
+                if(!gameStarted||gameOver||finalSubmitted) return;
+                if(!task1Locked||!task2Locked){ alert('请先完成任务一和任务二并提交正确！'); return; }
+                const guesses = {};
+                LABELS.forEach(l=>guesses[l]=parseInt(numberInputs[l].value));
+                if(Object.values(guesses).some(v=>isNaN(v))){ alert('请填写所有数字'); return; }
+                stopTimer();
+                let correct3=0;
+                LABELS.forEach(l=>{ if(guesses[l]===secret[LABELS.indexOf(l)]) correct3++; });
+                task3Score = correct3*8;
+                finalSubmitted=true; gameOver=true; btnReveal.disabled=true;
+                revealAll(); updateSidePanel(); showFinalFeedback();
+                sendTaskSubmit(3, correct3===5, task3Score);
+            });
+            testCloudBtn.addEventListener('click', async ()=>{
+                updateCloudStatus('测试', '发送测试中...');
+                try{
+                    const testData = { 测试: true, 姓名: studentName||'匿名', 时间: new Date().toISOString() };
+                    const res = await fetch(QUICKFORM_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(testData) });
+                    if(res.ok) updateCloudStatus('测试', '连接成功 ✅');
+                    else updateCloudStatus('测试', `HTTP ${res.status}`);
+                } catch(e){ updateCloudStatus('测试', '失败 (CORS/网络)'); }
+            });
+            initClassSelect(); resetGame(); updateSidePanel();
+        })();
+    </script>
+
+</body></html>

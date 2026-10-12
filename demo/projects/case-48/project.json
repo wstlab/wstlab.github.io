@@ -1,0 +1,12 @@
+{
+  "id": "case-48",
+  "title": "化学元素消除（前20号元素）",
+  "category": "practice",
+  "description": "元素配对图谱：围绕得分、配对数、操作次数开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "化学"
+  ],
+  "order": 48,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

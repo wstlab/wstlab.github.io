@@ -1,0 +1,12 @@
+{
+  "id": "case-11",
+  "title": "远距离输电 · 电力特工队",
+  "category": "simulation",
+  "description": "电力行动报告：围绕总分、第一阶段、第二阶段开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "物理"
+  ],
+  "order": 11,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "case-25",
+  "title": "课堂签到 · 演示班级",
+  "category": "activities",
+  "description": "使用演示小组和序号完成签到，查看到课记录及参与分布。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 25,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

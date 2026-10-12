@@ -1,0 +1,12 @@
+{
+  "id": "case-47",
+  "title": "DNA 是遗传物质的探索之旅",
+  "category": "exploration",
+  "description": "遗传证据实验册：围绕实验、选择、预测开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "生物"
+  ],
+  "order": 47,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

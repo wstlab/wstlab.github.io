@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":56,"key":"case-56","title":"记录身边的数据 · 在线导学单","category":"observation","description":"身边数据观察簿：围绕观察任务、数值、单位开展交互学习，在数据大屏中回看记录。","headline":"身边数据观察簿","view":"wall","fields":[{"key":"task","label":"观察任务"},{"key":"value","label":"数值"},{"key":"unit","label":"单位"},{"key":"content","label":"记录"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"71JnBlxPHYF"},"mapping":{"hoc08hrvuv":"71JnBlxPHYF"},"accent":"#527b43","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>《记录身边的数据》在线导学单 | 腾蛟实验小学四3班</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f0f7ff;
+            padding: 24px 20px;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* 阶段页面 */
+        .phase {
+            padding: 28px 32px;
+        }
+
+        .phase-hidden {
+            display: none;
+        }
+
+        /* 标题 */
+        .main-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E6F5C, #289672);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: -0.3px;
+        }
+
+        /* 表格样式 */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-table th,
+        .student-table td {
+            padding: 14px 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .student-table th {
+            background-color: #eef2f9;
+            font-weight: 600;
+            color: #1e466e;
+        }
+
+        .student-table tr:hover {
+            background-color: #f8fafd;
+        }
+
+        .enter-btn {
+            background: #2c7da0;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .enter-btn:hover {
+            background: #1f5e7a;
+            transform: scale(0.98);
+        }
+
+        /* 第二阶段头部 */
+        .phase2-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .student-badge {
+            font-size: 1.25rem;
+            background: #e9f4f8;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #0b3b4f;
+        }
+
+        .back-home-btn {
+            background: #f1f3f5;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2c3e50;
+        }
+
+        .back-home-btn:hover {
+            background: #dee2e6;
+        }
+
+        /* 任务卡片 */
+        .task-card {
+            background: #ffffff;
+            border-radius: 28px;
+            margin-bottom: 36px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eef2f9;
+            overflow: hidden;
+        }
+
+        .task-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 18px 24px 8px 24px;
+            color: #1e466e;
+            border-left: 6px solid #289672;
+            background: #fafcff;
+        }
+
+        .split-layout {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .learn-area {
+            flex: 3;
+            padding: 20px 24px;
+            border-right: 1px solid #edf2f7;
+            background: #fefefe;
+        }
+
+        .side-area {
+            flex: 1;
+            padding: 20px 18px;
+            background: #f9fbfe;
+        }
+
+        /* 任务一拖拽区样式 */
+        .drag-images {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .drag-img {
+            width: 22%;
+            min-width: 100px;
+            background: #f8f9fc;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            cursor: grab;
+            transition: 0.1s;
+            border: 2px solid transparent;
+        }
+        .drag-img:active { cursor: grabbing; }
+        .drag-img img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            pointer-events: none;
+        }
+
+        .drop-zones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0 24px;
+        }
+        .drop-box {
+            flex: 1;
+            min-width: 160px;
+            background: #fff9ef;
+            border: 2px dashed #b9c8e0;
+            border-radius: 20px;
+            padding: 16px 8px;
+            text-align: center;
+            transition: all 0.1s;
+            min-height: 130px;
+        }
+        .drop-box p {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c5a7a;
+        }
+        .drop-preview {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #2c7a5e;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            align-items: center;
+        }
+        .drop-preview img {
+            max-width: 48px;
+            max-height: 48px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+        }
+        .wrong-border {
+            background-color: #ffe6e8;
+            border: 2px solid #f07c6e;
+        }
+
+        .submit-btn {
+            background: #2c7da0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        .submit-btn:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .feedback-msg {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* 多选题组样式 */
+        .question-item {
+            background: #ffffff;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 24px;
+            border: 1px solid #e2edf7;
+            transition: 0.1s;
+        }
+        .wrong-question {
+            background-color: #fff0f0;
+            border-left: 6px solid #f56565;
+        }
+        .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 40px;
+        }
+
+        /* 任务三 图片行 */
+        .image-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .clickable-img {
+            width: 23%;
+            min-width: 140px;
+            cursor: pointer;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .clickable-img img {
+            width: 100%;
+            display: block;
+            transition: 0.2s;
+        }
+        .clickable-img:hover {
+            transform: scale(1.02);
+        }
+
+        /* 模态框放大图片 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: white;
+            border: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 6px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            color: #111;
+        }
+
+        /* 任务四图片行 */
+        .weather-imgs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+        }
+        .weather-imgs img {
+            width: 18%;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        hr {
+            margin: 16px 0;
+        }
+        button {
+            cursor: pointer;
+        }
+        @media (max-width: 800px) {
+            .split-layout { flex-direction: column; }
+            .learn-area { border-right: none; }
+            .drag-images .drag-img { width: 45%; }
+            .drop-zones { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    
+    <div id="phase1" class="phase">
+        <div class="main-title">📊 《记录身边的数据》导学单</div>
+        <div style="overflow-x: auto;">
+            <table class="student-table" id="studentTable">
+                <thead>
+                <tr><th>学生号</th><th>姓名</th><th>操作</th></tr>
+                </thead>
+                <tbody id="studentTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div id="phase2" class="phase phase-hidden">
+        <div class="phase2-header">
+            <div class="student-badge" id="currentStudentName">——</div>
+            <button class="back-home-btn" id="backToHomeBtn">🔙 返回重新选择</button>
+        </div>
+
+        
+        <div class="task-card">
+            <div class="task-title">📌 任务一 · 数据类型匹配</div>
+            <div class="split-layout">
+                <div class="learn-area">
+                    <div style="font-weight:500; margin-bottom:12px;">🎯 拖动图片到对应虚线框中，如果拖错可以重新拖入新图片。</div>
+                    <div class="drag-images" id="dragImagesContainer"></div>
+                    <div class="drop-zones" id="dropZonesContainer"></div>
+                    <button class="submit-btn" id="task1SubmitBtn">✅ 提交匹配答案</button>
+                    <div id="task1Feedback" class="feedback-msg"></div>
+                </div>
+                <div class="side-area">
+                    <h4>📝 学生自评</h4>
+                    <p>已掌握数据类型是多种多样的</p>
+                    <div><label><input type="radio" name="selfEval1" value="master"> 我已掌握</label> <label><input type="radio" name="selfEval1" value="not"> 还未掌握</label></div>
+                    <button class="submit-btn" id="selfEval1Btn" style="background:#3b8b5e; margin-top:15px;">📤 提交自评</button>
+                    <div id="self1Status" style="margin-top:8px; font-size:0.8rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="task-card">
+            <div class="task-title">📌 任务二 · 选择合适记录方式</div>
+            <div class="split-layout">
+                <div class="learn-area" id="task2Area">
+                    
+                </div>
+                <div class="side-area">
+                    <h4>📝 学生自评</h4>
+                    <p>已经能够综合运用多种记录方法来记录数据</p>
+                    <div><label><input type="radio" name="selfEval2" value="master"> 我已掌握</label> <label><input type="radio" name="selfEval2" value="not"> 还未掌握</label></div>
+                    <button class="submit-btn" id="selfEval2Btn" style="background:#3b8b5e;">📤 提交自评</button>
+                    <div id="self2Status" style="margin-top:8px;"></div>
+                </div>
+            </div>
+            <div style="padding:0 24px 24px 24px;"><button class="submit-btn" id="task2SubmitBtn" style="width:200px;">📥 提交任务二答案</button><div id="task2Feedback" class="feedback-msg"></div></div>
+        </div>
+
+        
+        <div class="task-card">
+            <div class="task-title">📌 任务三 · 分析记录单组成</div>
+            <div class="split-layout">
+                <div class="learn-area">
+                    <div>📖 请观察四份记录单，分析记录单的组成（点击图片可放大）</div>
+                    <div class="image-row" id="task3ImagesRow"></div>
+                    <div style="margin: 16px 0 8px;"><strong>记录单的组成要素分别是（多选题）</strong> <span style="color:#c44536;">* 多选</span></div>
+                    <div id="task3Options">
+                        <label><input type="checkbox" value="A"> A. 记录主题</label>
+                        <label><input type="checkbox" value="B"> B. 记录者</label>
+                        <label><input type="checkbox" value="C"> C. 记录内容</label>
+                        <label><input type="checkbox" value="D"> D. 数据分析报告</label>
+                    </div>
+                    <button class="submit-btn" id="task3SubmitBtn" style="margin-top:20px;">📌 提交任务三答案</button>
+                    <div id="task3Feedback" class="feedback-msg"></div>
+                </div>
+                <div class="side-area">
+                    <h4>📝 学生自评</h4>
+                    <p>已经了解记录单的基本组成结构</p>
+                    <div><label><input type="radio" name="selfEval3" value="master"> 我已掌握</label> <label><input type="radio" name="selfEval3" value="not"> 还未掌握</label></div>
+                    <button class="submit-btn" id="selfEval3Btn" style="background:#3b8b5e;">📤 提交自评</button>
+                    <div id="self3Status"></div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="task-card">
+            <div class="task-title">📌 任务四 · 天气数据记录单</div>
+            <div class="split-layout">
+                <div class="learn-area">
+                    <div>🌤️ 请在纸质导学单上记录4月14日~4月18日的天气数据，以下为天气图标参考</div>
+                    <div class="weather-imgs" id="weatherImages"></div>
+                </div>
+                <div class="side-area">
+                    <h4>📝 学生自评</h4>
+                    <p>记录数据时记录单结构完整，没有随意篡改数据</p>
+                    <div><label><input type="radio" name="selfEval4" value="master"> 我已掌握</label> <label><input type="radio" name="selfEval4" value="not"> 还未掌握</label></div>
+                    <button class="submit-btn" id="selfEval4Btn" style="background:#3b8b5e;">📤 提交自评</button>
+                    <div id="self4Status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <button class="close-modal" id="closeModalBtn">✕ 关闭</button>
+        <img id="modalImage" src="" alt="放大图">
+    </div>
+</div>
+
+<script>
+    // ---------- 学生名单 (基于excel数据) ----------
+    const students = [];
+    // 前23人 + 备用账号1~27 共50
+    const nameList=Array.from({length:23},(_,i)=>"观察员"+String(i+1).padStart(2,"0"));
+    for(let i=1; i<=23; i++) students.push({id:i, name:nameList[i-1]});
+    for(let i=1; i<=27; i++) students.push({id:23+i, name:`备用账号${i}`});
+    
+    // 图片数据 (任务一)
+    const task1Images = [
+        { id:0, url:"https://img-volc.jianpian.info/56170191/article/20260404/6e7137bfe4984b3d9ddf2939e71fcce3.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp", correctType:"视频数据" },
+        { id:1, url:"https://img-volc.jianpian.info/56170191/article/20260404/bd688c1851a544b9a03b19b47c3b3dec.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp", correctType:"图片数据" },
+        { id:2, url:"https://img-volc.jianpian.info/56170191/article/20260404/65dd05a70bc74181bd88e31255008909.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp", correctType:"文本数据" },
+        { id:3, url:"https://img-volc.jianpian.info/56170191/article/20260404/ca432b7632d84ba4a3a34648d59dcd17.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp", correctType:"音频数据" }
+    ];
+    const dropTypes = ["图片数据","文本数据","视频数据","音频数据"];
+    
+    // 全局状态
+    let currentStudent = "";
+    let task1Submitted = false, task2Submitted = false, task3Submitted = false;
+    let self1Submitted=false, self2Submitted=false, self3Submitted=false, self4Submitted=false;
+    // 存储每个虚线框当前放置的图片对象
+    let dropAssignments = [null, null, null, null]; // 索引对应 dropTypes顺序
+
+    // 辅助: 获取存储键
+    function getStorageKey(student, type) { return `stu_${student}_${type}`; }
+    function loadSubmitState(student) {
+        task1Submitted = localStorage.getItem(getStorageKey(student, "task1_submit")) === "true";
+        task2Submitted = localStorage.getItem(getStorageKey(student, "task2_submit")) === "true";
+        task3Submitted = localStorage.getItem(getStorageKey(student, "task3_submit")) === "true";
+        self1Submitted = localStorage.getItem(getStorageKey(student, "self1_submit")) === "true";
+        self2Submitted = localStorage.getItem(getStorageKey(student, "self2_submit")) === "true";
+        self3Submitted = localStorage.getItem(getStorageKey(student, "self3_submit")) === "true";
+        self4Submitted = localStorage.getItem(getStorageKey(student, "self4_submit")) === "true";
+    }
+    function setSubmitState(student, type, value) { localStorage.setItem(getStorageKey(student, type), value); }
+    
+    // 通用POST
+    async function postData(data) {
+        try {
+            await fetch("https://qf.kjxs.site/api/71JnBlxPHYF", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+        } catch(e) { console.warn("提交失败", e); }
+    }
+
+    // 渲染第一阶段表格
+    function renderPhase1() {
+        const tbody = document.getElementById("studentTableBody");
+        tbody.innerHTML = "";
+        students.forEach(s => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = s.id;
+            row.insertCell(1).innerText = s.name;
+            const btnCell = row.insertCell(2);
+            const btn = document.createElement("button");
+            btn.innerText = "点击进入学习";
+            btn.className = "enter-btn";
+            btn.onclick = () => {
+                localStorage.setItem("selectedStudent", s.name);
+                currentStudent = s.name;
+                loadSubmitState(currentStudent);
+                initPhase2();
+                document.getElementById("phase1").classList.add("phase-hidden");
+                document.getElementById("phase2").classList.remove("phase-hidden");
+            };
+            btnCell.appendChild(btn);
+        });
+    }
+    
+    // 初始化第二阶段全部内容
+    function initPhase2() {
+        document.getElementById("currentStudentName").innerText = currentStudent;
+        // 重置UI任务一拖拽状态
+        resetTask1UI();
+        resetTask2UI();
+        resetTask3UI();
+        resetTask4UI();
+        // 加载自评按钮状态
+        updateSelfEvalUI();
+        // 如果任务已提交过则禁用相应提交按钮
+        if(task1Submitted) disableTask1Submit();
+        if(task2Submitted) disableTask2Submit();
+        if(task3Submitted) disableTask3Submit();
+    }
+
+    function resetTask1UI() {
+        // 重新渲染拖拽图片和放置区
+        const dragDiv = document.getElementById("dragImagesContainer");
+        dragDiv.innerHTML = "";
+        task1Images.forEach((img,idx) => {
+            const div = document.createElement("div");
+            div.className = "drag-img";
+            div.setAttribute("draggable", "true");
+            div.setAttribute("data-img-id", idx);
+            div.innerHTML = `<img src="${img.url}" alt="图片${idx+1}" style="width:100%;">`;
+            div.addEventListener("dragstart", e => {
+                e.dataTransfer.setData("text/plain", idx);
+                e.dataTransfer.effectAllowed = "copy";
+            });
+            dragDiv.appendChild(div);
+        });
+        // 放置区
+        dropAssignments = [null, null, null, null];
+        const zonesDiv = document.getElementById("dropZonesContainer");
+        zonesDiv.innerHTML = "";
+        dropTypes.forEach((type, idx) => {
+            const box = document.createElement("div");
+            box.className = "drop-box";
+            box.setAttribute("data-zone-idx", idx);
+            box.innerHTML = `<p>📁 ${type}</p><div class="drop-preview" id="preview_${idx}"></div>`;
+            box.addEventListener("dragover", e => e.preventDefault());
+            box.addEventListener("drop", e => {
+                e.preventDefault();
+                const imgId = parseInt(e.dataTransfer.getData("text/plain"));
+                const imgObj = task1Images[imgId];
+                if(imgObj) {
+                    dropAssignments[idx] = imgObj;
+                    const previewDiv = document.getElementById(`preview_${idx}`);
+                    previewDiv.innerHTML = `<img src="${imgObj.url}" style="max-width:50px; border-radius:8px;">`;
+                }
+            });
+            zonesDiv.appendChild(box);
+        });
+        document.getElementById("task1Feedback").innerHTML = "";
+        const submitBtn = document.getElementById("task1SubmitBtn");
+        submitBtn.disabled = task1Submitted;
+        if(task1Submitted) submitBtn.innerText = "已提交";
+        else submitBtn.innerText = "✅ 提交匹配答案";
+        // 清除边框红色
+        document.querySelectorAll(".drop-box").forEach(b => b.classList.remove("wrong-border"));
+    }
+    
+    function disableTask1Submit() { 
+        const btn = document.getElementById("task1SubmitBtn");
+        btn.disabled = true;
+        btn.innerText = "已提交";
+    }
+    // 任务一提交逻辑
+    function submitTask1() {
+        if(task1Submitted) { alert("你已经提交过任务一了！"); return; }
+        let score = 0;
+        dropAssignments.forEach((img, idx) => {
+            if(img && img.correctType === dropTypes[idx]) score++;
+        });
+        const allCorrect = (score === 4);
+        const feedbackDiv = document.getElementById("task1Feedback");
+        if(allCorrect) feedbackDiv.innerHTML = "<span style='color:#2b7a4b;'>🎉 恭喜你都答对了！</span>";
+        else feedbackDiv.innerHTML = "<span style='color:#c7362b;'>⚠️ 没有全对，还要继续努力</span>";
+        // 高亮错误虚线框
+        const boxes = document.querySelectorAll(".drop-box");
+        boxes.forEach((box, idx) => {
+            box.classList.remove("wrong-border");
+            if(!(dropAssignments[idx] && dropAssignments[idx].correctType === dropTypes[idx])) {
+                box.classList.add("wrong-border");
+            }
+        });
+        task1Submitted = true;
+        setSubmitState(currentStudent, "task1_submit", "true");
+        disableTask1Submit();
+        // POST数据
+        postData({ studentName: currentStudent, task: "任务一", score: score, correctCount: score, maxScore:4 });
+    }
+    
+    // 任务二动态渲染
+    const task2Questions = [
+        { text:"记录一分钟的跳绳个数，选择的记录方式是（ ）", wrongAnswers:["C","E"], correctAny:["A","B","D"], options:["A.手绘","B.书写","C.拍照","D.录像","E.录音"] },
+        { text:"记录旅途中的风景，选择的记录方式是（ ）", wrongAnswers:["B","E"], correctAny:["A","C","D"], options:["A.手绘","B.书写","C.拍照","D.录像","E.录音"] },
+        { text:"记录英语朗读作业，选择的记录方式是（ ）", wrongAnswers:["A","B","C"], correctAny:["D","E"], options:["A.手绘","B.书写","C.拍照","D.录像","E.录音"] }
+    ];
+    let task2Selections = [[],[],[]];
+    function resetTask2UI() {
+        const container = document.getElementById("task2Area");
+        container.innerHTML = "";
+        task2Questions.forEach((q, idx) => {
+            const div = document.createElement("div");
+            div.className = "question-item";
+            div.id = `q2_${idx}`;
+            div.innerHTML = `<strong>${idx+1}. ${q.text}</strong><div class="option-group" id="opts_${idx}"></div>`;
+            container.appendChild(div);
+            const optsDiv = div.querySelector(`.option-group`);
+            q.options.forEach(opt => {
+                const val = opt.charAt(0);
+                const label = document.createElement("label");
+                label.innerHTML = `<input type="checkbox" value="${val}"> ${opt}`;
+                label.querySelector("input").addEventListener("change", (e) => {
+                    if(task2Submitted) return;
+                    const checked = e.target.checked;
+                    if(checked) task2Selections[idx].push(val);
+                    else task2Selections[idx] = task2Selections[idx].filter(v=>v!==val);
+                });
+                optsDiv.appendChild(label);
+            });
+            div.classList.remove("wrong-question");
+        });
+        document.getElementById("task2Feedback").innerHTML = "";
+        const btn = document.getElementById("task2SubmitBtn");
+        btn.disabled = task2Submitted;
+        if(task2Submitted) btn.innerText = "已提交";
+        else btn.innerText = "📥 提交任务二答案";
+        task2Selections = [[],[],[]];
+    }
+    function submitTask2() {
+        if(task2Submitted) return alert("任务二已提交过！");
+        let totalScore = 0;
+        let wrongFlags = [false, false, false];
+        for(let i=0;i<task2Questions.length;i++) {
+            const q = task2Questions[i];
+            const selected = task2Selections[i];
+            const hasWrong = selected.some(v => q.wrongAnswers.includes(v));
+            const hasCorrect = selected.some(v => q.correctAny.includes(v));
+            if(!hasWrong && hasCorrect && selected.length>0) totalScore++;
+            else wrongFlags[i] = true;
+        }
+        let feedback = "";
+        for(let i=0;i<task2Questions.length;i++) {
+            const qDiv = document.getElementById(`q2_${i}`);
+            if(wrongFlags[i]) {
+                qDiv.classList.add("wrong-question");
+                feedback += `第${i+1}题选到了错误的记录方式哦；`;
+            } else {
+                qDiv.classList.remove("wrong-question");
+                feedback += `第${i+1}题恭喜你选对了正确的记录方法；`;
+            }
+        }
+        document.getElementById("task2Feedback").innerHTML = `<span style="color:#2b6e4f;">📢 ${feedback}</span>`;
+        task2Submitted = true;
+        setSubmitState(currentStudent, "task2_submit", "true");
+        document.getElementById("task2SubmitBtn").disabled = true;
+        document.getElementById("task2SubmitBtn").innerText = "已提交";
+        postData({ studentName: currentStudent, task: "任务二", score: totalScore, details: task2Selections });
+    }
+    function disableTask2Submit() { document.getElementById("task2SubmitBtn").disabled=true; document.getElementById("task2SubmitBtn").innerText="已提交";}
+    
+    // 任务三
+    const task3Images = [
+        "https://img-volc.jianpian.info/56170191/article/20260407/a51305d9e4ca463b905065e6606faaaf.jpg~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260407/b7e70bcdb5fc4561b6535fe5a67882d7.jpg~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260407/4d030064aaa9454ba727bf4d942da106.jpg~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260407/19c99892181040a4a12bf36df464b7ec.jpg~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp"
+    ];
+    function resetTask3UI() {
+        const row = document.getElementById("task3ImagesRow");
+        row.innerHTML = "";
+        task3Images.forEach((url,idx) => {
+            const div = document.createElement("div");
+            div.className = "clickable-img";
+            div.innerHTML = `<img src="${url}" alt="记录单${idx+1}">`;
+            div.onclick = () => { openModal(url); };
+            row.appendChild(div);
+        });
+        document.querySelectorAll("#task3Options input").forEach(cb => cb.checked = false);
+        document.getElementById("task3Feedback").innerHTML = "";
+        const btn = document.getElementById("task3SubmitBtn");
+        btn.disabled = task3Submitted;
+        btn.innerText = task3Submitted ? "已提交" : "📌 提交任务三答案";
+        document.getElementById("task3Options").classList.remove("wrong-border");
+    }
+    function submitTask3() {
+        if(task3Submitted) return alert("任务三已经提交过了");
+        const selected = Array.from(document.querySelectorAll("#task3Options input:checked")).map(cb=>cb.value);
+        const correctSet = ["A","B","C"];
+        const isCorrect = selected.length===3 && selected.every(v=>correctSet.includes(v)) && !selected.includes("D");
+        const feedbackDiv = document.getElementById("task3Feedback");
+        if(isCorrect) feedbackDiv.innerHTML = "<span style='color:green'>🎉 恭喜你知道了记录单的组成！</span>";
+        else {
+            feedbackDiv.innerHTML = "<span style='color:#c7362b'>❌ 答错啦，再仔细看一下记录单哦</span>";
+            document.getElementById("task3Options").classList.add("wrong-border");
+        }
+        task3Submitted = true;
+        setSubmitState(currentStudent, "task3_submit", "true");
+        document.getElementById("task3SubmitBtn").disabled = true;
+        document.getElementById("task3SubmitBtn").innerText = "已提交";
+        postData({ studentName: currentStudent, task: "任务三", score: isCorrect?1:0, selected });
+    }
+    function disableTask3Submit(){}
+    
+    // 任务四图片
+    const weatherImgs = [
+        "https://img-volc.jianpian.info/56170191/article/20260405/40f50d3afd624b2d9eae0c08a7be03b7.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260405/eda9410e823c4a5d88a6d130c33cc635.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260405/8a59caca8f1a4019950f7c5ac1c75020.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260405/8abe3d0dea964599872a86efc1524f04.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp",
+        "https://img-volc.jianpian.info/56170191/article/20260405/b81bccfffb55420babb5530a2a7d6829.png~tplv-flrovnc8r8-s2-cC-q:0:0:0:0:q80.webp"
+    ];
+    function resetTask4UI() { 
+        const container = document.getElementById("weatherImages");
+        container.innerHTML = weatherImgs.map(url => `<img src="${url}" alt="天气">`).join("");
+    }
+    
+    // 自评提交通用函数
+    function setupSelfEval(btnId, radioName, taskName, storageSuffix, statusDivId) {
+        const btn = document.getElementById(btnId);
+        const statusDiv = document.getElementById(statusDivId);
+        const isSubmitted = (storageSuffix === "self1" && self1Submitted) || (storageSuffix === "self2" && self2Submitted) || (storageSuffix === "self3" && self3Submitted) || (storageSuffix === "self4" && self4Submitted);
+        if(isSubmitted) { btn.disabled = true; btn.innerText = "已提交"; if(statusDiv) statusDiv.innerText = "已提交自评"; }
+        btn.onclick = () => {
+            let submittedFlag = false;
+            if(storageSuffix === "self1") submittedFlag = self1Submitted;
+            if(storageSuffix === "self2") submittedFlag = self2Submitted;
+            if(storageSuffix === "self3") submittedFlag = self3Submitted;
+            if(storageSuffix === "self4") submittedFlag = self4Submitted;
+            if(submittedFlag) { alert("您已经自评过了！"); return; }
+            const radios = document.getElementsByName(radioName);
+            let selectedVal = null;
+            for(let r of radios) if(r.checked) selectedVal = r.value;
+            if(!selectedVal) { alert("请先完成自评选项"); return; }
+            postData({ studentName: currentStudent, task: taskName, selfEvaluation: selectedVal });
+            if(storageSuffix === "self1") { self1Submitted=true; setSubmitState(currentStudent,"self1_submit","true"); }
+            if(storageSuffix === "self2") { self2Submitted=true; setSubmitState(currentStudent,"self2_submit","true"); }
+            if(storageSuffix === "self3") { self3Submitted=true; setSubmitState(currentStudent,"self3_submit","true"); }
+            if(storageSuffix === "self4") { self4Submitted=true; setSubmitState(currentStudent,"self4_submit","true"); }
+            btn.disabled = true; btn.innerText = "已提交";
+            if(statusDiv) statusDiv.innerText = "✓ 已提交自评";
+            // 隐藏选项区
+            const parent = btn.parentNode;
+            const radiosDiv = parent.querySelector(`div:has(input[name="${radioName}"])`);
+            if(radiosDiv) radiosDiv.style.display = "none";
+        };
+    }
+    function updateSelfEvalUI() {
+        setupSelfEval("selfEval1Btn", "selfEval1", "任务一自评", "self1", "self1Status");
+        setupSelfEval("selfEval2Btn", "selfEval2", "任务二自评", "self2", "self2Status");
+        setupSelfEval("selfEval3Btn", "selfEval3", "任务三自评", "self3", "self3Status");
+        setupSelfEval("selfEval4Btn", "selfEval4", "任务四自评", "self4", "self4Status");
+    }
+    
+    // 模态框
+    function openModal(src) { const modal=document.getElementById("imageModal"); document.getElementById("modalImage").src=src; modal.style.display="flex"; }
+    document.getElementById("closeModalBtn").onclick = () => document.getElementById("imageModal").style.display="none";
+    window.onclick = (e) => { if(e.target === document.getElementById("imageModal")) document.getElementById("imageModal").style.display="none"; };
+    
+    // 返回首页逻辑
+    document.getElementById("backToHomeBtn").onclick = () => {
+        document.getElementById("phase2").classList.add("phase-hidden");
+        document.getElementById("phase1").classList.remove("phase-hidden");
+    };
+    // 事件绑定
+    document.getElementById("task1SubmitBtn").addEventListener("click", submitTask1);
+    document.getElementById("task2SubmitBtn").addEventListener("click", submitTask2);
+    document.getElementById("task3SubmitBtn").addEventListener("click", submitTask3);
+    
+    renderPhase1();
+    // 预加载重置
+    if(localStorage.getItem("selectedStudent")) currentStudent = localStorage.getItem("selectedStudent");
+    else currentStudent = "";
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":7,"key":"case-07","title":"巧算24点","category":"practice","description":"用四则运算挑战24点，保留多次尝试与竞赛过程，比较不同解法。","headline":"24点解法研究","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"correctCount","label":"正确题数"},{"key":"totalTime","label":"用时"},{"key":"expression","label":"运算表达式"}],"upload":"","rebuilt":false,"configIds":["e4x91r8wjq"],"pages":[{"file":"ppt.html","title":"同题多解 · PPT教学版"},{"file":"ppt-dashboard.html","title":"同题多解 · 数据分析"},{"file":"index.html","title":"竞赛练习 · 进阶版"},{"file":"lesson-2.html","title":"规则讲解课件"}],"tasks":{"records":"3R1MoMlX7OB","config-e4x91r8wjq":"Dh0DyVuVtKX"},"mapping":{"e4x91r8wjq":"Dh0DyVuVtKX","xpmozn8xui":"3R1MoMlX7OB","kvn2uastxj":"3R1MoMlX7OB"},"accent":"#4468ab","capture":false,"lesson":"PPT同题多解"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生24点答题情况分析 · 实时数据</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f4f9ff;
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+        header {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0b3954;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge {
+            background: #d4e3fd;
+            color: #103f5e;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .refresh-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 8px 18px 8px 24px;
+            border-radius: 60px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+            border: 1px solid #cde0ed;
+        }
+        .api-url {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #1f6899;
+            background: #e3f0fd;
+            padding: 5px 12px;
+            border-radius: 60px;
+        }
+        .refresh-btn {
+            background: #1b6b9e;
+            border: none;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+            border: 1px solid #105a88;
+        }
+        .refresh-btn:hover {
+            background: #0e4f79;
+            transform: scale(1.02);
+        }
+        .refresh-btn:active {
+            background: #083b59;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 48px;
+            padding: 50px 20px;
+            margin: 20px 0;
+            color: #1f5880;
+            font-size: 1.2rem;
+            gap: 20px;
+            border: 1px solid #bdd2e6;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #cfe2f5;
+            border-top: 5px solid #1976a5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error-box {
+            background: #ffefef;
+            border: 1px solid #ffb5b5;
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            color: #a12b2b;
+            margin: 20px 0;
+        }
+        .stats-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            background: white;
+            padding: 20px 28px;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px rgba(0,20,40,0.04);
+            margin: 25px 0 30px 0;
+            border: 1px solid #dde9f2;
+        }
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .stat-label {
+            font-weight: 500;
+            color: #3f607d;
+            font-size: 0.95rem;
+        }
+        .stat-number {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #003f5f;
+            line-height: 1.2;
+        }
+        .student-section {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 10px 30px rgba(0,30,50,0.05);
+            padding: 28px 24px;
+            margin-bottom: 40px;
+            border: 1px solid #e2eef9;
+            transition: box-shadow 0.2s;
+        }
+        .student-section:hover {
+            box-shadow: 0 16px 36px rgba(0,45,70,0.08);
+        }
+        .student-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            border-bottom: 2px dashed #bdd8ea;
+            padding-bottom: 16px;
+        }
+        .student-name {
+            font-size: 1.9rem;
+            font-weight: 650;
+            color: #0a3144;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+        .student-meta {
+            background: #e5f0f9;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            color: #1a4b6d;
+            font-weight: 500;
+            display: flex;
+            gap: 20px;
+        }
+        .puzzle-grid {
+            overflow-x: auto;
+            border-radius: 24px;
+            border: 1px solid #cde0ed;
+            background: #fbfeff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 600px;
+        }
+        th {
+            background: #dcebf5;
+            color: #113e57;
+            font-weight: 600;
+            padding: 18px 12px;
+            white-space: nowrap;
+            font-size: 0.95rem;
+            text-align: center;
+            border-bottom: 2px solid #b1cee4;
+        }
+        td {
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 1px solid #d2e3f0;
+            background-color: white;
+            vertical-align: middle;
+        }
+        .puzzle-numbers {
+            font-weight: 600;
+            color: #0b4b6b;
+            background: #e2f0fa;
+            border-radius: 40px;
+            padding: 6px 0;
+            display: inline-block;
+            width: 140px;
+            text-align: center;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        .stats-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .attempts {
+            font-weight: 650;
+            font-size: 1.3rem;
+            color: #003153;
+        }
+        .correct-badge {
+            background: #c1f0db;
+            color: #006b47;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            display: inline-block;
+            min-width: 70px;
+        }
+        .no-correct {
+            background: #f1e3e8;
+            color: #a14a6b;
+        }
+        .skip-indicator {
+            color: #8c9aa8;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .skip-indicator span {
+            background: #e9eef3;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            color: #57758c;
+            font-size: 0.9rem;
+        }
+        .time-tag {
+            background: white;
+            border-radius: 40px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            color: #2c607b;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>
+                🧮 24点答题动态分析
+                <span class="badge">实时获取</span>
+            </h1>
+            <div class="api-url">🔗 https://qf.kjxs.site/api/3R1MoMlX7OB/all</div>
+        </div>
+        <div class="refresh-area">
+            <span class="time-tag" id="update-time">刚刚</span>
+            <button class="refresh-btn" id="refreshButton">⟳ 刷新数据</button>
+        </div>
+    </header>
+
+    <!-- 动态内容容器 -->
+    <div id="analysis-root">
+        <div class="loading">
+            <div class="spinner"></div>
+            <div>正在从服务器获取最新答题数据...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const esc=CaseFlow.escape;
+        const API_URL = 'https://qf.kjxs.site/api/3R1MoMlX7OB/all';
+        const root = document.getElementById('analysis-root');
+        const refreshBtn = document.getElementById('refreshButton');
+        const timeSpan = document.getElementById('update-time');
+
+        // 核心处理函数：将API数据转换为分析结构
+        function processApiData(apiData) {
+            if (!apiData || !apiData.submissions || !Array.isArray(apiData.submissions)) {
+                throw new Error('API返回格式异常，缺少submissions数组');
+            }
+
+            const rawStudents = apiData.submissions.filter(s => s.lesson === "PPT同题多解" && !s.verification && Array.isArray(s.submissions)).map(s => ({
+                ...s,
+                displayName: s.studentName || '匿名',
+            }));
+
+            const processedStudents = rawStudents.map(studentRaw => {
+                const submissionList = studentRaw.submissions || [];
+                const puzzleMap = new Map(); // key: 排序后数字组合
+
+                for (let sub of submissionList) {
+                    if (!sub.puzzle || !Array.isArray(sub.puzzle)) continue;
+                    // 统一用排序后的数字作为题目唯一标识 (24点题目由数字组合决定)
+                    const sortedKey = [...sub.puzzle].sort((a,b)=>a-b).join(',');
+                    
+                    if (!puzzleMap.has(sortedKey)) {
+                        puzzleMap.set(sortedKey, {
+                            puzzle: sub.puzzle, // 保留原始顺序用于显示
+                            totalAttempts: 0,
+                            correctCount: 0,
+                            skipCount: 0,
+                        });
+                    }
+                    const record = puzzleMap.get(sortedKey);
+                    
+                    // 提交次数只统计 type='submit' 且 action 为 correct/incorrect (即真正提交了答案)
+                    if (sub.type === 'submit' && (sub.action === 'correct' || sub.action === 'incorrect')) {
+                        record.totalAttempts += 1;
+                        if (sub.isCorrect === true) {
+                            record.correctCount += 1;
+                        }
+                    } else if (sub.type === 'skip' || sub.action === 'skip') {
+                        record.skipCount += 1;
+                    }
+                }
+
+                const puzzleStats = Array.from(puzzleMap.values()).map(p => ({
+                    ...p,
+                    puzzleDisplay: p.puzzle.join(', '),
+                })).sort((a,b) => a.puzzleDisplay.localeCompare(b.puzzleDisplay));
+
+                return {
+                    originalName: studentRaw.studentName,
+                    displayName: studentRaw.studentName + (studentRaw.submitted_at ? ` (${new Date(studentRaw.submitted_at).toLocaleString('zh-CN',{hour12:false, timeZone: 'Asia/Shanghai'})})` : ''),
+                    submitted_at: studentRaw.submitted_at,
+                    puzzleStats,
+                    totalCorrect: puzzleStats.reduce((acc, p) => acc + p.correctCount, 0),
+                    totalAttemptsSum: puzzleStats.reduce((acc, p) => acc + p.totalAttempts, 0),
+                };
+            });
+
+            return {
+                students: processedStudents,
+                totalStudents: processedStudents.length,
+                totalSubmissionsRaw: apiData.submissions.length,
+                taskTitle: apiData.task_title || '24点游戏',
+                note: apiData.note || '',
+            };
+        }
+
+        // 渲染HTML
+        function renderDashboard(container, data) {
+            const { students, totalStudents, taskTitle, note } = data;
+            
+            if (!students.length) {
+                container.innerHTML = `<div class="student-section" style="text-align:center;padding:50px;">📭 暂无学生答题数据</div>`;
+                return;
+            }
+
+            const totalCorrectAll = students.reduce((acc, s) => acc + s.totalCorrect, 0);
+            const totalAttemptsAll = students.reduce((acc, s) => acc + s.totalAttemptsSum, 0);
+            const totalPuzzleCount = students.reduce((acc, s) => acc + s.puzzleStats.length, 0);
+
+            let html = `
+                <div class="stats-summary">
+                    <div class="stat-item"><span class="stat-label">📋 任务</span><span class="stat-number">${esc(taskTitle)}</span></div>
+                    <div class="stat-item"><span class="stat-label">👥 学生答题记录</span><span class="stat-number">${totalStudents}</span></div>
+                    <div class="stat-item"><span class="stat-label">✅ 总正确次数</span><span class="stat-number">${totalCorrectAll}</span></div>
+                    <div class="stat-item"><span class="stat-label">📝 总提交次数</span><span class="stat-number">${totalAttemptsAll}</span></div>
+                    <div class="stat-item"><span class="stat-label">🧩 涉及题目数</span><span class="stat-number">${totalPuzzleCount}</span></div>
+                </div>
+            `;
+
+            students.forEach(student => {
+                const puzzleRows = student.puzzleStats.map(p => {
+                    const skipText = p.skipCount > 0 ? `<span class="skip-indicator"><span>⏭️ 跳过 ${p.skipCount}</span></span>` : '';
+                    const correctBadgeClass = p.correctCount > 0 ? 'correct-badge' : 'correct-badge no-correct';
+                    const correctText = p.correctCount > 0 ? `${p.correctCount} 次` : '0 次';
+
+                    return `<tr>
+                        <td><span class="puzzle-numbers">[ ${esc(p.puzzleDisplay)} ]</span></td>
+                        <td><div class="stats-badge"><span class="attempts">${p.totalAttempts}</span> 次提交</div></td>
+                        <td><div class="stats-badge"><span class="${correctBadgeClass}">✅ ${correctText}</span> ${skipText}</div></td>
+                    </tr>`;
+                }).join('');
+
+                html += `
+                    <div class="student-section">
+                        <div class="student-header">
+                            <span class="student-name">🧑‍🎓 ${esc(student.displayName)}</span>
+                            <div class="student-meta">
+                                <span>📅 ${esc(student.submitted_at ? student.submitted_at.split('T')[0] : '时间未知')}</span>
+                                <span>✅ 正确 ${student.totalCorrect}</span>
+                                <span>📤 提交 ${student.totalAttemptsSum}</span>
+                            </div>
+                        </div>
+                        <div class="puzzle-grid">
+                            <table>
+                                <thead>
+                                    <tr><th>题目 (四张牌)</th><th>提交次数 (不正确+正确)</th><th>正确次数 / 跳过</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${puzzleRows || '<tr><td colspan="3" style="text-align:center; padding:30px;">无题目记录</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `<div class="footer-note">🔍 实时数据 · 服务器备注：${esc(note)} · 页面刷新于 ${new Date().toLocaleString()}</div>`;
+            container.innerHTML = html;
+        }
+
+        // 加载数据并更新界面
+        async function fetchAndRender() {
+            root.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>正在连接服务器获取最新数据...</div>
+                </div>
+            `;
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+
+                const response = await fetch(API_URL, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! 状态码: ${response.status}`);
+                }
+
+                const apiData = await response.json();
+                const processed = processApiData(apiData);
+                renderDashboard(root, processed);
+
+                // 更新刷新时间标记
+                const now = new Date();
+                timeSpan.textContent = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            } catch (error) {
+                console.error('获取数据失败:', error);
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = '请求超时，服务器响应过慢。';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '无法连接到服务器，请检查网络或API地址是否可访问。';
+                }
+
+                root.innerHTML = `
+                    <div class="error-box">
+                        <div style="font-size: 2.5rem; margin-bottom: 16px;">⚠️</div>
+                        <h2 style="margin:0 0 12px; font-weight:500;">加载失败</h2>
+                        <p style="margin:0 0 24px; color:#b13b3b;">${errorMessage}</p>
+                        <button class="refresh-btn" id="retryBtn" style="background: #a04646; border-color:#803a3a;">🔄 点击重试</button>
+                    </div>
+                `;
+                // 重新绑定重试按钮
+                document.getElementById('retryBtn')?.addEventListener('click', () => {
+                    fetchAndRender();
+                });
+            }
+        }
+
+        // 初次加载
+        fetchAndRender();
+
+        // 刷新按钮事件
+        refreshBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetchAndRender();
+        });
+    })();
+</script>
+</body>
+</html>

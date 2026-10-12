@@ -1,0 +1,12 @@
+{
+  "id": "case-13",
+  "title": "正方形拼接周长探索工具",
+  "category": "exploration",
+  "description": "拼摆与周长实验册：围绕正方形数、重合边、周长开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学"
+  ],
+  "order": 13,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

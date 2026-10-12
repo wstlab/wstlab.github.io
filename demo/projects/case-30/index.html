@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":30,"key":"case-30","title":"地理 · 地形图标记","category":"creation","description":"地形标注画廊：围绕说明、标记、创作者开展交互学习，在数据大屏中回看记录。","headline":"地形标注画廊","view":"gallery","fields":[{"key":"description","label":"说明"},{"key":"markers","label":"标记"},{"key":"name","label":"创作者"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"打开"}],"tasks":{"records":"BzPzZ5X2ZSX"},"mapping":{"b17il2w2tu":"BzPzZ5X2ZSX"},"accent":"#916749","capture":false,"lesson":"打开"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>分区界线绘制 + 拖写文字 + 提交</title>
+
+<style>
+  body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#0b132b;color:#fff;}
+  header{padding:12px 20px;background:#111;font-size:18px;}
+  .wrap{display:grid;grid-template-columns:360px 1fr;gap:10px;padding:10px;}
+  .card{background:#1c2541;border-radius:10px;padding:10px;}
+  .row{margin-bottom:10px;}
+  label{display:block;margin-bottom:6px;opacity:.9;font-size:13px;}
+  select,input{width:100%;padding:6px;box-sizing:border-box;border-radius:8px;border:0;}
+  button{
+    padding:9px;margin-top:6px;cursor:pointer;width:100%;
+    box-sizing:border-box;border:0;border-radius:8px;background:#2e4a7d;color:#fff;
+  }
+  button:hover{opacity:0.95;}
+  button:active{transform:translateY(1px);}
+  hr{border:0;border-top:1px solid rgba(255,255,255,0.15);margin:12px 0;}
+  .canvasWrap{position:relative;width:100%;max-width:1100px;margin:auto;}
+  canvas{position:absolute;left:0;top:0;width:100%;}
+  #base{z-index:1}
+  #draw{z-index:2}
+  #statusBox{
+    margin-top:10px;padding:10px;background:rgba(0,0,0,0.25);
+    border-radius:10px;font-size:13px;line-height:1.5;word-break:break-all;min-height:44px;
+  }
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;margin-right:6px;background:rgba(255,255,255,0.12);}
+  .hint{font-size:12px;opacity:0.85;line-height:1.5;margin-top:6px;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+</style>
+<style>@media(max-width:640px){.layout,.row,.wrap{display:flex!important;flex-direction:column!important;min-width:0!important}.card{width:100%!important;min-width:0!important;max-width:100%!important}}</style></head>
+
+<body>
+<header>在地形图上画分区界线 + 拖写文字 + 提交</header>
+
+<div class="wrap">
+  <div class="card">
+    <div class="two">
+      <div class="row">
+        <label>班级（必填）</label>
+        <input type="text" id="className" placeholder="如：六(1)班" />
+      </div>
+      <div class="row">
+        <label>学号（必填）</label>
+        <input type="text" id="studentNo" placeholder="如：20260123" />
+      </div>
+    </div>
+
+    <div class="row">
+      <label>姓名（必填）</label>
+      <input type="text" id="studentName" placeholder="如：张三" />
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <label>模式</label>
+      <select id="mode">
+        <option value="pen">画线</option>
+        <option value="eraser">橡皮</option>
+        <option value="text-drag">拖写文字</option>
+      </select>
+      <div class="hint">选择“拖写文字”后，按住鼠标拖动即可沿路径反复写字。</div>
+    </div>
+
+    <div class="row">
+      <label>颜色</label>
+      <input type="color" id="color" value="#ff0000">
+    </div>
+
+    <div class="row">
+      <label>粗细（画线/橡皮）</label>
+      <input type="range" id="size" min="2" max="30" value="6">
+    </div>
+
+    <div class="row">
+      <label>字号（拖写文字）</label>
+      <input type="range" id="fontSize" min="12" max="48" value="22">
+    </div>
+
+    <div class="row">
+      <label>拖写文字内容</label>
+      <input type="text" id="dragText" value="南方地区" />
+    </div>
+
+    <div class="row">
+      <label>文字间距（越大越稀疏）</label>
+      <input type="range" id="dragSpacing" min="10" max="120" value="40">
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <label>提交图片压缩（解决“提交不出去”的常见原因：payload太大）</label>
+      <div class="two">
+        <div>
+          <label style="margin-top:0;">最大宽度（像素）</label>
+          <input type="number" id="maxWidth" value="1400" min="600" max="4000" />
+        </div>
+        <div>
+          <label style="margin-top:0;">JPEG质量(0~1)</label>
+          <input type="number" id="jpegQuality" value="0.7" step="0.05" min="0.3" max="0.95" />
+        </div>
+      </div>
+      <div class="hint">建议：最大宽度 1200~1600，质量 0.6~0.8。PNG 会很大，容易被接口拒绝。</div>
+    </div>
+
+    <button id="btnUndo">撤销</button>
+    <button id="btnRedo">重做</button>
+    <button id="btnClear">清空</button>
+
+    <hr>
+
+    <button id="btnSave">保存图片</button>
+    <button id="btnSubmit" style="background:#1f8a5b;">提交（POST JSON 到 QuickForm）</button>
+
+    <div id="statusBox"><span class="badge">状态</span>未提交</div>
+  </div>
+
+  <div class="card">
+    <div class="canvasWrap" id="canvasWrap">
+      <canvas id="base"></canvas>
+      <canvas id="draw"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+/** ✅ 底图文件名（与HTML同目录） */
+const IMAGE_SRC = "地形图.jpg";
+/** ✅ QuickForm 提交地址 */
+const SUBMIT_URL = "https://qf.kjxs.site/api/BzPzZ5X2ZSX";
+
+const baseCanvas = document.getElementById("base");
+const drawCanvas = document.getElementById("draw");
+const baseCtx = baseCanvas.getContext("2d");
+const drawCtx = drawCanvas.getContext("2d");
+
+const modeEl = document.getElementById("mode");
+const colorEl = document.getElementById("color");
+const sizeEl = document.getElementById("size");
+const fontSizeEl = document.getElementById("fontSize");
+const dragTextEl = document.getElementById("dragText");
+const dragSpacingEl = document.getElementById("dragSpacing");
+
+const classNameEl = document.getElementById("className");
+const studentNoEl = document.getElementById("studentNo");
+const studentNameEl = document.getElementById("studentName");
+
+const maxWidthEl = document.getElementById("maxWidth");
+const jpegQualityEl = document.getElementById("jpegQuality");
+
+const btnUndo = document.getElementById("btnUndo");
+const btnRedo = document.getElementById("btnRedo");
+const btnClear = document.getElementById("btnClear");
+const btnSave = document.getElementById("btnSave");
+const btnSubmit = document.getElementById("btnSubmit");
+const statusBox = document.getElementById("statusBox");
+
+const img = new Image();
+img.src = IMAGE_SRC;
+
+let undoStack = [];
+let redoStack = [];
+
+function setStatus(type, msg, extra){
+  const badge = type === "ok" ? "成功" : type === "err" ? "失败" : "状态";
+  const line1 = `<span class="badge">${badge}</span>${msg || ""}`;
+  const line2 = extra ? `<div style="margin-top:6px;opacity:0.9;">${extra}</div>` : "";
+  statusBox.innerHTML = line1 + line2;
+}
+
+function snapshot(){
+  undoStack.push(drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+  redoStack = [];
+}
+function undo(){
+  if(!undoStack.length) return;
+  redoStack.push(drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+  drawCtx.putImageData(undoStack.pop(),0,0);
+}
+function redo(){
+  if(!redoStack.length) return;
+  undoStack.push(drawCtx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+  drawCtx.putImageData(redoStack.pop(),0,0);
+}
+btnUndo.onclick = undo;
+btnRedo.onclick = redo;
+
+btnClear.onclick = ()=>{
+  snapshot();
+  drawCtx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+};
+
+function fit(){
+  const w = img.width, h = img.height;
+  baseCanvas.width = w; baseCanvas.height = h;
+  drawCanvas.width = w; drawCanvas.height = h;
+  baseCtx.clearRect(0,0,w,h);
+  baseCtx.drawImage(img,0,0);
+}
+img.onload = fit;
+
+/** ✅ 修复“鼠标位置与落笔位置不一致”（关键：CSS缩放后的坐标映射） */
+function getPoint(e){
+  const r = drawCanvas.getBoundingClientRect();
+  const scaleX = drawCanvas.width / r.width;
+  const scaleY = drawCanvas.height / r.height;
+  return {
+    x: (e.clientX - r.left) * scaleX,
+    y: (e.clientY - r.top) * scaleY
+  };
+}
+function dist(a,b){
+  const dx=a.x-b.x, dy=a.y-b.y;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+let drawing=false;
+let lastStampPoint=null;
+let carryDist=0;
+
+function stampTextAt(p){
+  const text=(dragTextEl.value||"").trim();
+  if(!text) return;
+  drawCtx.globalCompositeOperation="source-over";
+  drawCtx.fillStyle=colorEl.value;
+  drawCtx.font=`${Number(fontSizeEl.value)}px Microsoft YaHei`;
+  drawCtx.textBaseline="middle";
+  drawCtx.textAlign="left";
+  drawCtx.fillText(text,p.x,p.y);
+}
+
+drawCanvas.onpointerdown=(e)=>{
+  snapshot();
+  drawing=true;
+  const p=getPoint(e);
+
+  if(modeEl.value==="pen" || modeEl.value==="eraser"){
+    drawCtx.beginPath();
+    drawCtx.moveTo(p.x,p.y);
+    return;
+  }
+  if(modeEl.value==="text-drag"){
+    lastStampPoint=p;
+    carryDist=0;
+    stampTextAt(p);
+    return;
+  }
+};
+
+drawCanvas.onpointermove=(e)=>{
+  if(!drawing) return;
+  const p=getPoint(e);
+
+  if(modeEl.value==="pen" || modeEl.value==="eraser"){
+    drawCtx.strokeStyle=colorEl.value;
+    drawCtx.lineWidth=Number(sizeEl.value);
+    drawCtx.lineCap="round";
+    drawCtx.lineJoin="round";
+    drawCtx.globalCompositeOperation=(modeEl.value==="eraser") ? "destination-out" : "source-over";
+    drawCtx.lineTo(p.x,p.y);
+    drawCtx.stroke();
+    return;
+  }
+
+  if(modeEl.value==="text-drag"){
+    const spacing=Number(dragSpacingEl.value)||40;
+    if(!lastStampPoint){ lastStampPoint=p; stampTextAt(p); return; }
+    carryDist += dist(lastStampPoint,p);
+    if(carryDist >= spacing){
+      stampTextAt(p);
+      carryDist = 0;
+    }
+    lastStampPoint=p;
+    return;
+  }
+};
+
+drawCanvas.onpointerup=()=>{
+  drawing=false;
+  lastStampPoint=null;
+  carryDist=0;
+  drawCtx.closePath();
+  drawCtx.globalCompositeOperation="source-over";
+};
+
+/** 合成底图+标注层 */
+function composeCanvas(){
+  const out=document.createElement("canvas");
+  out.width=baseCanvas.width;
+  out.height=baseCanvas.height;
+  const ctx=out.getContext("2d");
+  ctx.drawImage(baseCanvas,0,0);
+  ctx.drawImage(drawCanvas,0,0);
+  return out;
+}
+
+/**
+ * ✅ 关键改动：压缩图片，避免 payload 太大导致接口拒绝
+ * - 限制最大宽度
+ * - 转 JPEG 并设置质量
+ * - 返回 { dataUrl, base64Pure, bytesApprox, width, height, mime }
+ */
+function exportCompressedImage(){
+  const src = composeCanvas();
+  const maxW = Math.max(600, Math.min(4000, Number(maxWidthEl.value) || 1400));
+  const q = Math.max(0.3, Math.min(0.95, Number(jpegQualityEl.value) || 0.7));
+
+  let w = src.width, h = src.height;
+  if(w > maxW){
+    const ratio = maxW / w;
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+  }
+
+  const out = document.createElement("canvas");
+  out.width = w; out.height = h;
+  const ctx = out.getContext("2d");
+  ctx.drawImage(src, 0, 0, w, h);
+
+  const mime = "image/jpeg";
+  const dataUrl = out.toDataURL(mime, q);
+
+  // 去掉 data:image/jpeg;base64, 前缀，进一步减小 JSON 字符串体积
+  const base64Pure = dataUrl.split(",")[1] || "";
+  // 粗略估算体积（base64 约等于原始字节 * 4/3）
+  const bytesApprox = Math.round(base64Pure.length * 3 / 4);
+
+  return { dataUrl, base64Pure, bytesApprox, width:w, height:h, mime, quality:q };
+}
+
+btnSave.onclick=()=>{
+  const { dataUrl } = exportCompressedImage();
+  const a=document.createElement("a");
+  a.href=dataUrl;
+  a.download="地图标注.jpg";
+  a.click();
+};
+
+async function postJson(url, payload){
+  const res = await fetch(url, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json;charset=UTF-8" },
+    body: JSON.stringify(payload)
+  });
+  const text = await res.text();
+  let json=null;
+  try{ json=JSON.parse(text); }catch(e){}
+  return { ok: res.ok, status: res.status, text, json };
+}
+
+btnSubmit.onclick = async ()=>{
+  const className = (classNameEl.value||"").trim();
+  const studentNo = (studentNoEl.value||"").trim();
+  const name = (studentNameEl.value||"").trim();
+
+  if(!className){ setStatus("err","请先填写班级再提交。"); classNameEl.focus(); return; }
+  if(!studentNo){ setStatus("err","请先填写学号再提交。"); studentNoEl.focus(); return; }
+  if(!name){ setStatus("err","请先填写姓名再提交。"); studentNameEl.focus(); return; }
+
+  try{
+    setStatus("info","正在提交，请稍候...");
+
+    const imgInfo = exportCompressedImage();
+
+    // 你截图里的字段风格：class/student_no/name/submitted_at...
+    const payload = {
+      class: className,
+      student_no: studentNo,
+      name: name,
+      // 图片：用更小的 base64（无前缀）+ 附带元信息
+      img_base64: imgInfo.base64Pure,
+      img_mime: imgInfo.mime,
+      img_w: imgInfo.width,
+      img_h: imgInfo.height,
+      img_quality: imgInfo.quality,
+      img_bytes_approx: imgInfo.bytesApprox,
+      submitted_at: new Date().toLocaleString()
+    };
+
+    // 提交前把“体积”显示出来，便于你现场判断是否还会超限
+    setStatus("info","提交中...", `图片约 ${Math.round(imgInfo.bytesApprox/1024)} KB，正在发送...`);
+
+    const fd=new FormData();for(const [k,v] of Object.entries(payload)){if(typeof v==='string'&&v.startsWith('data:image/')){const blob=await (await fetch(v)).blob();fd.append('image',blob,'terrain.png');}else fd.append(k,typeof v==='object'?JSON.stringify(v):v);} const response=await CaseFlow.send(fd);const r={ok:response.ok,status:response.status,json:await response.json()};
+
+    if(r.ok){
+      setStatus("ok","已提交到 QuickForm。", `返回：${r.json ? JSON.stringify(r.json) : r.text}`);
+      return;
+    }
+
+    // 如果这里仍失败：把状态码和返回体展示出来，便于你对比“可提交的网页”返回了什么
+    setStatus("err", `提交失败（HTTP ${r.status}）。`,
+      `返回：${(r.text||"").slice(0,1200)}${(r.text||"").length>1200?"...":""}<br><br>` +
+      `建议对比：1）QuickForm 端是否有字段/大小限制；2）可提交网页的 payload 体积很小，而本页包含图片。`
+    );
+
+  }catch(err){
+    setStatus("err","提交发生异常（可能是网络/CORS/接口拒绝）。", String(err));
+  }
+};
+</script>
+</body>
+</html>

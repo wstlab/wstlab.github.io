@@ -1,0 +1,13 @@
+{
+  "id": "case-06",
+  "title": "谣言风暴眼 · 抢盐风波",
+  "category": "creation",
+  "description": "证据与观点：围绕调查角色、责任判断、观点开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息素养",
+    "社会"
+  ],
+  "order": 6,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

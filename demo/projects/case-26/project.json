@@ -1,0 +1,12 @@
+{
+  "id": "case-26",
+  "title": "课堂观察 · 教学共评",
+  "category": "activities",
+  "description": "从目标清晰度、参与程度和反馈质量观察课堂，用文字建议补充评价。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 26,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

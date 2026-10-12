@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":60,"key":"case-60","title":"HTML 代码拖拖乐（叠滘龙舟）","category":"programming","description":"龙舟代码构建图：围绕得分、正确槽位、题目数开展交互学习，在数据大屏中回看记录。","headline":"龙舟代码构建图","view":"diagnostic","fields":[{"key":"score","label":"得分"},{"key":"correctCount","label":"正确槽位"},{"key":"totalQuestions","label":"题目数"},{"key":"answers","label":"代码填空"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"应用展示"}],"tasks":{"records":"OV7VmKcFWIZ"},"mapping":{"qxpyeyt5ml":"OV7VmKcFWIZ"},"accent":"#416d89","capture":false,"lesson":"应用展示"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>叠滘龙舟 · 代码拖拽学堂 | 班级学号版</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #000000;
+      font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    /* 整体布局微调：顶部增加学生信息栏 */
+    .app-wrapper {
+      width: 100%;
+      max-width: 1700px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 学生身份栏 (班别 + 学号) */
+    .student-info-bar {
+      background: #0f1a0f;
+      border: 1px solid #3a6e3a;
+      border-radius: 60px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 0 #0a2f0a;
+    }
+    .info-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .selector-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e2a1e;
+      padding: 6px 18px;
+      border-radius: 48px;
+      border-left: 4px solid #ffcd7e;
+    }
+    .selector-item label {
+      font-weight: bold;
+      color: #eaffd0;
+      font-size: 1rem;
+    }
+    select {
+      background: #2c3e2c;
+      border: 1px solid #6f9e6f;
+      color: #f9f2cf;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      outline: none;
+      transition: 0.1s;
+      font-family: monospace;
+    }
+    select:hover {
+      background: #3f6a3f;
+      border-color: #ffd966;
+    }
+    .student-badge {
+      background: #2a451a;
+      padding: 6px 22px;
+      border-radius: 40px;
+      color: #ffefb9;
+      font-weight: bold;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px 320px;
+      gap: 16px;
+      width: 100%;
+      height: 85vh;
+      min-height: 700px;
+    }
+
+    .panel {
+      background: #0b0b0b;
+      border: 1px solid #2a3a2a;
+      border-radius: 20px;
+      padding: 16px 12px;
+      box-shadow: 0 8px 0 #0f1f0f;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #b5ffb5;
+      text-shadow: 0 0 5px #2e8b57;
+      letter-spacing: 2px;
+      border-bottom: 1px dashed #3a5a3a;
+      padding-bottom: 8px;
+    }
+
+    .code-library {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .code-category {
+      color: #8fbf8f;
+      font-size: 13px;
+      margin-top: 6px;
+      margin-bottom: 2px;
+      padding-left: 6px;
+      border-left: 3px solid #4a7a4a;
+    }
+
+    .code-card {
+      background: #1a1f1a;
+      border-left: 6px solid #6f9e6f;
+      border-radius: 12px;
+      padding: 10px 10px;
+      color: #e0f0e0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0,20,0,0.8);
+      cursor: grab;
+      transition: 0.1s;
+      border: 1px solid #2c4c2c;
+      word-break: break-word;
+    }
+
+    .code-card.font-tag {
+      background: #1a2a1a;
+      border-left-color: #ffd700;
+      border-left-width: 8px;
+    }
+
+    .code-card:active {
+      cursor: grabbing;
+      opacity: 0.8;
+      box-shadow: 0 0 12px #6f9e6f;
+    }
+
+    .code-card[draggable="true"]:hover {
+      background: #1e2e1e;
+      border-left-color: #b5ffb5;
+    }
+
+    .code-card.font-tag:hover {
+      border-left-color: #ffed4e;
+    }
+
+    .hint {
+      color: #7a9a7a;
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .text-showcase {
+      justify-content: flex-start;
+    }
+
+    .dragonboat-text {
+      background: #0f130f;
+      border-radius: 18px;
+      padding: 18px 14px;
+      box-shadow: inset 0 0 10px #1a2a1a;
+      border: 1px solid #3b5e3b;
+    }
+
+    .dragonboat-text p {
+      margin: 16px 0;
+      line-height: 1.5;
+      padding: 6px 10px;
+      border-radius: 30px;
+      background: rgba(20, 40, 20, 0.3);
+      transition: 0.1s;
+    }
+
+    .dropzone-panel {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slots-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .slot-item {
+      background: #121a12;
+      border: 2px dashed #3f6e3f;
+      border-radius: 18px;
+      padding: 12px 10px;
+      transition: 0.15s;
+    }
+
+    .slot-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .slot-label {
+      font-weight: bold;
+      color: #b8d9b8;
+      background: #1e2e1e;
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 15px;
+    }
+
+    .slot-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .clear-btn {
+      background: #2a1e1e;
+      color: #ffb0b0;
+      border: 1px solid #8b3a3a;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 0 #3a1e1e;
+    }
+
+    .clear-btn:hover {
+      background: #5a2a2a;
+      color: #ffd0d0;
+      border-color: #cc6666;
+    }
+
+    .clear-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    .check-mark {
+      font-size: 28px;
+      opacity: 0.3;
+      transition: 0.2s;
+      margin-right: 6px;
+    }
+
+    .check-mark.valid {
+      opacity: 1;
+      color: #4eff4e;
+      text-shadow: 0 0 12px #00aa33;
+    }
+
+    .code-blocks-container {
+      min-height: 80px;
+      background: #0c120c;
+      border-radius: 14px;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border: 1px solid #2c4f2c;
+    }
+
+    .dropped-code {
+      background: #1e311e;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      color: #d4f0d4;
+      border: 1px solid #5f9e5f;
+      box-shadow: 0 2px 0 #1e3b1e;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .dropped-code.font-tag-chip {
+      background: #2a3a1a;
+      border-color: #ffd700;
+      color: #ffeaa0;
+    }
+
+    .dropped-code .remove-btn {
+      margin-left: 6px;
+      font-weight: bold;
+      color: #ffb0b0;
+      background: #3a1e1e;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      border: none;
+    }
+
+    .dropped-code .remove-btn:hover {
+      background: #a33;
+      color: white;
+    }
+
+    .empty-hint {
+      color: #4f6f4f;
+      font-style: italic;
+      padding: 10px;
+    }
+
+    .quiz-panel {
+      background: #0a100a;
+    }
+
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    .quiz-card {
+      background: #131e13;
+      border-radius: 18px;
+      padding: 16px 14px;
+      border: 1px solid #2f5a2f;
+    }
+
+    .quiz-desc {
+      color: #c3e0c3;
+      font-size: 16px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .quiz-target {
+      background: #1f2e1f;
+      padding: 10px 12px;
+      border-radius: 24px;
+      font-family: monospace;
+      color: #abebc6;
+      border-left: 8px solid #ffd700;
+    }
+
+    .quiz-requirement {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #b8d9b8;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .req-badge {
+      background: #2a3a2a;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .req-badge.required {
+      background: #3a2a1a;
+      color: #ffd966;
+      border: 1px solid #daa520;
+    }
+
+    .quiz-status {
+      margin-top: 12px;
+      font-size: 24px;
+      text-align: right;
+    }
+
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: #2e5e2e;
+      border-radius: 10px;
+    }
+
+    /* 新增提交按钮区 */
+    .submit-area {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+    }
+    .submit-work-btn {
+      background: #ffaa33;
+      border: none;
+      width: 80%;
+      padding: 10px;
+      border-radius: 60px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #1e3a1e;
+      transition: 0.1s;
+      box-shadow: 0 4px 0 #a55f1a;
+    }
+    .submit-work-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2e6e2e;
+      padding: 8px 24px;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      z-index: 1000;
+      font-size: 14px;
+    }
+  </style>
+<style>@media(max-width:640px){.workspace,.main-content,.panels,.main-layout{display:flex!important;flex-direction:column!important;min-width:0!important}.panel{width:100%!important;min-width:0!important;box-sizing:border-box}.panel font{white-space:normal!important;overflow-wrap:anywhere}}</style><style>@media(max-width:640px){.app{display:flex!important;flex-direction:column!important;min-width:0!important}.app-wrapper{width:100%!important;min-width:0!important}.panel{flex:none!important;width:100%!important;max-width:100%!important}}</style></head>
+<body>
+<div class="app-wrapper">
+  
+  <div class="student-info-bar">
+    <div class="info-group">
+      <div class="selector-item">
+        <label>🐉 班 别 :</label>
+        <select id="classSelect">
+          <option value="">-- 请选择班级 --</option>
+        </select>
+      </div>
+      <div class="selector-item">
+        <label>🎽 学 号 :</label>
+        <select id="studentIdSelect">
+          <option value="">-- 请选择学号 --</option>
+        </select>
+      </div>
+    </div>
+    <div class="student-badge" id="studentBadge">⚡ 未选择身份</div>
+  </div>
+
+  
+  <div class="app">
+    
+    <div class="panel">
+      <div class="panel-title">📦 代码库</div>
+      <div class="code-library">
+        <div class="code-category">🏷️ 标签结构 (必选)</div>
+        <div class="code-card font-tag" draggable="true" data-code='<font>' data-type='tag-open'>🔖 &lt;font&gt; (开始标签)</div>
+        <div class="code-card font-tag" draggable="true" data-code='</font>' data-type='tag-close'>🔖 &lt;/font&gt; (结束标签)</div>
+        
+        <div class="code-category">🎨 颜色属性</div>
+        <div class="code-card" draggable="true" data-code='color="#FF0000"' data-type='attr'>🔴 color="#FF0000"</div>
+        <div class="code-card" draggable="true" data-code='color="#FFFFFF"' data-type='attr'>⚪ color="#FFFFFF"</div>
+        <div class="code-card" draggable="true" data-code='color="#000000"' data-type='attr'>⚫ color="#000000"</div>
+        <div class="code-card" draggable="true" data-code='color="#FFFF00"' data-type='attr'>🟡 color="#FFFF00"</div>
+        <div class="code-card" draggable="true" data-code='color="#0000FF"' data-type='attr'>🔵 color="#0000FF"</div>
+        <div class="code-card" draggable="true" data-code='color="#800080"' data-type='attr'>🟣 color="#800080"</div>
+        
+        <div class="code-category">✍️ 字体属性 (family)</div>
+        <div class="code-card" draggable="true" data-code='family="楷体"' data-type='attr'>✍️ family="楷体"</div>
+        <div class="code-card" draggable="true" data-code='family="微软雅黑"' data-type='attr'>✍️ family="微软雅黑"</div>
+        <div class="code-card" draggable="true" data-code='family="宋体"' data-type='attr'>✍️ family="宋体"</div>
+        <div class="code-card" draggable="true" data-code='family="仿宋"' data-type='attr'>✍️ family="仿宋"</div>
+        <div class="code-card" draggable="true" data-code='family="黑体"' data-type='attr'>✍️ family="黑体"</div>
+
+        <div class="code-category">🔤 字号属性</div>
+        <div class="code-card" draggable="true" data-code='size="5"' data-type='attr'>🔤 size="5"</div>
+        <div class="code-card" draggable="true" data-code='size="14"' data-type='attr'>🔤 size="14"</div>
+        <div class="code-card" draggable="true" data-code='size="10"' data-type='attr'>🔤 size="10"</div>
+        <div class="code-card" draggable="true" data-code='size="20"' data-type='attr'>🔤 size="20"</div>
+        <div class="code-card" draggable="true" data-code='size="2"' data-type='attr'>🔤 size="2"</div>
+        
+        <div class="code-category">🎯 其他属性</div>
+        <div class="code-card" draggable="true" data-code='bgcolor="#000000"' data-type='attr'>🎨 bgcolor="#000000"</div>
+        <div class="code-card" draggable="true" data-code='align="left"' data-type='attr'>⬅️ align="left"</div>
+        <div class="code-card" draggable="true" data-code='align="right"' data-type='attr'>➡️ align="right"</div>
+        <div class="code-card" draggable="true" data-code='align="center"' data-type='attr'>⬆️ align="center"</div>
+      </div>
+      <div class="hint">👇 拖拽代码块到右侧放置区<br>（必须包含&lt;font&gt;标签才正确）</div>
+    </div>
+
+    
+    <div class="panel text-showcase">
+      <div class="panel-title">🐉 叠滘龙舟·魂</div>
+      <div class="dragonboat-text" id="dragonboatTextContainer">
+        <p id="para1"><font color="#FF0000" face="楷体" size="5">① 叠滘龙舟，弯道漂移，龙船过S形水道，鼓声如雷。</font></p>
+        <p id="para2"><font color="#000000" face="微软雅黑" size="14">② 岭南水乡叠滘，龙舟文化传承数百年，夜龙巡游灯火璀璨。</font></p>
+        <p id="para3"><font color="#FFFF00" face="宋体" size="10">③ 龙舟匠人手工雕刻龙头，每一道鳞片都寄托着风调雨顺。</font></p>
+        <p id="para4"><font color="#0000FF" face="仿宋" size="20">④ 叠滘龙舟漂移赛惊险刺激，全球唯一，扒仔齐心协力。</font></p>
+        <p id="para5"><font color="#800080" face="黑体" size="2">⑤ 龙舟饭，百家味道，叠滘乡情在一碗碗烟火中延续。</font></p>
+      </div>
+      <div style="margin-top: 12px; color:#9fbb9f; font-size:14px; text-align:center;">⬅️ 右侧拖拽代码块改变文字样式</div>
+    </div>
+
+    
+    <div class="panel dropzone-panel">
+      <div class="panel-title">🧩 拖拽组装区</div>
+      <div class="slots-container" id="slotsContainer"></div>
+      <div style="margin-top: 16px; color: #8faf8f; font-size:13px;">把代码拖入对应段落区域，组合成正确样式✔</div>
+      <div class="submit-area">
+        <button class="submit-work-btn" id="submitHomeworkBtn">🚀 提交作业 (记录班级学号)</button>
+      </div>
+    </div>
+
+    
+    <div class="panel quiz-panel">
+      <div class="panel-title">📋 闯关题目</div>
+      <div class="quiz-list" id="quizList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- 班级 & 学号 初始化 ----------
+    const classSelect = document.getElementById('classSelect');
+    const studentIdSelect = document.getElementById('studentIdSelect');
+    const studentBadge = document.getElementById('studentBadge');
+    // 填充班级 1-27
+    for(let i=1;i<=27;i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `${i}班`;
+      classSelect.appendChild(option);
+    }
+    // 填充学号 1-55
+    for(let i=1;i<=55;i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `学号 ${i}`;
+      studentIdSelect.appendChild(option);
+    }
+    
+    let currentClass = '';
+    let currentStudentNo = '';
+    function updateBadge() {
+      if(currentClass && currentStudentNo) {
+        studentBadge.innerHTML = `🎓 ${currentClass}班 ｜ 学号 ${currentStudentNo}`;
+      } else {
+        studentBadge.innerHTML = `⚠️ 请选择完整班级学号后再提交`;
+      }
+    }
+    classSelect.addEventListener('change', (e) => {
+      currentClass = e.target.value;
+      updateBadge();
+    });
+    studentIdSelect.addEventListener('change', (e) => {
+      currentStudentNo = e.target.value;
+      updateBadge();
+    });
+    
+    // ---------- 原有拖拽学堂核心逻辑 ----------
+    const PARAGRAPHS = [
+      { id: 'para1', index: 1 },
+      { id: 'para2', index: 2 },
+      { id: 'para3', index: 3 },
+      { id: 'para4', index: 4 },
+      { id: 'para5', index: 5 }
+    ];
+
+    let slotCodeMap = {
+      para1: [],
+      para2: [],
+      para3: [],
+      para4: [],
+      para5: []
+    };
+
+    const REQUIRED_ATTRS = {
+      family: '黑体',
+      color: '#FFFFFF',
+      size: '5'
+    };
+
+    const slotsContainer = document.getElementById('slotsContainer');
+    const quizListEl = document.getElementById('quizList');
+
+    function renderUI() {
+      renderSlots();
+      renderQuiz();
+    }
+
+    function renderSlots() {
+      slotsContainer.innerHTML = '';
+      PARAGRAPHS.forEach((p, idx) => {
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'slot-item';
+        slotDiv.dataset.paraId = p.id;
+
+        const header = document.createElement('div');
+        header.className = 'slot-header';
+        
+        const label = document.createElement('span');
+        label.className = 'slot-label';
+        label.textContent = `段落 ${idx+1}`;
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'slot-actions';
+        
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'clear-btn';
+        clearBtn.textContent = '🗑️ 清空';
+        clearBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearSlot(p.id);
+        });
+        
+        const checkSpan = document.createElement('span');
+        checkSpan.className = 'check-mark';
+        checkSpan.id = `check-${p.id}`;
+        checkSpan.textContent = '✔';
+        
+        actionsDiv.appendChild(clearBtn);
+        actionsDiv.appendChild(checkSpan);
+        
+        header.appendChild(label);
+        header.appendChild(actionsDiv);
+        
+        const blocksContainer = document.createElement('div');
+        blocksContainer.className = 'code-blocks-container';
+        blocksContainer.id = `blocks-${p.id}`;
+        blocksContainer.addEventListener('dragover', (e) => e.preventDefault());
+        blocksContainer.addEventListener('drop', (e) => handleDrop(e, p.id));
+        
+        slotDiv.appendChild(header);
+        slotDiv.appendChild(blocksContainer);
+        slotsContainer.appendChild(slotDiv);
+
+        renderCodeBlocks(p.id);
+      });
+    }
+
+    function clearSlot(paraId) {
+      if (slotCodeMap[paraId]) {
+        slotCodeMap[paraId] = [];
+        renderCodeBlocks(paraId);
+      }
+    }
+
+    function renderCodeBlocks(paraId) {
+      const container = document.getElementById(`blocks-${paraId}`);
+      if (!container) return;
+      const codes = slotCodeMap[paraId] || [];
+      container.innerHTML = '';
+      if (codes.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'empty-hint';
+        emptyMsg.textContent = '✨ 拖入代码块';
+        container.appendChild(emptyMsg);
+      } else {
+        codes.forEach((codeStr, index) => {
+          const chip = document.createElement('span');
+          chip.className = 'dropped-code';
+          if (codeStr === '<font>' || codeStr === '</font>') {
+            chip.classList.add('font-tag-chip');
+          }
+          chip.textContent = codeStr;
+          const removeBtn = document.createElement('span');
+          removeBtn.textContent = '✖';
+          removeBtn.className = 'remove-btn';
+          removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeCode(paraId, index);
+          });
+          chip.appendChild(removeBtn);
+          container.appendChild(chip);
+        });
+      }
+      updateParagraphStyle(paraId);
+      updateCheckMark(paraId);
+      updateQuizStatus(paraId);
+    }
+
+    function removeCode(paraId, index) {
+      if (slotCodeMap[paraId]) {
+        slotCodeMap[paraId].splice(index, 1);
+        renderCodeBlocks(paraId);
+      }
+    }
+
+    function handleDrop(e, paraId) {
+      e.preventDefault();
+      const dragData = e.dataTransfer.getData('text/plain');
+      if (!dragData) return;
+      const existing = slotCodeMap[paraId] || [];
+      if (dragData === '<font>' || dragData === '</font>') {
+        const filtered = existing.filter(code => code !== dragData);
+        filtered.push(dragData);
+        slotCodeMap[paraId] = filtered;
+      } else if (dragData.includes('=')) {
+        const attrName = dragData.split('=')[0];
+        const filtered = existing.filter(code => {
+          if (code === '<font>' || code === '</font>') return true;
+          return code.split('=')[0] !== attrName;
+        });
+        filtered.push(dragData);
+        slotCodeMap[paraId] = filtered;
+      } else {
+        return;
+      }
+      renderCodeBlocks(paraId);
+    }
+
+    function initDraggable() {
+      document.querySelectorAll('.code-card[draggable="true"]').forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', card.dataset.code);
+          e.dataTransfer.effectAllowed = 'copy';
+        });
+      });
+    }
+
+    function updateParagraphStyle(paraId) {
+      const paraEl = document.getElementById(paraId);
+      if (!paraEl) return;
+      const codes = slotCodeMap[paraId] || [];
+      const attrs = {};
+      codes.forEach(code => {
+        if (code.includes('=')) {
+          const eqIndex = code.indexOf('=');
+          const key = code.substring(0, eqIndex).trim();
+          let value = code.substring(eqIndex+1).trim();
+          if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+          }
+          attrs[key] = value;
+        }
+      });
+      const originalText = paraEl.innerText || paraEl.textContent;
+      const font = document.createElement('font');
+      if (attrs.color) font.setAttribute('color', attrs.color);
+      if (attrs.family) font.setAttribute('face', attrs.family);
+      else if (attrs.face) font.setAttribute('face', attrs.face);
+      if (attrs.size) font.setAttribute('size', attrs.size);
+      font.textContent = originalText;
+      paraEl.innerHTML = '';
+      paraEl.appendChild(font);
+    }
+
+    function isParagraphCorrect(paraId) {
+      const codes = slotCodeMap[paraId] || [];
+      const hasOpen = codes.includes('<font>');
+      const hasClose = codes.includes('</font>');
+      if (!hasOpen || !hasClose) return false;
+      const attrs = {};
+      codes.forEach(code => {
+        if (code.includes('=')) {
+          const eq = code.indexOf('=');
+          const k = code.substring(0, eq).trim();
+          let v = code.substring(eq+1).trim().replace(/["']/g, '');
+          attrs[k] = v;
+        }
+      });
+      return (attrs.family === REQUIRED_ATTRS.family && 
+              attrs.color === REQUIRED_ATTRS.color && 
+              attrs.size === REQUIRED_ATTRS.size);
+    }
+
+    function updateCheckMark(paraId) {
+      const checkEl = document.getElementById(`check-${paraId}`);
+      if (checkEl) {
+        if (isParagraphCorrect(paraId)) {
+          checkEl.classList.add('valid');
+        } else {
+          checkEl.classList.remove('valid');
+        }
+      }
+    }
+
+    function updateQuizStatus(paraId) {
+      const quizStatusEl = document.getElementById(`quiz-status-${paraId}`);
+      if (quizStatusEl) {
+        if (isParagraphCorrect(paraId)) {
+          quizStatusEl.innerHTML = '✅ 正确';
+          quizStatusEl.style.color = '#4eff4e';
+        } else {
+          quizStatusEl.innerHTML = '⬜ 未完成';
+          quizStatusEl.style.color = '#aaa';
+        }
+      }
+    }
+
+    function renderQuiz() {
+      quizListEl.innerHTML = '';
+      PARAGRAPHS.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <div class="quiz-desc">📌 题目 ${p.index}</div>
+          <div class="quiz-requirement">
+            <span class="req-badge">设置字体为"黑体"</span>
+            <span class="req-badge">设置颜色="#FFFFFF"</span>
+            <span class="req-badge">设置字号="5"</span>
+          </div>
+          <div class="quiz-status" id="quiz-status-${p.id}">⬜ 未完成</div>
+        `;
+        quizListEl.appendChild(card);
+      });
+      PARAGRAPHS.forEach(p => updateQuizStatus(p.id));
+    }
+
+    // 提交作业至服务器 (POST)
+    async function submitHomework() {
+      if(!currentClass || !currentStudentNo) {
+        alert('请先选择班级和学号后再提交作业！');
+        return;
+      }
+      // 构建每道题的详细信息
+      const questionsData = PARAGRAPHS.map(p => {
+        const codes = slotCodeMap[p.id] || [];
+        const isCorrect = isParagraphCorrect(p.id);
+        const isFilled = codes.length > 0;
+        const attrs = {};
+        codes.forEach(code => {
+          if(code.includes('=')) {
+            const eq = code.indexOf('=');
+            const k = code.substring(0, eq).trim();
+            let v = code.substring(eq+1).trim().replace(/["']/g, '');
+            attrs[k] = v;
+          }
+        });
+        return {
+          paragraphIndex: p.index,
+          paragraphId: p.id,
+          currentCodeBlocks: codes,
+          hasOpenTag: codes.includes('<font>'),
+          hasCloseTag: codes.includes('</font>'),
+          currentFamily: attrs.family || null,
+          currentColor: attrs.color || null,
+          currentSize: attrs.size || null,
+          isFilled: isFilled,
+          isCorrect: isCorrect
+        };
+      });
+      
+      const payload = {
+        studentClass: currentClass,
+        studentNumber: currentStudentNo,
+        submitTime: new Date().toISOString(),
+        totalQuestions: PARAGRAPHS.length,
+        questions: questionsData,
+        rawCodeMap: JSON.parse(JSON.stringify(slotCodeMap))
+      };
+      
+      try {
+        const response = await fetch('https://qf.kjxs.site/api/OV7VmKcFWIZ', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        let msg = '';
+        if(response.ok) {
+          msg = `✅ 作业提交成功！班级 ${currentClass}班 学号 ${currentStudentNo} 已记录。`;
+          alert(msg);
+        } else {
+          msg = `❌ 提交失败 HTTP ${response.status}`;
+          alert(msg);
+        }
+      } catch(err) {
+        console.error(err);
+        alert(`网络错误: ${err.message}\n但本地已保存配置，可稍后重试。`);
+      }
+    }
+
+    function initSlotStateFromExisting() {
+      slotCodeMap.para1 = ['<font>', 'color="#FF0000"', 'family="楷体"', 'size="5"', '</font>'];
+      slotCodeMap.para2 = ['<font>', 'color="#000000"', 'family="微软雅黑"', 'size="14"', '</font>'];
+      slotCodeMap.para3 = ['<font>', 'color="#FFFF00"', 'family="宋体"', 'size="10"', '</font>'];
+      slotCodeMap.para4 = ['<font>', 'color="#0000FF"', 'family="仿宋"', 'size="20"', '</font>'];
+      slotCodeMap.para5 = ['<font>', 'color="#800080"', 'family="黑体"', 'size="2"', '</font>'];
+    }
+
+    function init() {
+      initSlotStateFromExisting();
+      renderUI();
+      initDraggable();
+      PARAGRAPHS.forEach(p => updateParagraphStyle(p.id));
+      PARAGRAPHS.forEach(p => { updateCheckMark(p.id); updateQuizStatus(p.id); });
+      document.addEventListener('dragover', (e) => e.preventDefault());
+      document.addEventListener('drop', (e) => e.preventDefault());
+      
+      const submitBtn = document.getElementById('submitHomeworkBtn');
+      if(submitBtn) submitBtn.addEventListener('click', submitHomework);
+    }
+    init();
+  })();
+</script>
+</body>
+</html>

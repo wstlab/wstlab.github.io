@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":37,"key":"case-37","title":"编码与解码的应用（4 课时）","category":"programming","description":"依次体验计算机、图像、声音和文字符号编码，保存各课时的学习证据。","headline":"编码作品实验室","view":"flow","fields":[{"key":"totalScore","label":"总分"},{"key":"taskAnswers","label":"编码答案"},{"key":"retries","label":"尝试次数"},{"key":"pixelData","label":"像素编码"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"① 计算机编码之旅"},{"file":"lesson-2.html","title":"② 图像编码设计师"},{"file":"lesson-3.html","title":"③ 声音编码设计师"},{"file":"lesson-4.html","title":"④ 文字符号编码设计师"}],"tasks":{"records":"TR2T7uOoqYR"},"mapping":{"6r3hj8caqg":"TR2T7uOoqYR"},"accent":"#416d89","capture":true,"lesson":"② 图像编码设计师"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像编码设计师 - 编码挑战</title>
+    <style>
+        /* ========== 与主网页完全一致的风格 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary-light: #F5E8C8;
+            --primary-medium: #E6D5B8;
+            --primary-dark: #D4C1A7;
+            --accent-orange: #D2691E;
+            --accent-gold: #D4A76A;
+            --accent-cream: #FFF9E6;
+            --text-dark: #5C4B37;
+            --text-medium: #8B7355;
+            --text-light: #3C2A21;
+            --background-light: #FFFDF5;
+            --background-medium: #F9F5EB;
+            --background-dark: #F0E6D6;
+            --success-color: #8F7B5E;
+            --warning-color: #B5651D;
+            --border-color: #D4C1A7;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(245, 232, 200, 0.9) 0%, rgba(245, 232, 200, 0.7) 90%),
+                radial-gradient(circle at 90% 80%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--background-medium);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent-orange), var(--accent-gold), var(--accent-orange));
+            border-radius: 15px 15px 0 0;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--text-light);
+            border-left: 5px solid var(--accent-orange);
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .subhead {
+            color: var(--text-medium);
+            margin-bottom: 30px;
+            padding-left: 25px;
+        }
+
+        .flex-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+
+        .canvas-area {
+            flex: 1.5;
+            min-width: 320px;
+        }
+
+        .answer-area {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .card {
+            background: var(--background-light);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(210, 105, 30, 0.1);
+            border-color: var(--accent-orange);
+        }
+
+        .card h2 {
+            color: var(--accent-orange);
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            display: inline-block;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        #pixelCanvas {
+            display: block;
+            border: 1px solid #ccc;
+            cursor: crosshair;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            background-color: white;
+        }
+
+        .size-control {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--primary-medium));
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            text-align: center;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-orange);
+            color: white;
+            border-color: var(--accent-orange);
+        }
+
+        .color-rule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .color-rule-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--background-dark);
+            padding: 6px 10px;
+            border-radius: 40px;
+        }
+
+        .color-preview {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .color-rule-item input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+        }
+
+        .rule-note {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .tool-btn {
+            flex: 1;
+            padding: 8px 0;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .tool-btn.active {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .answer-input {
+            width: 100%;
+            font-family: monospace;
+            font-size: 0.85rem;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            resize: vertical;
+        }
+
+        .feedback {
+            background: var(--background-dark);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .feedback p {
+            margin: 5px 0;
+        }
+
+        .correct {
+            color: #2c7a2c;
+        }
+        .wrong {
+            color: #c0392b;
+        }
+
+        .note {
+            background: #FFF9E6;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-medium);
+            margin-top: 12px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--success-color);
+            text-decoration: none;
+            text-align: center;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-color), transparent);
+            margin: 25px 0;
+        }
+
+        @media (max-width: 800px) {
+            .flex-layout { flex-direction: column; }
+            .color-rule-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🖼️ 图像编码设计师</h1>
+    <div class="subhead">绘制像素画，并手动填写编码，系统会帮你检查对错</div>
+
+    <div class="flex-layout">
+        
+        <div class="canvas-area">
+            <div class="card">
+                <h2>🎨 像素画板</h2>
+                <div class="size-control">
+                    <button class="btn btn-small" id="size8x8">8×8</button>
+                    <button class="btn btn-small" id="size16x16">16×16</button>
+                    <button class="btn btn-small" id="size32x32">32×32</button>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="number" id="customSize" min="4" max="64" value="16" style="width: 70px; padding: 6px; border-radius: 20px; border:1px solid var(--border-color);">
+                        <button class="btn btn-small" id="applySizeBtn">设定</button>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="pixelCanvas"></canvas>
+                </div>
+                <div class="tool-group">
+                    <button class="tool-btn active" id="pencilTool">✏️ 铅笔</button>
+                    <button class="tool-btn" id="fillTool">🪣 填充</button>
+                    <button class="tool-btn" id="eraserTool">🧽 橡皮</button>
+                </div>
+                <div class="tool-group">
+                    <button class="btn btn-small" id="clearBtn">清空画板</button>
+                    <button class="btn btn-small" id="resetBtn">重置</button>
+                    <button class="btn btn-small" id="saveBtn">保存图片</button>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="answer-area">
+            <div class="card">
+                <h2>⚙️ 编码模式 & 规则</h2>
+                <div class="mode-switch">
+                    <div class="mode-btn active" id="binaryModeBtn">黑白模式 (0/1)</div>
+                    <div class="mode-btn" id="colorModeBtn">彩色模式 (自定义数字)</div>
+                </div>
+
+                
+                <div id="binaryColorPanel" class="color-rule-grid" style="grid-template-columns: repeat(2,1fr);">
+                    <div class="color-rule-item">
+                        <div class="color-preview" style="background-color: #FFFFFF;"></div>
+                        <span>白色 → 编码</span>
+                        <input type="text" id="binaryWhiteCode" value="0" maxlength="2" style="width: 50px;">
+                    </div>
+                    <div class="color-rule-item">
+                        <div class="color-preview" style="background-color: #000000;"></div>
+                        <span>黑色 → 编码</span>
+                        <input type="text" id="binaryBlackCode" value="1" maxlength="2" style="width: 50px;">
+                    </div>
+                </div>
+
+                
+                <div id="colorRulePanel" style="display: none;">
+                    <div class="color-rule-grid" id="colorRuleContainer"></div>
+                    <div class="rule-note">💡 为每种颜色分配一个十进制数字（0-9）</div>
+                </div>
+
+                <div class="tool-group" style="margin-top: 5px;">
+                    <button class="btn btn-small" id="applyRuleBtn">应用规则</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📝 我的编码答案</h2>
+                <textarea id="userAnswer" class="answer-input" rows="10" placeholder="按行填写编码，每行像素之间用空格隔开，例如：&#10;0 1 0 1 0 1 0 1&#10;1 0 1 0 1 0 1 0"></textarea>
+                <div class="tool-group">
+                    <button class="btn btn-small" id="checkBtn">✅ 检查答案</button>
+                    <button class="btn btn-small" id="showAnswerBtn">🔍 显示正确答案</button>
+                    <button class="btn btn-small" id="copyAnswerBtn">📋 复制正确答案</button>
+                </div>
+                <div id="feedback" class="feedback">
+                    <p>✏️ 点击“检查答案”后，会在这里显示每行的对错。</p>
+                </div>
+                <div class="note">
+                    💡 提示：先绘制像素画，然后根据画面手动填写编码。系统会根据当前的编码规则检查你填写的答案。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div style="text-align: center;">
+        <a href="index.html" class="btn btn-back" style="text-decoration: none;">← 返回主页面</a>
+    </div>
+</div>
+
+<script>
+    // ---------- 画板部分（与原代码一致） ----------
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas.getContext('2d');
+    let gridSize = 16;
+    let pixelSize = 25;
+    let currentTool = 'pencil';
+    let isDrawing = false;
+    let currentMode = 'binary';
+    let currentColor = '#000000';
+
+    // 黑白映射
+    let binaryCodeMap = { '#FFFFFF': '0', '#000000': '1' };
+    // 彩色预设
+    const colorPresets = [
+        { name: '橙', color: '#D2691E', defaultCode: '0' },
+        { name: '浅褐', color: '#E6D5B8', defaultCode: '1' },
+        { name: '棕', color: '#8B7355', defaultCode: '2' },
+        { name: '米白', color: '#FFFDF5', defaultCode: '3' },
+        { name: '深褐', color: '#3C2A21', defaultCode: '4' },
+        { name: '红', color: '#FF6B6B', defaultCode: '5' },
+        { name: '蓝', color: '#4D96FF', defaultCode: '6' },
+        { name: '绿', color: '#51CF66', defaultCode: '7' },
+        { name: '黄', color: '#FFD43B', defaultCode: '8' },
+        { name: '紫', color: '#9D4EDD', defaultCode: '9' }
+    ];
+    let colorCodeMap = {};
+
+    function normalizeColor(c) { return c.toUpperCase(); }
+
+    function initColorCodeMap() {
+        colorCodeMap = {};
+        colorPresets.forEach(p => { colorCodeMap[normalizeColor(p.color)] = p.defaultCode; });
+    }
+
+    // 画板基础函数
+    function setGridSize(size) {
+        let newSize = Math.min(64, Math.max(4, Math.floor(size)));
+        gridSize = newSize;
+        const maxCanvas = 500;
+        pixelSize = Math.floor(maxCanvas / gridSize);
+        if (pixelSize < 8) pixelSize = 8;
+        canvas.width = gridSize * pixelSize;
+        canvas.height = gridSize * pixelSize;
+        drawGrid();
+    }
+
+    function drawGrid() {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#D4C1A7';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= gridSize; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * pixelSize, 0);
+            ctx.lineTo(i * pixelSize, canvas.height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, i * pixelSize);
+            ctx.lineTo(canvas.width, i * pixelSize);
+            ctx.stroke();
+        }
+    }
+
+    function setPixel(x, y, color) {
+        if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) return;
+        ctx.fillStyle = color;
+        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        ctx.strokeStyle = '#D4C1A7';
+        ctx.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+    }
+
+    function getPixelColor(x, y) {
+        const imgData = ctx.getImageData(x * pixelSize, y * pixelSize, 1, 1);
+        const [r,g,b] = imgData.data;
+        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    function floodFill(startX, startY, targetColor, replaceColor) {
+        if (targetColor === replaceColor) return;
+        const stack = [[startX, startY]];
+        const visited = new Set();
+        while (stack.length) {
+            const [x, y] = stack.pop();
+            if (x<0 || x>=gridSize || y<0 || y>=gridSize) continue;
+            const key = `${x},${y}`;
+            if (visited.has(key)) continue;
+            visited.add(key);
+            if (getPixelColor(x, y) === targetColor) {
+                setPixel(x, y, replaceColor);
+                stack.push([x+1,y], [x-1,y], [x,y+1], [x,y-1]);
+            }
+        }
+    }
+
+    function handleDraw(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let mouseX = (e.clientX - rect.left) * scaleX;
+        let mouseY = (e.clientY - rect.top) * scaleY;
+        const x = Math.floor(mouseX / pixelSize);
+        const y = Math.floor(mouseY / pixelSize);
+        if (x<0 || x>=gridSize || y<0 || y>=gridSize) return;
+        if (currentTool === 'pencil') {
+            setPixel(x, y, currentColor);
+        } else if (currentTool === 'eraser') {
+            setPixel(x, y, '#FFFFFF');
+        } else if (currentTool === 'fill') {
+            const target = getPixelColor(x, y);
+            floodFill(x, y, target, currentColor);
+        }
+    }
+    function startDraw(e) { isDrawing = true; handleDraw(e); }
+    function moveDraw(e) { if (isDrawing && (currentTool === 'pencil' || currentTool === 'eraser')) handleDraw(e); }
+    function endDraw() { isDrawing = false; }
+
+    // 获取正确答案（二维数组）
+    function getCorrectEncoding() {
+        const codeMap = currentMode === 'binary' ? binaryCodeMap : colorCodeMap;
+        let correct = [];
+        for (let y = 0; y < gridSize; y++) {
+            let row = [];
+            for (let x = 0; x < gridSize; x++) {
+                let color = getPixelColor(x, y);
+                let code = codeMap[normalizeColor(color)];
+                if (code === undefined) {
+                    // 黑白模式下，非纯白纯黑按非白色处理（输出1）
+                    if (currentMode === 'binary' && color !== '#FFFFFF') code = '1';
+                    else code = '?';
+                }
+                row.push(code);
+            }
+            correct.push(row);
+        }
+        return correct;
+    }
+
+    // 解析学生填写的答案
+    function parseUserAnswer(answerText) {
+        const lines = answerText.trim().split(/\r?\n/);
+        let parsed = [];
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (line === '') continue;
+            // 按空格或制表符分割
+            let tokens = line.split(/\s+/);
+            let row = [];
+            for (let t of tokens) {
+                if (t.length > 0) row.push(t);
+            }
+            parsed.push(row);
+        }
+        return parsed;
+    }
+
+    // 检查答案
+    function checkAnswer() {
+        const userText = document.getElementById('userAnswer').value;
+        const userRows = parseUserAnswer(userText);
+        const correct = getCorrectEncoding();
+        const feedbackDiv = document.getElementById('feedback');
+        let html = '';
+        let allCorrect = true;
+
+        // 检查行数
+        if (userRows.length !== gridSize) {
+            html += `<p class="wrong">❌ 行数不正确：当前画板是 ${gridSize} 行，你填写了 ${userRows.length} 行。</p>`;
+            allCorrect = false;
+        }
+
+        for (let i = 0; i < Math.min(userRows.length, gridSize); i++) {
+            const userRow = userRows[i];
+            const correctRow = correct[i];
+            let rowCorrect = true;
+            if (userRow.length !== gridSize) {
+                html += `<p class="wrong">📌 第 ${i+1} 行：期望 ${gridSize} 个编码，你填写了 ${userRow.length} 个。</p>`;
+                rowCorrect = false;
+                allCorrect = false;
+                continue;
+            }
+            for (let j = 0; j < gridSize; j++) {
+                if (userRow[j] !== correctRow[j]) {
+                    rowCorrect = false;
+                    allCorrect = false;
+                }
+            }
+            if (rowCorrect) {
+                html += `<p class="correct">✅ 第 ${i+1} 行 正确</p>`;
+            } else {
+                html += `<p class="wrong">❌ 第 ${i+1} 行 错误（期望：${correctRow.join(' ')}）</p>`;
+            }
+        }
+
+        if (allCorrect && userRows.length === gridSize) {
+            html = `<p class="correct">🎉 恭喜！所有行的编码都正确！🎉</p>`;
+        } else if (userRows.length === gridSize && !allCorrect) {
+            html += `<p class="wrong">✏️ 请修改错误的行，再试一次。</p>`;
+        }
+        feedbackDiv.innerHTML = html;
+    }
+
+    // 显示正确答案（在反馈区域）
+    function showAnswer() {
+        const correct = getCorrectEncoding();
+        let answerStr = '';
+        for (let i = 0; i < correct.length; i++) {
+            answerStr += correct[i].join(' ') + '\n';
+        }
+        document.getElementById('feedback').innerHTML = `<p>📖 正确答案（按行，空格分隔）：</p><pre style="font-family: monospace;">${answerStr}</pre>`;
+    }
+
+    function copyAnswer() {
+        const correct = getCorrectEncoding();
+        let answerStr = '';
+        for (let i = 0; i < correct.length; i++) {
+            answerStr += correct[i].join(' ') + '\n';
+        }
+        navigator.clipboard.writeText(answerStr).then(() => alert('正确答案已复制')).catch(() => alert('手动复制'));
+    }
+
+    // 规则应用（手动刷新规则映射）
+    function applyRules() {
+        if (currentMode === 'binary') {
+            const white = document.getElementById('binaryWhiteCode').value.trim();
+            const black = document.getElementById('binaryBlackCode').value.trim();
+            if (white !== '') binaryCodeMap['#FFFFFF'] = white;
+            if (black !== '') binaryCodeMap['#000000'] = black;
+        } else {
+            for (let i = 0; i < colorPresets.length; i++) {
+                const input = document.getElementById(`colorCode_${i}`);
+                if (input) {
+                    let val = input.value.trim();
+                    if (val === '') val = colorPresets[i].defaultCode;
+                    colorCodeMap[normalizeColor(colorPresets[i].color)] = val;
+                }
+            }
+        }
+        // 可以给个提示
+        document.getElementById('feedback').innerHTML = '<p>✅ 编码规则已更新，记得检查答案哦。</p>';
+    }
+
+    // 模式切换
+    function setMode(mode) {
+        currentMode = mode;
+        const binaryModeBtn = document.getElementById('binaryModeBtn');
+        const colorModeBtn = document.getElementById('colorModeBtn');
+        const binaryPanel = document.getElementById('binaryColorPanel');
+        const colorPanel = document.getElementById('colorRulePanel');
+        if (mode === 'binary') {
+            binaryModeBtn.classList.add('active');
+            colorModeBtn.classList.remove('active');
+            binaryPanel.style.display = 'grid';
+            colorPanel.style.display = 'none';
+            currentColor = '#000000';
+            rebuildBinaryColorSelect();
+        } else {
+            colorModeBtn.classList.add('active');
+            binaryModeBtn.classList.remove('active');
+            binaryPanel.style.display = 'none';
+            colorPanel.style.display = 'block';
+            rebuildColorRulePanel();
+            rebuildColorSelectForColorMode();
+            currentColor = colorPresets[0].color;
+        }
+    }
+
+    // 构建UI组件（颜色选择器等）
+    function rebuildBinaryColorSelect() {
+        let old = document.getElementById('binaryColorSelect');
+        if (old) old.remove();
+        const div = document.createElement('div');
+        div.id = 'binaryColorSelect';
+        div.style.display = 'flex';
+        div.style.gap = '15px';
+        div.style.marginBottom = '15px';
+        div.style.justifyContent = 'center';
+        const whiteBtn = document.createElement('button');
+        whiteBtn.style.backgroundColor = '#FFFFFF';
+        whiteBtn.style.border = '2px solid #ccc';
+        whiteBtn.style.width = '50px';
+        whiteBtn.style.height = '40px';
+        whiteBtn.style.borderRadius = '12px';
+        whiteBtn.style.cursor = 'pointer';
+        whiteBtn.onclick = () => { currentColor = '#FFFFFF'; };
+        const blackBtn = document.createElement('button');
+        blackBtn.style.backgroundColor = '#000000';
+        blackBtn.style.border = '2px solid #ccc';
+        blackBtn.style.width = '50px';
+        blackBtn.style.height = '40px';
+        blackBtn.style.borderRadius = '12px';
+        blackBtn.style.cursor = 'pointer';
+        blackBtn.onclick = () => { currentColor = '#000000'; };
+        div.appendChild(whiteBtn);
+        div.appendChild(blackBtn);
+        const container = document.querySelector('.canvas-container');
+        container.parentNode.insertBefore(div, container.nextSibling);
+    }
+
+    function rebuildColorSelectForColorMode() {
+        let old = document.getElementById('colorModeSelect');
+        if (old) old.remove();
+        const div = document.createElement('div');
+        div.id = 'colorModeSelect';
+        div.style.display = 'flex';
+        div.style.flexWrap = 'wrap';
+        div.style.gap = '8px';
+        div.style.marginBottom = '15px';
+        div.style.justifyContent = 'center';
+        colorPresets.forEach(p => {
+            const btn = document.createElement('button');
+            btn.style.backgroundColor = p.color;
+            btn.style.width = '36px';
+            btn.style.height = '36px';
+            btn.style.borderRadius = '8px';
+            btn.style.border = '2px solid transparent';
+            btn.style.cursor = 'pointer';
+            btn.onclick = () => { currentColor = p.color; };
+            div.appendChild(btn);
+        });
+        const container = document.querySelector('.canvas-container');
+        container.parentNode.insertBefore(div, container.nextSibling);
+        if (div.firstChild) div.firstChild.style.border = '2px solid var(--accent-orange)';
+    }
+
+    function rebuildColorRulePanel() {
+        const container = document.getElementById('colorRuleContainer');
+        container.innerHTML = '';
+        colorPresets.forEach((p, idx) => {
+            const cur = colorCodeMap[normalizeColor(p.color)] || p.defaultCode;
+            const item = document.createElement('div');
+            item.className = 'color-rule-item';
+            item.innerHTML = `
+                <div class="color-preview" style="background-color: ${p.color};"></div>
+                <span>${p.name}</span>
+                <input type="text" id="colorCode_${idx}" value="${cur}" maxlength="2" style="width: 50px;">
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    // 清空/重置
+    function clearCanvas() {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+    }
+    function resetCanvas() {
+        setGridSize(16);
+        clearCanvas();
+        if (currentMode === 'binary') {
+            document.getElementById('binaryWhiteCode').value = '0';
+            document.getElementById('binaryBlackCode').value = '1';
+            binaryCodeMap = { '#FFFFFF': '0', '#000000': '1' };
+        } else {
+            initColorCodeMap();
+            rebuildColorRulePanel();
+        }
+        document.getElementById('userAnswer').value = '';
+        document.getElementById('feedback').innerHTML = '<p>✏️ 已重置，请重新绘制并填写答案。</p>';
+    }
+    function saveArtwork() {
+        const link = document.createElement('a');
+        link.download = `pixel-art-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+    function setActiveTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tool + 'Tool').classList.add('active');
+    }
+
+    // 事件绑定
+    function bindEvents() {
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', moveDraw);
+        canvas.addEventListener('mouseup', endDraw);
+        canvas.addEventListener('mouseleave', endDraw);
+
+        document.getElementById('size8x8').addEventListener('click', () => setGridSize(8));
+        document.getElementById('size16x16').addEventListener('click', () => setGridSize(16));
+        document.getElementById('size32x32').addEventListener('click', () => setGridSize(32));
+        document.getElementById('applySizeBtn').addEventListener('click', () => {
+            let val = parseInt(document.getElementById('customSize').value);
+            if (isNaN(val)) val = 16;
+            val = Math.min(64, Math.max(4, val));
+            setGridSize(val);
+            document.getElementById('customSize').value = val;
+        });
+        document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+        document.getElementById('resetBtn').addEventListener('click', resetCanvas);
+        document.getElementById('saveBtn').addEventListener('click', saveArtwork);
+        document.getElementById('pencilTool').addEventListener('click', () => setActiveTool('pencil'));
+        document.getElementById('fillTool').addEventListener('click', () => setActiveTool('fill'));
+        document.getElementById('eraserTool').addEventListener('click', () => setActiveTool('eraser'));
+        document.getElementById('binaryModeBtn').addEventListener('click', () => setMode('binary'));
+        document.getElementById('colorModeBtn').addEventListener('click', () => setMode('color'));
+        document.getElementById('applyRuleBtn').addEventListener('click', applyRules);
+        document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+        document.getElementById('showAnswerBtn').addEventListener('click', showAnswer);
+        document.getElementById('copyAnswerBtn').addEventListener('click', copyAnswer);
+    }
+
+    // 初始化
+    function init() {
+        initColorCodeMap();
+        setGridSize(16);
+        setActiveTool('pencil');
+        bindEvents();
+        setMode('binary');
+        clearCanvas();
+    }
+    init();
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

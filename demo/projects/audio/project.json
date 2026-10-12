@@ -1,0 +1,13 @@
+{
+  "id": "audio",
+  "title": "声场 · 声音作品上传与评价",
+  "category": "creation",
+  "description": "上传一段声音，试听彼此的作品，用星级评价留下反馈。在大屏中查看作品与评价的关联。",
+  "subjects": [
+    "信息科技",
+    "音乐"
+  ],
+  "order": 1,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

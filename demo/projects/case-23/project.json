@@ -1,0 +1,12 @@
+{
+  "id": "case-23",
+  "title": "园林探访 · 模拟报名",
+  "category": "activities",
+  "description": "围绕植物观察、园林测绘与自然笔记体验报名，汇总主题选择和参与人数。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 23,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

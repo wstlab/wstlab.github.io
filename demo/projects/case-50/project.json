@@ -1,0 +1,12 @@
+{
+  "id": "case-50",
+  "title": "七年级英语单词连连看",
+  "category": "practice",
+  "description": "词义连线图谱：围绕得分、正确率、用时开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "英语"
+  ],
+  "order": 50,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "case-24",
+  "title": "影像作品 · 模拟共评",
+  "category": "activities",
+  "description": "为模拟影像作品留下评价与推荐理由，在大屏中比较观点。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 24,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

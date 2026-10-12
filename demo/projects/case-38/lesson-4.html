@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":38,"key":"case-38","title":"第20课 反馈控制有算法（5 课时）","category":"simulation","description":"经历算法诊断、阈值判断、自主仿真和反思，比较反馈控制的设计思路。","headline":"反馈算法实验簿","view":"flow","fields":[{"key":"threshold","label":"阈值"},{"key":"algorithm","label":"算法"},{"key":"result","label":"仿真结果"},{"key":"reflection","label":"反思"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"任务一 · 算法诊断"},{"file":"lesson-2.html","title":"任务二 · 八闽阈值速答"},{"file":"lesson-3.html","title":"任务三 · 自主设计与仿真"},{"file":"lesson-4.html","title":"任务四 · 对比反思"},{"file":"lesson-5.html","title":"微作业0 · 节水感知"}],"tasks":{"records":"cMr2KhdUMRE"},"mapping":{},"accent":"#3c697b","capture":true,"lesson":"任务四 · 对比反思"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务四 · 对比反思与生活迁移</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #eaf7e1, #d4e8c8);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            max-width: 760px;
+            width: 100%;
+            background: #fcfef9;
+            border-radius: 48px;
+            padding: 28px 24px 30px;
+            box-shadow: 0 20px 40px rgba(60, 90, 40, 0.16);
+            border: 2px solid #c3d7b0;
+            position: relative;
+        }
+        .card::before {
+            content: "🌅🏡";
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.06;
+            top: 0;
+            right: 0;
+            pointer-events: none;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px dashed #a7c494;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            background: #d4e8c4;
+            border-radius: 100px;
+            padding: 6px 18px 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f3f10;
+            border: 2px solid #5f7a4b;
+            box-shadow: 0 4px 0 #8aaa78;
+        }
+        .avatar span {
+            font-size: 2rem;
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f3b12;
+            background: #e6f0da;
+            padding: 4px 20px;
+            border-radius: 60px;
+            border: 2px solid #b1cb9a;
+        }
+        .badge {
+            background: #f5b342;
+            color: #2d401a;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 4px 14px;
+            border-radius: 60px;
+            border: 2px solid #c4882a;
+            margin-left: auto;
+        }
+
+        .chat {
+            background: #f4fae8;
+            border-radius: 28px 28px 28px 6px;
+            padding: 16px 20px;
+            border: 2px solid #b8d0a3;
+            margin: 10px 0 18px;
+            position: relative;
+        }
+        .chat::before {
+            content: "🤔";
+            position: absolute;
+            font-size: 28px;
+            left: -10px;
+            top: -10px;
+            background: #f4fae8;
+            border-radius: 50%;
+            padding: 2px;
+            border: 2px solid #b8d0a3;
+        }
+        .chat p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #1d3313;
+        }
+        .chat strong {
+            color: #2a6a1a;
+        }
+        .chat .hl {
+            background: #1e3d1a;
+            color: #b5e09a;
+            font-weight: 700;
+            padding: 2px 14px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 1.05rem;
+        }
+
+        .mission {
+            background: #eef6e4;
+            border-radius: 32px;
+            padding: 20px 18px;
+            border: 2px solid #b6cf9e;
+        }
+        .mission h3 {
+            font-size: 1.1rem;
+            color: #1b3c0d;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mission h3 .num {
+            background: #4f8a3a;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        /* 反思卡片 */
+        .reflect-item {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 2px solid #c6dbb2;
+            margin: 12px 0;
+        }
+        .reflect-item .q {
+            font-weight: 700;
+            color: #1f3f10;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reflect-item .q .icon {
+            font-size: 1.3rem;
+        }
+        .reflect-item .sub-q {
+            font-weight: 600;
+            color: #29501a;
+            font-size: 0.9rem;
+            margin: 4px 0;
+        }
+
+        .fill-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 12px;
+            margin: 6px 0;
+            font-size: 0.95rem;
+            color: #1e3d10;
+        }
+        .fill-row .label {
+            font-weight: 600;
+            color: #29501a;
+        }
+        .fill-row .blank {
+            display: inline-block;
+            border-bottom: 4px solid #7fad66;
+            min-width: 70px;
+            background: #fafff5;
+            border-radius: 4px;
+        }
+        .fill-row .blank input {
+            border: none;
+            border-bottom: 4px solid #7fad66;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1d4a0d;
+            width: 100%;
+            min-width: 60px;
+            outline: none;
+            padding: 2px 6px;
+            height: 30px;
+        }
+        .fill-row .blank input:focus {
+            border-bottom-color: #3f7a2a;
+        }
+        .fill-row .hint {
+            font-size: 0.8rem;
+            background: #e3efd2;
+            padding: 2px 14px;
+            border-radius: 40px;
+            color: #3f622b;
+        }
+
+        .reflect-item textarea {
+            width: 100%;
+            border: 2px solid #b6cd9d;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 56px;
+            font-family: inherit;
+            outline: none;
+            background: #fafff5;
+            transition: 0.1s;
+            margin-top: 4px;
+        }
+        .reflect-item textarea:focus {
+            border-color: #5d8846;
+            background: #f6ffe8;
+            box-shadow: 0 0 0 4px #c7e0b0;
+        }
+
+        .reflect-item .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 6px 0;
+        }
+        .reflect-item .tag-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #eef6e4;
+            padding: 4px 16px;
+            border-radius: 60px;
+            border: 2px solid #c6dbb2;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1f3f10;
+        }
+        .reflect-item .tag-group label:hover {
+            border-color: #7fad66;
+        }
+        .reflect-item .tag-group input[type="radio"] {
+            accent-color: #4f8a3a;
+        }
+
+        /* 总结框 */
+        .summary-box {
+            background: #dcefd0;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border-left: 6px solid #3f8a3f;
+            margin: 12px 0 6px;
+        }
+        .summary-box .label {
+            font-weight: 700;
+            color: #1f3f10;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .summary-box .blank {
+            display: inline-block;
+            border-bottom: 4px solid #2b5f1a;
+            min-width: 200px;
+            background: #f6ffe8;
+            border-radius: 4px;
+        }
+        .summary-box .blank input {
+            border: none;
+            border-bottom: 4px solid #2b5f1a;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1d4a0d;
+            width: 100%;
+            min-width: 180px;
+            outline: none;
+            padding: 2px 6px;
+            height: 30px;
+        }
+        .summary-box .blank input:focus {
+            border-bottom-color: #1a4a0a;
+        }
+
+        /* 自评 */
+        .self-eval {
+            background: #f6ffe8;
+            border-radius: 32px;
+            padding: 12px 16px;
+            border: 2px solid #b6cf9e;
+            margin: 14px 0 6px;
+        }
+        .self-eval .title-sm {
+            font-weight: 700;
+            color: #1f3f10;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .self-eval .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .self-eval .options label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: white;
+            padding: 4px 14px;
+            border-radius: 60px;
+            border: 2px solid #c6dbb2;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .self-eval .options label:hover {
+            border-color: #7fad66;
+        }
+        .self-eval .options input[type="radio"] {
+            accent-color: #4f8a3a;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+            justify-content: center;
+        }
+        .btn {
+            border-radius: 80px;
+            padding: 10px 28px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.06s linear;
+            border: 3px solid #92af7a;
+            background: #e3f2d4;
+            color: #1d3a0d;
+            box-shadow: 0 4px 0 #7f9d67;
+            border: none;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #7f9d67;
+        }
+        .btn-primary {
+            background: #79b85e;
+            border-color: #3f7a2a;
+            color: white;
+            box-shadow: 0 4px 0 #2a5f1a;
+            border: 3px solid #3f7a2a;
+        }
+        .btn-primary:active {
+            box-shadow: 0 1px 0 #2a5f1a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 3px solid #7f9d67;
+            color: #1d3a0d;
+            box-shadow: 0 4px 0 #7f9d67;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #2a5f1a;
+            margin-top: 12px;
+            min-height: 24px;
+        }
+
+        .footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #427031;
+            border-top: 2px dotted #b3cd9b;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .footer span {
+            background: #e2efd3;
+            padding: 2px 14px;
+            border-radius: 60px;
+            border: 1px solid #aac092;
+        }
+
+        .inline-flex {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (max-width: 520px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .badge {
+                margin-left: 0;
+                text-align: center;
+            }
+            .self-eval .options {
+                flex-direction: column;
+            }
+            .fill-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .fill-row .blank {
+                min-width: 100%;
+            }
+            .summary-box .blank {
+                min-width: 100%;
+            }
+            .summary-box .blank input {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="avatar"><span>🤔</span> 反思者</div>
+        <div class="title">🌅 对比反思 · 生活迁移</div>
+        <div class="badge">⏱ 3分钟</div>
+    </div>
+
+    <div class="chat">
+        <p>
+            <strong>“对比临平 <span class="hl">95%</span> 节水率，你的差距在哪？”</strong><br>
+            “如果给自家阳台设计灌溉方案，<strong style="color:#2a6a1a;">你会怎么设置阈值？</strong>”
+        </p>
+    </div>
+
+    <div class="mission">
+        <h3><span class="num">4</span> 对比 · 迁移 · 总结</h3>
+
+        
+        <div class="reflect-item">
+            <div class="q"><span class="icon">📊</span> 1. 对比临平</div>
+
+            <div class="fill-row">
+                <span class="label">我的最终节水率：</span>
+                <span class="blank"><input type="text" id="myRate" placeholder="?"></span>
+                <span class="hint">%</span>
+                <span style="font-weight:600; color:#2a5f1a; background:#dcefd0; padding:0 14px; border-radius:30px;">临平 95%</span>
+            </div>
+
+            <div class="sub-q" style="margin-top:8px;">📌 差距主要在：</div>
+            <textarea id="gapReason" placeholder="写下你的分析……（如：传感器精度、算法因素、环境数据等）"></textarea>
+
+            <div style="margin-top:8px; font-size:0.85rem; color:#3f622b; background:#f6ffe8; padding:6px 14px; border-radius:12px; border:1px solid #b6cf9e;">
+                💡 提示：可以从传感器精度、算法考量因素、数据来源等方面分析
+            </div>
+        </div>
+
+        
+        <div class="reflect-item">
+            <div class="q"><span class="icon">🏡</span> 2. 生活迁移 — 为自家阳台设计</div>
+
+            <div class="fill-row">
+                <span class="label">种植作物：</span>
+                <span class="blank"><input type="text" id="plantType" placeholder="如：多肉、草莓"></span>
+            </div>
+
+            <div class="fill-row">
+                <span class="label">🌱 湿度下限：</span>
+                <span class="blank"><input type="text" id="lowerLimit" placeholder="?"></span>
+                <span class="hint">%</span>
+                <span class="label" style="margin-left:12px;">📈 湿度上限：</span>
+                <span class="blank"><input type="text" id="upperLimit" placeholder="?"></span>
+                <span class="hint">%</span>
+            </div>
+
+            <div class="sub-q" style="margin-top:8px;">📌 为什么这样设置？</div>
+            <textarea id="reasonText" placeholder="写出你的理由……（如：多肉耐旱，过湿会烂根）"></textarea>
+
+            <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;">
+                <span style="font-weight:600; color:#29501a; font-size:0.9rem;">参考作物：</span>
+                <span style="background:#eef6e4; padding:2px 14px; border-radius:30px; font-size:0.85rem; border:1px solid #c6dbb2;">🌵 多肉：下限20% 上限40%</span>
+                <span style="background:#eef6e4; padding:2px 14px; border-radius:30px; font-size:0.85rem; border:1px solid #c6dbb2;">🍓 草莓：下限70% 上限80%</span>
+                <span style="background:#eef6e4; padding:2px 14px; border-radius:30px; font-size:0.85rem; border:1px solid #c6dbb2;">🌿 绿萝：下限60% 上限85%</span>
+            </div>
+        </div>
+
+        
+        <div class="summary-box">
+            <span class="label">💡 3. 总结 · 反馈控制算法的关键是：</span>
+            <div class="blank" style="min-width:100%;">
+                <input type="text" id="summaryKey" placeholder="写下你的理解……" style="min-width:100%;">
+            </div>
+        </div>
+
+        
+        <div class="self-eval">
+            <span class="title-sm">🧠 我的反思深度：</span>
+            <div class="options">
+                <label><input type="radio" name="depth" value="A"> 🌟🌟🌟 定量分析 + ≥2个原因</label>
+                <label><input type="radio" name="depth" value="B"> 🌟🌟 1个原因</label>
+                <label><input type="radio" name="depth" value="C" checked> 🌟 仅填数据</label>
+            </div>
+        </div>
+
+        
+        <div class="actions">
+            <button class="btn btn-primary" id="submitBtn">📤 提交反思</button>
+            <button class="btn btn-outline" id="resetBtn">🔄 重置</button>
+        </div>
+
+        <div class="feedback" id="feedbackMsg">💬 填写所有反思内容 → 自评 → 提交</div>
+    </div>
+
+    <div class="footer">
+        <span>🌿 任务四 · 对比反思与生活迁移</span>
+        <span>🤔 总结与迁移</span>
+        <span>📖 教材 P99 拓展与提升</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedback = document.getElementById('feedbackMsg');
+
+        // 所有输入项
+        const inputs = [
+            document.getElementById('myRate'),
+            document.getElementById('gapReason'),
+            document.getElementById('plantType'),
+            document.getElementById('lowerLimit'),
+            document.getElementById('upperLimit'),
+            document.getElementById('reasonText'),
+            document.getElementById('summaryKey')
+        ];
+
+        function countFilled() {
+            let c = 0;
+            inputs.forEach(inp => {
+                if (inp.value && inp.value.trim() !== '') c++;
+            });
+            return c;
+        }
+
+        function getDepthLabel() {
+            const radios = document.querySelectorAll('input[name="depth"]');
+            for (let r of radios) {
+                if (r.checked) return r.parentElement.textContent.trim();
+            }
+            return '未选择';
+        }
+
+        function handleSubmit() {
+            const filled = countFilled();
+            const total = inputs.length;
+            const depth = getDepthLabel();
+
+            // 获取部分内容用于反馈（不提供答案，只展示填写情况）
+            const myRate = document.getElementById('myRate').value.trim() || '未填';
+            const plant = document.getElementById('plantType').value.trim() || '未填';
+            const summary = document.getElementById('summaryKey').value.trim() || '未填';
+
+            let msg = `✅ 填写了 ${filled}/${total} 个空；`;
+            msg += `节水率：${myRate}%；作物：${plant}；`;
+            msg += `总结：${summary.substring(0, 15)}${summary.length > 15 ? '…' : ''}；`;
+            msg += `自评：${depth}`;
+
+            // 鼓励性引导（不提供答案）
+            if (filled < 4) {
+                msg += ' 💪 继续完成反思，越深入收获越大！';
+            } else if (filled < total) {
+                msg += ' 🌱 不错，再补充一下细节！';
+            } else {
+                msg += ' 👏 反思完成！把算法思维带到生活中去吧！';
+            }
+
+            // 如果节水率填了，给出对比提示
+            const rateNum = parseFloat(myRate);
+            if (!isNaN(rateNum) && rateNum > 0) {
+                if (rateNum >= 90) {
+                    msg += ' 🎉 接近临平95%！继续保持！';
+                } else if (rateNum >= 70) {
+                    msg += ' 💪 还不错！向临平95%看齐！';
+                } else if (rateNum >= 50) {
+                    msg += ' 📈 有提升空间，思考一下差距在哪？';
+                } else {
+                    msg += ' 🌱 试试调整算法参数，提高节水率！';
+                }
+            }
+
+            feedback.textContent = msg;
+            feedback.style.color = '#1d4a0d';
+        }
+
+        function resetAll() {
+            inputs.forEach(inp => inp.value = '');
+            document.querySelector('input[name="depth"][value="C"]').checked = true;
+            feedback.textContent = '🔄 已重置，重新反思吧！';
+            feedback.style.color = '#3d6b2a';
+        }
+
+        submitBtn.addEventListener('click', handleSubmit);
+        resetBtn.addEventListener('click', resetAll);
+
+        // 回车快捷提交
+        inputs.forEach(inp => {
+            if (inp.tagName === 'INPUT') {
+                inp.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') handleSubmit();
+                });
+            }
+        });
+
+        // 初始提示
+        feedback.textContent = '💬 填写所有反思内容 → 自评 → 提交';
+    })();
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>

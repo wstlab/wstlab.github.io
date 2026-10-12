@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {root} from './build.mjs';
+const [id,title=id]=process.argv.slice(2);
+if(!/^[a-z][a-z0-9-]{1,49}$/.test(id||'')||id==='shared')throw Error('用法：npm run new -- my-demo "项目名称"（ID 为小写英文、数字和连字符）');
+const dir=path.join(root,'projects',id);
+if(fs.existsSync(dir))throw Error('项目已存在：'+id);
+fs.mkdirSync(dir);
+fs.writeFileSync(path.join(dir,'project.json'),JSON.stringify({id,title,category:'exploration',description:'请补充教学目标与交互说明。',subjects:[],order:100,app:'index.html',dashboard:'dashboard.html'},null,2)+'\n');
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const head=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><script src="/config.js"></script><script src="/projects/shared/transport.js"></script></head><body><a href="/index.html">返回作品集</a><h1>${esc(title)}</h1>`;
+fs.writeFileSync(path.join(dir,'index.html'),head+'<form id="form"><label>学习发现 <input name="reflection" required></label><button>提交</button></form><p id="status" role="status"></p><a href="dashboard.html">数据大屏</a><script>document.getElementById("form").onsubmit=async e=>{e.preventDefault();try{const r=await fetch("https://qf.kjxs.site/api/'+id+'",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});if(!r.ok)throw Error("保存失败");document.getElementById("status").textContent="已保存";}catch(e){document.getElementById("status").textContent=e.message;}};</script></body></html>');
+fs.writeFileSync(path.join(dir,'dashboard.html'),head+'<a href="index.html">应用展示</a><pre id="records"></pre><script>fetch("https://qf.kjxs.site/api/'+id+'/all").then(r=>r.json()).then(d=>document.getElementById("records").textContent=JSON.stringify(d.submissions,null,2)).catch(e=>document.getElementById("records").textContent=e.message);</script></body></html>');
+console.log(`Created projects/${id}; edit project.json, then npm run check`);

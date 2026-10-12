@@ -1,0 +1,13 @@
+{
+  "id": "case-14",
+  "title": "雷达目标定位 · 方位角探究",
+  "category": "simulation",
+  "description": "方位角定位轨迹：围绕定位角度、定位距离、任务开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "数学",
+    "物理"
+  ],
+  "order": 14,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

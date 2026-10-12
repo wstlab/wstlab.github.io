@@ -1,0 +1,12 @@
+{
+  "id": "case-36",
+  "title": "单词跑酷挑战",
+  "category": "practice",
+  "description": "单词闯关轨迹：围绕单元、用时、最佳用时开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "英语"
+  ],
+  "order": 36,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":31,"key":"case-31","title":"神经智学舱 · 神经系统交互学习平台","category":"exploration","description":"走进脑、脊髓、周围神经和传导通路四个模块，记录学习过程。","headline":"神经系统学习地图","view":"flow","fields":[{"key":"pageTitle","label":"学习模块"},{"key":"duration","label":"学习秒数"},{"key":"action","label":"学习行为"}],"upload":"","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"应用展示"}],"tasks":{"records":"IfFvMpIjFHR"},"mapping":{"xp011mi5im":"IfFvMpIjFHR"},"accent":"#327a72","capture":false,"lesson":"应用展示"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神经系统交互学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-title h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .main-title p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* 四宫格布局 */
+        .cards-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 25px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            flex-shrink: 0;
+        }
+
+        .card-title h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .card-title p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* 模块内容区域 */
+        .card-modules {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .module-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 12px 15px;
+        }
+
+        .module-section-title {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .module-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .module-item {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.85);
+            transition: all 0.3s;
+        }
+
+        .card:hover .module-item {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        .brain-card:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .spinal-card:hover {
+            border-color: rgba(46, 204, 113, 0.5);
+        }
+
+        .peripheral-card:hover {
+            border-color: rgba(241, 196, 15, 0.5);
+        }
+
+        .pathway-card:hover {
+            border-color: rgba(231, 76, 60, 0.5);
+        }
+
+        /* 点击提示 */
+        .click-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .click-hint {
+            opacity: 1;
+        }
+
+        /* 展厅按钮 */
+        .exhibition-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow:
+                0 8px 20px rgba(102, 126, 234, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-decoration: none;
+        }
+
+        .exhibition-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow:
+                0 12px 30px rgba(102, 126, 234, 0.6),
+                0 6px 12px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .exhibition-btn:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            box-shadow:
+                0 4px 10px rgba(102, 126, 234, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 -2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .exhibition-btn-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .exhibition-btn-text {
+            font-size: 0.75rem;
+            color: #fff;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* 中心展厅按钮 */
+        .exhibition-btn-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow:
+                0 12px 35px rgba(102, 126, 234, 0.5),
+                0 8px 15px rgba(0, 0, 0, 0.4),
+                inset 0 2px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            padding: 10px;
+        }
+
+        .exhibition-btn-center:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow:
+                0 15px 40px rgba(102, 126, 234, 0.7),
+                0 8px 16px rgba(0, 0, 0, 0.5),
+                inset 0 2px 6px rgba(255, 255, 255, 0.5),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .exhibition-btn-center:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            box-shadow:
+                0 6px 15px rgba(102, 126, 234, 0.4),
+                0 3px 6px rgba(0, 0, 0, 0.3),
+                inset 0 2px 6px rgba(0, 0, 0, 0.3),
+                inset 0 -2px 6px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 展厅iframe容器 */
+        .exhibition-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            background: #1a1a2e;
+            flex-direction: column;
+        }
+
+        .exhibition-container.active {
+            display: flex;
+        }
+
+        .exhibition-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exhibition-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .close-btn {
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .close-btn:hover {
+            background: rgba(231, 76, 60, 1);
+            transform: scale(1.05);
+        }
+
+        .exhibition-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .exhibition-iframe {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .exhibition-iframe.loaded {
+            opacity: 1;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .exhibition-header {
+                padding: 12px 20px;
+            }
+
+            .exhibition-title {
+                font-size: 1rem;
+            }
+
+            .close-btn {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* 版权信息 */
+        .footer {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* iframe 容器 */
+        .iframe-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: #1a1a2e;
+        }
+
+        .iframe-container.active {
+            display: block;
+        }
+
+        .iframe-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .iframe-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .iframe-wrapper {
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+        }
+
+        /* ========== 可折叠应用容器 ========== */
+        .app-iframe-section {
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            width: 100%;
+            padding: 0 30px;
+        }
+
+        .app-iframe-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .app-iframe-container:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-iframe-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 25px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .app-iframe-header:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+        }
+
+        .app-iframe-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .app-iframe-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .app-iframe-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .app-iframe-container.collapsed .app-iframe-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .app-iframe-wrapper {
+            height: 600px;
+            transition: height 0.4s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .app-iframe-container.collapsed .app-iframe-wrapper {
+            height: 0;
+            opacity: 0;
+        }
+
+        .app-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        .app-iframe-hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .app-iframe-section {
+                padding: 0 15px;
+                margin-bottom: 20px;
+            }
+
+            .app-iframe-header {
+                padding: 15px 20px;
+            }
+
+            .app-iframe-title {
+                font-size: 1rem;
+            }
+
+            .app-iframe-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+            }
+
+            .app-iframe-wrapper {
+                height: 400px;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .main-title h1 {
+                font-size: 2rem;
+            }
+
+            .main-title p {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 15px;
+            }
+
+            .main-title h1 {
+                font-size: 1.6rem;
+                letter-spacing: 2px;
+            }
+
+            .main-title p {
+                font-size: 0.85rem;
+            }
+
+            .logo-icon {
+                font-size: 2rem;
+            }
+
+            .cards-container {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .card-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.5rem;
+            }
+
+            .card-title h2 {
+                font-size: 1.1rem;
+            }
+
+            .card-title p {
+                font-size: 0.7rem;
+            }
+
+            .module-section {
+                padding: 8px 10px;
+            }
+
+            .module-section-title {
+                font-size: 0.8rem;
+            }
+
+            .module-item {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* 背景音乐控制按钮 */
+        .music-control {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .music-control.playing {
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 4px 25px rgba(102, 126, 234, 0.8), 0 0 30px rgba(102, 126, 234, 0.4); }
+        }
+
+        .music-control.muted {
+            background: linear-gradient(145deg, #666 0%, #444 100%);
+            opacity: 0.7;
+        }
+
+        /* ========== 学习时长排行榜组件 ========== */
+        .study-ranking-widget {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            z-index: 998;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        }
+
+        .ranking-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+
+        .ranking-header-icon {
+            font-size: 1.3rem;
+        }
+
+        .ranking-header-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .ranking-item.top3 {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.25);
+        }
+
+        .ranking-item.top3:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        .ranking-item.top1 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 100%);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .ranking-item.top2 {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(169, 169, 169, 0.15) 100%);
+            border-color: rgba(192, 192, 192, 0.4);
+        }
+
+        .ranking-item.top3 {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(184, 115, 51, 0.15) 100%);
+            border-color: rgba(205, 127, 50, 0.4);
+        }
+
+        .ranking-number {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ranking-number.gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .ranking-number.silver {
+            background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4);
+        }
+
+        .ranking-number.bronze {
+            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+        }
+
+        .ranking-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ranking-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ranking-time {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 2px;
+        }
+
+        .ranking-item.rotating {
+            animation: rotateIn 0.5s ease;
+        }
+
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .ranking-error {
+            padding: 15px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .ranking-loading {
+            padding: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .ranking-loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .ranking-update-time {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 1200px) {
+            .study-ranking-widget {
+                display: none;
+            }
+        }
+
+        /* ========== 登录模态框样式 ========== */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: none;
+        }
+
+        .login-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        .login-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: loginSlideIn 0.4s ease;
+        }
+
+        @keyframes loginSlideIn {
+            from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-box.shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .login-header h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .label-icon {
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .login-error {
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #e74c3c;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-submit {
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .login-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .login-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .login-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-footer p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* 用户信息栏 */
+        .user-info-bar {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .user-info-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar { font-size: 1.3rem; }
+
+        .user-name {
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .user-id {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            padding: 6px 14px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 30px 25px;
+            }
+
+            .user-info-bar {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 15px;
+                display: flex;
+                justify-content: center;
+            }
+
+            .user-info-content {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="login-modal" id="loginModal">
+        <div class="login-overlay"></div>
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="login-icon">🔐</div>
+                    <h2>学生登录</h2>
+                    <p>欢迎访问神经系统交互学习平台</p>
+                </div>
+                <form id="loginForm" class="login-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="studentName">
+                            <span class="label-icon">👤</span>
+                            用户名
+                        </label>
+                        <input type="text" id="studentName" name="studentName" placeholder="请输入您的姓名" maxlength="20" autocomplete="off">
+                        <span class="input-hint">支持中文、英文及常见符号，至少2个字符</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentId">
+                            <span class="label-icon">🎫</span>
+                            密码
+                        </label>
+                        <input type="text" id="studentId" name="studentId" placeholder="请输入您的学号" maxlength="20" inputmode="numeric" autocomplete="off">
+                        <span class="input-hint">仅支持数字输入，至少4位，系统验证学号后四位</span>
+                    </div>
+                    <div id="loginError" class="login-error"></div>
+                    <button type="submit" id="loginSubmit" class="login-submit">
+                        <span class="submit-text">立即登录</span>
+                        <span class="submit-loading" style="display:none;">
+                            <span class="login-spinner"></span>
+                            登录中...
+                        </span>
+                    </button>
+                </form>
+                <div class="login-footer">
+                    <p>登录启程，一同探秘神经世界的无穷奥秘</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="study-ranking-widget" id="studyRankingWidget">
+        <div class="ranking-header">
+            <span class="ranking-header-icon">🏆</span>
+            <span class="ranking-header-title">学习时长榜</span>
+        </div>
+        <div class="ranking-list" id="rankingList">
+            <div class="ranking-loading">
+                <div class="ranking-loading-spinner"></div>
+                <div>加载中...</div>
+            </div>
+        </div>
+        <div class="ranking-update-time" id="rankingUpdateTime"></div>
+    </div>
+
+    
+    <audio id="bgMusic" loop preload="auto">
+        <source src="http://tdwcxoa3x.hd-bkt.clouddn.com/beijingyingyue.mp3" type="audio/mpeg">
+    </audio>
+
+    
+    <button class="music-control" id="musicBtn" onclick="toggleMusic()" title="背景音乐">
+        🎵
+    </button>
+
+    <div class="main-container">
+        <header>
+            <div class="header-content">
+                <div class="main-title">
+                    <div class="logo-icon">🧠</div>
+                    <h1>神经系统交互学习平台</h1>
+                    <p>探索神经奥秘，守护生命健康</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="cards-container">
+            
+            <div class="card brain-card" onclick="loadPage('brain.html', '🧠', '脑')">
+                <div class="card-header">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-title">
+                        <h2>脑</h2>
+                        <p>守护 "指挥中枢"，践行医者仁心</p>
+                    </div>
+                </div>
+                <div class="card-modules">
+                    <div class="module-section">
+                        <div class="module-section-title">📚 学习模块</div>
+                        <div class="module-items">
+                            <span class="module-item">🎬 微课视频</span>
+                            <span class="module-item">🎮 3D仿真</span>
+                            <span class="module-item">📚 理论知识</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">🏥 临床实践</div>
+                        <div class="module-items">
+                            <span class="module-item">🏥 临床病例</span>
+                            <span class="module-item">💉 护理操作</span>
+                            <span class="module-item">🔬 实训要点</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">📝 复习巩固</div>
+                        <div class="module-items">
+                            <span class="module-item">💡 记忆口诀</span>
+                            <span class="module-item">📋 知识闪卡</span>
+                            <span class="module-item">📝 考证模拟</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-hint">点击进入 →</div>
+            </div>
+
+            
+            <div class="card spinal-card" onclick="loadPage('spinal.html', '🦴', '脊髓')">
+                <div class="card-header">
+                    <div class="card-icon">🦴</div>
+                    <div class="card-title">
+                        <h2>脊髓</h2>
+                        <p>筑牢 "生命支柱"，传承责任担当</p>
+                    </div>
+                </div>
+                <div class="card-modules">
+                    <div class="module-section">
+                        <div class="module-section-title">📚 学习模块</div>
+                        <div class="module-items">
+                            <span class="module-item">🎬 微课视频</span>
+                            <span class="module-item">🎮 3D仿真</span>
+                            <span class="module-item">📚 理论知识</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">🏥 临床实践</div>
+                        <div class="module-items">
+                            <span class="module-item">🏥 临床病例</span>
+                            <span class="module-item">💉 护理操作</span>
+                            <span class="module-item">🔬 实训要点</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">📝 复习巩固</div>
+                        <div class="module-items">
+                            <span class="module-item">💡 记忆口诀</span>
+                            <span class="module-item">📋 知识闪卡</span>
+                            <span class="module-item">📝 考证模拟</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-hint">点击进入 →</div>
+            </div>
+
+            
+            <div class="card peripheral-card" onclick="loadPage('peripheral.html', '⚡', '周围神经')">
+                <div class="card-header">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">
+                        <h2>周围神经</h2>
+                        <p>筑牢 "生命支柱"，传承责任担当</p>
+                    </div>
+                </div>
+                <div class="card-modules">
+                    <div class="module-section">
+                        <div class="module-section-title">📚 学习模块</div>
+                        <div class="module-items">
+                            <span class="module-item">🎬 微课视频</span>
+                            <span class="module-item">🎮 3D仿真</span>
+                            <span class="module-item">📚 科普教育</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">🏥 临床实践</div>
+                        <div class="module-items">
+                            <span class="module-item">🏥 临床病例</span>
+                            <span class="module-item">💉 护理操作</span>
+                            <span class="module-item">🔬 实训要点</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">📝 复习巩固</div>
+                        <div class="module-items">
+                            <span class="module-item">💡 记忆口诀</span>
+                            <span class="module-item">📋 知识闪卡</span>
+                            <span class="module-item">📝 考证模拟</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-hint">点击进入 →</div>
+            </div>
+
+            
+            <div class="card pathway-card" onclick="loadPage('pathway.html', '🔄', '神经传导通路')">
+                <div class="card-header">
+                    <div class="card-icon">🔄</div>
+                    <div class="card-title">
+                        <h2>神经传导通路</h2>
+                        <p>贯通 "信号链路"，厚植家国情怀</p>
+                    </div>
+                </div>
+                <div class="card-modules">
+                    <div class="module-section">
+                        <div class="module-section-title">📚 学习模块</div>
+                        <div class="module-items">
+                            <span class="module-item">🎬 微课视频</span>
+                            <span class="module-item">🎮 3D仿真</span>
+                            <span class="module-item">📚 科普教育</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">🏥 临床实践</div>
+                        <div class="module-items">
+                            <span class="module-item">🏥 临床病例</span>
+                            <span class="module-item">💉 护理操作</span>
+                            <span class="module-item">🔬 实训要点</span>
+                        </div>
+                    </div>
+                    <div class="module-section">
+                        <div class="module-section-title">📝 复习巩固</div>
+                        <div class="module-items">
+                            <span class="module-item">💡 记忆口诀</span>
+                            <span class="module-item">📋 知识闪卡</span>
+                            <span class="module-item">📝 考证模拟</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="click-hint">点击进入 →</div>
+            </div>
+
+            
+            <div class="exhibition-btn-center" onclick="openExhibition()">
+                <span class="exhibition-btn-icon">🏛️</span>
+                <span class="exhibition-btn-text">神经虚拟<br>展厅</span>
+            </div>
+        </div>
+
+        
+        <section class="app-iframe-section">
+            <div class="app-iframe-container" id="appIframeContainer">
+                <div class="app-iframe-header" onclick="toggleAppIframe()">
+                    <div class="app-iframe-title">
+                        <div class="app-iframe-icon">📚</div>
+                        <span>扩展学习资源<span class="app-iframe-hint">(点击折叠/展开)</span></span>
+                    </div>
+                    <div class="app-iframe-toggle" id="appIframeToggle">▼</div>
+                </div>
+                <div class="app-iframe-wrapper">
+                    <iframe class="app-iframe" src="https://app-anso98abiold.appmiaoda.com" frameborder="0" allowfullscreen allow="clipboard-write"></iframe>
+                </div>
+            </div>
+        </section>
+
+        
+        <footer class="footer">
+            <p class="footer-text">人体解剖学教育研究中心 | 2026</p>
+        </footer>
+    </div>
+
+    
+    <div class="iframe-container" id="iframeContainer">
+        <div class="iframe-header">
+            <div class="iframe-title">
+                <span id="pageIcon">🧠</span>
+                <span id="pageTitle">脑</span>
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                <span>←</span> 返回首页
+            </button>
+        </div>
+        <iframe id="contentFrame" class="iframe-wrapper" src="" frameborder="0"></iframe>
+    </div>
+
+    
+    <div class="exhibition-container" id="exhibitionContainer">
+        <div class="exhibition-header">
+            <div class="exhibition-title">
+                <span>🏛️</span>
+                <span>虚拟展厅</span>
+            </div>
+            <button class="close-btn" onclick="closeExhibition()">
+                <span>✕</span> 关闭
+            </button>
+        </div>
+        <div class="exhibition-loading" id="exhibitionLoading">
+            <div class="loading-spinner"></div>
+            <p>正在加载展厅内容...</p>
+        </div>
+        <iframe id="exhibitionFrame" class="exhibition-iframe" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // ========== 学习时长排行榜组件 ==========
+        (function() {
+            const API_URL = 'https://qf.kjxs.site/api/IfFvMpIjFHR/all';
+            const REFRESH_INTERVAL = 20000; // 20秒刷新一次
+            const ROTATE_INTERVAL = 5000;   // 5秒轮播一次
+            
+            let rankingData = [];
+            let rotateIndex = 0;
+            let refreshTimer = null;
+            let rotateTimer = null;
+            
+            /**
+             * 处理API数据，计算学生学习时长
+             * @param {Array} data - API返回的原始数据
+             * @returns {Array} - 按学习时长排序的学生列表
+             */
+            function processStudyData(data) {
+                const students = {};
+                
+                // 统计每个学生的登录次数和模块点击次数
+                data.forEach(record => {
+                    let username = null;
+                    
+                    // 从登录事件中获取用户名
+                    if (record.event === 'login' && record.username) {
+                        username = record.username;
+                    } else if (record.user && record.user.username) {
+                        username = record.user.username;
+                    }
+                    
+                    if (!username) return;
+                    
+                    if (!students[username]) {
+                        students[username] = {
+                            name: username,
+                            loginCount: 0,
+                            moduleClicks: 0
+                        };
+                    }
+                    
+                    if (record.event === 'login') {
+                        students[username].loginCount++;
+                    } else if (record.event === 'module_click') {
+                        students[username].moduleClicks++;
+                    }
+                });
+                
+                // 计算学习时长：每次登录算5分钟，每次模块点击算2分钟
+                const result = Object.values(students).map(student => {
+                    const studyMinutes = student.loginCount * 5 + student.moduleClicks * 2;
+                    return {
+                        name: student.name,
+                        minutes: studyMinutes,
+                        loginCount: student.loginCount
+                    };
+                });
+                
+                // 按学习时长降序排序
+                return result.sort((a, b) => b.minutes - a.minutes);
+            }
+            
+            /**
+             * 格式化学习时长显示
+             * @param {number} minutes - 分钟数
+             * @returns {string} - 格式化后的字符串
+             */
+            function formatStudyTime(minutes) {
+                if (minutes < 60) {
+                    return minutes + '分钟';
+                } else {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    if (mins === 0) {
+                        return hours + '小时';
+                    } else {
+                        return hours + '小时' + mins + '分';
+                    }
+                }
+            }
+            
+            /**
+             * 渲染排行榜
+             */
+            function renderRanking() {
+                const listContainer = document.getElementById('rankingList');
+                
+                if (rankingData.length === 0) {
+                    listContainer.innerHTML = '<div class="ranking-error">暂无学习数据</div>';
+                    return;
+                }
+                
+                let html = '';
+                
+                // 渲染前3名（固定显示）
+                for (let i = 0; i < Math.min(3, rankingData.length); i++) {
+                    const student = rankingData[i];
+                    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : 'top3';
+                    const numClass = i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
+                    
+                    html += `
+                        <div class="ranking-item ${rankClass}">
+                            <div class="ranking-number ${numClass}">${i + 1}</div>
+                            <div class="ranking-info">
+                                <div class="ranking-name">${escapeHtml(student.name)}</div>
+                                <div class="ranking-time">${formatStudyTime(student.minutes)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 渲染第4-10名（轮播显示）
+                if (rankingData.length > 3) {
+                    const rotateStudents = rankingData.slice(3, 10);
+                    if (rotateStudents.length > 0) {
+                        const currentStudent = rotateStudents[rotateIndex % rotateStudents.length];
+                        const actualRank = 3 + (rotateIndex % rotateStudents.length) + 1;
+                        
+                        html += `
+                            <div class="ranking-item rotating" id="rotateItem">
+                                <div class="ranking-number">${actualRank}</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">${escapeHtml(currentStudent.name)}</div>
+                                    <div class="ranking-time">${formatStudyTime(currentStudent.minutes)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // 如果有更多学生，显示提示
+                if (rankingData.length > 10) {
+                    html += `
+                        <div style="text-align: center; padding: 8px; font-size: 0.7rem; color: rgba(255,255,255,0.4);">
+                            共 ${rankingData.length} 名学生
+                        </div>
+                    `;
+                }
+                
+                listContainer.innerHTML = html;
+            }
+            
+            /**
+             * HTML转义，防止XSS攻击
+             * @param {string} text - 原始文本
+             * @returns {string} - 转义后的文本
+             */
+            function escapeHtml(text) {
+                if (typeof text !== 'string') return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            /**
+             * 轮播切换第4-10名
+             */
+            function rotateRanking() {
+                if (rankingData.length <= 3) return;
+                
+                rotateIndex++;
+                const rotateItem = document.getElementById('rotateItem');
+                
+                if (rotateItem) {
+                    // 淡出效果
+                    rotateItem.style.opacity = '0';
+                    rotateItem.style.transform = 'translateX(-10px)';
+                    
+                    setTimeout(() => {
+                        renderRanking();
+                        // 淡入效果
+                        const newItem = document.getElementById('rotateItem');
+                        if (newItem) {
+                            newItem.style.opacity = '1';
+                            newItem.style.transform = 'translateX(0)';
+                        }
+                    }, 300);
+                } else {
+                    renderRanking();
+                }
+            }
+            
+            /**
+             * 从API获取数据
+             */
+            async function fetchRankingData() {
+                const listContainer = document.getElementById('rankingList');
+                
+                try {
+                    const response = await fetch(API_URL);
+                    if (!response.ok) {
+                        throw new Error('网络请求失败: ' + response.status);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (result.submissions && Array.isArray(result.submissions)) {
+                        rankingData = processStudyData(result.submissions);
+                        renderRanking();
+                        
+                        // 更新最后更新时间
+                        const updateTimeEl = document.getElementById('rankingUpdateTime');
+                        if (updateTimeEl) {
+                            updateTimeEl.textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                        }
+                    } else {
+                        throw new Error('数据格式错误');
+                    }
+                } catch (error) {
+                    console.error('[排行榜] 数据获取失败:', error);
+                    listContainer.innerHTML = `
+                        <div class="ranking-error">
+                            <div>📡 数据加载失败</div>
+                            <div style="font-size: 0.75rem; margin-top: 5px;">请检查网络连接</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            /**
+             * 启动定时刷新
+             */
+            function startAutoRefresh() {
+                // 清除现有定时器
+                if (refreshTimer) clearInterval(refreshTimer);
+                if (rotateTimer) clearInterval(rotateTimer);
+                
+                // 立即获取数据
+                fetchRankingData();
+                
+                // 每20秒刷新数据
+                refreshTimer = setInterval(fetchRankingData, REFRESH_INTERVAL);
+                
+                // 每5秒轮播第4-5名
+                rotateTimer = setInterval(rotateRanking, ROTATE_INTERVAL);
+            }
+            
+            /**
+             * 初始化排行榜组件
+             */
+            function initRanking() {
+                startAutoRefresh();
+                
+                // 页面可见性变化时处理
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        // 页面隐藏时暂停定时器
+                        if (refreshTimer) clearInterval(refreshTimer);
+                        if (rotateTimer) clearInterval(rotateTimer);
+                    } else {
+                        // 页面显示时恢复定时器
+                        startAutoRefresh();
+                    }
+                });
+            }
+            
+            // 页面加载完成后初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initRanking);
+            } else {
+                initRanking();
+            }
+            
+            // 暴露刷新方法供外部调用
+            window.refreshStudyRanking = fetchRankingData;
+        })();
+
+        // ========== 数据发送到API（仅限已登录用户） ==========
+        function sendDataToAPI(page, pageTitle) {
+            var user = getAuthUser();
+
+            if (!user) {
+                console.log('[Data] ⚠️ 用户未登录，跳过数据发送，避免产生无用户名的浏览日志');
+                return;
+            }
+
+            var fullStudentId = localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour;
+            var currentPage = page || 'index.html';
+            var currentPageTitle = pageTitle || '神经系统交互学习平台-主页面';
+
+            console.log('[Data] ✅ 准备发送页面访问数据，当前用户:', user.username, '完整学号:', fullStudentId, '页面:', currentPage);
+
+            var postData = {
+                event: 'page_visit',
+                page: currentPage,
+                pageTitle: currentPageTitle,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                username: user.username,
+                studentId: fullStudentId,
+                studentIdLastFour: user.studentIdLastFour,
+                sessionId: sessionStorage.getItem('neuro_learn_session'),
+                source: 'main_page_auto'
+            };
+
+            fetch('https://qf.kjxs.site/api/IfFvMpIjFHR', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    console.log('[Data] ✅ 页面访问数据发送成功, 关联用户:', user.username);
+                    return response.json();
+                } else {
+                    throw new Error('服务器返回错误: ' + response.status);
+                }
+            })
+            .then(function(data) {
+                console.log('[Data] 📊 服务器响应:', data);
+            })
+            .catch(function(error) {
+                console.log('[Data] ❌ 数据发送失败:', error.message);
+            });
+        }
+
+        // 延迟发送数据，等待登录系统初始化完成
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var user = getAuthUser();
+                if (user) {
+                    console.log('[Data] 🎯 检测到已登录用户，准备发送页面访问数据...');
+                    sendDataToAPI('index.html', '神经系统交互学习平台-主页面');
+                } else {
+                    console.log('[Data] ⏳ 用户尚未登录，将在登录成功后发送数据');
+                    window.addEventListener('loginSuccess', function() {
+                        console.log('[Data] 🎯 捕获到登录成功事件，准备发送页面访问数据...');
+                        setTimeout(function() {
+                            sendDataToAPI('index.html', '神经系统交互学习平台-主页面');
+                        }, 500);
+                    }, { once: true });
+                }
+            }, 1500);
+        });
+
+        // 外部链接配置
+        var externalLinks = {
+            'brain.html': 'brain.html',
+            'spinal.html': 'spinal.html',
+            'peripheral.html': 'peripheral.html',
+            'pathway.html': 'pathway.html'
+        };
+
+        var modulePageMap = {
+            'brain.html': '脑',
+            'spinal.html': '脊髓',
+            'peripheral.html': '周围神经',
+            'pathway.html': '传导通路'
+        };
+
+        var currentModulePage = null;
+        var moduleVisitStartTime = null;
+
+        function getAuthUser() {
+            try {
+                var encrypted = localStorage.getItem('neuro_learn_auth');
+                if (!encrypted) {
+                    console.log('[getAuthUser] ⚠️ localStorage中未找到登录数据');
+                    return null;
+                }
+
+                console.log('[getAuthUser] 🔍 找到加密数据，开始解密...');
+
+                // 使用与登录模块相同的解密算法 (base64解码 + XOR解密)
+                var key = 'neuro_learn_2026_secure_key';
+
+                // 1. Base64解码
+                var binary = atob(encrypted);
+                var encryptedBytes = new Uint8Array(binary.length);
+                for (var i = 0; i < binary.length; i++) {
+                    encryptedBytes[i] = binary.charCodeAt(i);
+                }
+
+                // 2. 将密钥转换为字节数组
+                var keyBytes = new TextEncoder().encode(key);
+
+                // 3. XOR解密
+                var decryptedBytes = new Uint8Array(encryptedBytes.length);
+                for (var i = 0; i < encryptedBytes.length; i++) {
+                    decryptedBytes[i] = encryptedBytes[i] ^ keyBytes[i % keyBytes.length];
+                }
+
+                // 4. 转换为字符串
+                var decrypted = new TextDecoder().decode(decryptedBytes);
+
+                console.log('[getAuthUser] 🔓 解密结果:', decrypted.substring(0, 50) + '...');
+
+                var data = JSON.parse(decrypted);
+
+                if (!data || !data.username) {
+                    console.log('[getAuthUser] ⚠️ 登录数据格式无效');
+                    return null;
+                }
+
+                if (data.timestamp && (Date.now() - data.timestamp > 24 * 60 * 60 * 1000)) {
+                    console.log('[getAuthUser] ⚠️ 登录会话已过期(24小时)');
+                    localStorage.removeItem('neuro_learn_auth');
+                    sessionStorage.removeItem('neuro_learn_session');
+                    return null;
+                }
+
+                console.log('[getAuthUser] ✅ 成功获取用户信息:', data.username);
+                return {
+                    username: data.username,
+                    studentIdLastFour: data.studentIdLastFour
+                };
+            } catch (e) {
+                console.error('[getAuthUser] ❌ 解析用户数据失败:', e.message);
+                console.error('[getAuthUser] ❌ 错误详情:', e);
+                return null;
+            }
+        }
+
+        function trackEvent(eventData) {
+            var user = getAuthUser();
+            if (!user) return;
+            var fullStudentId = localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour;
+            var payload = {
+                event: eventData.event || 'interaction',
+                username: user.username,
+                studentId: fullStudentId,
+                studentIdLastFour: user.studentIdLastFour,
+                timestamp: new Date().toISOString(),
+                submitted_at: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            };
+            for (var key in eventData) {
+                if (eventData.hasOwnProperty(key) && key !== 'event') {
+                    payload[key] = eventData[key];
+                }
+            }
+            fetch('https://qf.kjxs.site/api/IfFvMpIjFHR', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(function(err) {
+                console.log('[Track] 事件发送失败:', err);
+            });
+        }
+
+        function loadPage(page, icon, title) {
+            console.log('[Navigation] 🚀 开始加载子页面:', page);
+
+            if (currentModulePage && moduleVisitStartTime) {
+                var duration = Math.round((Date.now() - moduleVisitStartTime) / 1000);
+                trackEvent({
+                    event: 'module_leave',
+                    module: modulePageMap[currentModulePage] || currentModulePage,
+                    duration: duration
+                });
+            }
+
+            document.getElementById('pageIcon').textContent = icon;
+            document.getElementById('pageTitle').textContent = title;
+
+            var externalUrl = externalLinks[page];
+            var targetUrl;
+
+            var user = getAuthUser();
+            var identityParams = '';
+
+            if (user) {
+                var fullStudentId = localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour;
+                var sessionId = sessionStorage.getItem('neuro_learn_session') || '';
+
+                identityParams = '?username=' + encodeURIComponent(user.username) +
+                                '&studentId=' + encodeURIComponent(fullStudentId) +
+                                '&studentIdLastFour=' + encodeURIComponent(user.studentIdLastFour) +
+                                '&sessionId=' + encodeURIComponent(sessionId) +
+                                '&timestamp=' + encodeURIComponent(Date.now()) +
+                                '&source=main_platform';
+
+                console.log('[Navigation] ✅ 用户身份信息准备完成:');
+                console.log('  - 用户名:', user.username);
+                console.log('  - 完整学号:', fullStudentId);
+                console.log('  - 学号后四位:', user.studentIdLastFour);
+                console.log('  - 会话ID:', sessionId);
+                console.log('  - 目标页面:', page);
+            } else {
+                console.warn('[Navigation] ⚠️ 未检测到登录用户，子页面将以无身份模式加载');
+                console.warn('[Navigation] 提示：这可能是正常情况（如首次访问），但学习数据可能无法关联到具体用户');
+                identityParams = '?timestamp=' + Date.now() + '&source=main_platform_anonymous';
+            }
+
+            if (externalUrl) {
+                targetUrl = externalUrl + (externalUrl.indexOf('?') === -1 ? identityParams : '&' + identityParams.substring(1));
+                console.log('[Navigation] 🔗 外部链接模式，最终URL长度:', targetUrl.length, '字符');
+            } else {
+                targetUrl = page + identityParams;
+                console.log('[Navigation] 🔗 本地文件模式，目标URL:', targetUrl);
+            }
+
+            console.log('[Navigation] 📡 正在设置iframe src属性...');
+            document.getElementById('contentFrame').src = targetUrl;
+            document.getElementById('iframeContainer').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            currentModulePage = page;
+            moduleVisitStartTime = Date.now();
+
+            updateIframeUserBar(user);
+
+            if (user) {
+                // 发送module_click事件记录用户点击
+                trackEvent({
+                    event: 'module_click',
+                    module: modulePageMap[page] || page,
+                    page: page,
+                    pageTitle: modulePageMap[page] || page,
+                    username: user.username,
+                    studentId: fullStudentId,
+                    studentIdLastFour: user.studentIdLastFour
+                });
+
+                // 发送page_visit事件记录页面访问
+                trackEvent({
+                    event: 'page_visit',
+                    page: page,
+                    pageTitle: (modulePageMap[page] || page) + ' - 微课学习',
+                    username: user.username,
+                    studentId: fullStudentId,
+                    studentIdLastFour: user.studentIdLastFour,
+                    source: 'module_page_visit'
+                });
+
+                console.log('[Navigation] ✅ 子页面加载成功，所有数据已关联到用户:', user.username);
+            } else {
+                console.warn('[Navigation] ⚠️ 虽然页面已加载，但未关联用户身份');
+            }
+        }
+
+        function updateIframeUserBar(user) {
+            var iframeHeader = document.querySelector('.iframe-header');
+            if (!iframeHeader || !user) return;
+
+            var existingUserBar = document.getElementById('iframeUserInfo');
+            if (existingUserBar) {
+                existingUserBar.remove();
+            }
+
+            var userBarDiv = document.createElement('div');
+            userBarDiv.id = 'iframeUserInfo';
+            userBarDiv.style.cssText = 'display: flex; align-items: center; gap: 15px; background: rgba(102, 126, 234, 0.15); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(102, 126, 234, 0.3);';
+            userBarDiv.innerHTML = '<span style="color: rgba(255,255,255,0.7); font-size: 0.85rem;">👤 当前学生:</span>' +
+                                   '<span style="color: #fff; font-weight: 600; font-size: 0.95rem;">' + user.username + '</span>' +
+                                   '<span style="color: rgba(255,255,255,0.6); font-size: 0.8rem;">| 学号:' + user.studentIdLastFour + '</span>' +
+                                   '<span style="color: #667eea; font-size: 0.75rem; margin-left: 5px;">✓ 身份已验证</span>';
+
+            var backButton = iframeHeader.querySelector('.back-btn');
+            if (backButton) {
+                iframeHeader.insertBefore(userBarDiv, backButton);
+            } else {
+                iframeHeader.appendChild(userBarDiv);
+            }
+        }
+
+        // 背景音乐控制
+        var bgMusic = document.getElementById('bgMusic');
+        var musicBtn = document.getElementById('musicBtn');
+        var isMusicPlaying = false;
+
+        // 初始化音乐状态
+        function initMusic() {
+            // 尝试自动播放（可能被浏览器阻止）
+            bgMusic.volume = 0.5;
+            var playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('playing');
+                }).catch(function() {
+                    // 自动播放被阻止，等待用户交互
+                    isMusicPlaying = false;
+                    musicBtn.classList.remove('playing');
+                });
+            }
+        }
+
+        // 切换音乐播放状态
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.classList.add('muted');
+                musicBtn.innerHTML = '🔇';
+                isMusicPlaying = false;
+            } else {
+                bgMusic.play().then(function() {
+                    musicBtn.classList.add('playing');
+                    musicBtn.classList.remove('muted');
+                    musicBtn.innerHTML = '🎵';
+                    isMusicPlaying = true;
+                }).catch(function(e) {
+                    console.log('音乐播放失败:', e);
+                });
+            }
+        }
+
+        // 页面加载完成后初始化音乐
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟初始化，避免影响页面加载性能
+            setTimeout(initMusic, 1000);
+        });
+
+        // 用户首次交互时尝试播放（解决浏览器自动播放策略）
+        document.addEventListener('click', function() {
+            if (!isMusicPlaying && bgMusic.paused) {
+                initMusic();
+            }
+        }, { once: true });
+
+        function goBack() {
+            console.log('[Navigation] ↩️ 用户正在返回主页面...');
+
+            var user = getAuthUser();
+
+            if (currentModulePage && moduleVisitStartTime) {
+                var duration = Math.round((Date.now() - moduleVisitStartTime) / 1000);
+
+                if (user) {
+                    trackEvent({
+                        event: 'module_leave',
+                        module: modulePageMap[currentModulePage] || currentModulePage,
+                        duration: duration,
+                        username: user.username,
+                        studentIdLastFour: user.studentIdLastFour
+                    });
+                    console.log('[Navigation] ✅ 已记录模块离开事件, 关联用户:', user.username);
+                } else {
+                    console.warn('[Navigation] ⚠️ 用户离开模块但未登录，跳过事件记录');
+                }
+            }
+
+            currentModulePage = null;
+            moduleVisitStartTime = null;
+
+            document.getElementById('iframeContainer').classList.remove('active');
+
+            var iframe = document.getElementById('contentFrame');
+            if (iframe) {
+                iframe.src = '';
+                console.log('[Navigation] 🧹 已清空iframe src属性，避免残留请求');
+            }
+
+            document.body.style.overflow = 'auto';
+
+            if (user) {
+                console.log('[Navigation] ✅ 成功返回主页面，当前用户:', user.username);
+                console.log('[Navigation] 💡 提示：返回后的任何操作都将关联到该用户');
+
+                setTimeout(function() {
+                    console.log('[Navigation] 📊 准备发送返回主页面的访问数据...');
+                    sendDataToAPI('index.html', '神经系统交互学习平台-主页面');
+                }, 1000);
+            } else {
+                console.warn('[Navigation] ⚠️ 返回主页面但未检测到登录用户');
+            }
+        }
+
+        // ========== 浏览器关闭时自动清除登录信息 ==========
+        window.addEventListener('beforeunload', function(e) {
+            var user = getAuthUser();
+            if (user) {
+                console.log('[Session] 🔄 浏览器正在关闭/刷新，当前用户:', user.username);
+
+                var isClosing = !e.target.document.hidden &&
+                                 performance.navigation.type === 0;
+
+                if (isClosing || e.clientY < 0) {
+                    console.log('[Session] 🚪 检测到浏览器关闭操作，准备清除登录信息...');
+
+                    try {
+                        localStorage.removeItem('neuro_learn_auth');
+                        localStorage.removeItem('neuro_learn_full_student_id');
+                        sessionStorage.removeItem('neuro_learn_session');
+
+                        console.log('[Session] ✅ 登录信息已自动清除（用户:', user.username, '）');
+                    } catch (err) {
+                        console.error('[Session] ❌ 清除登录信息失败:', err);
+                    }
+                } else {
+                    console.log('[Session] 📝 检测到页面刷新/导航，保留登录信息');
+                }
+            }
+        });
+
+        // 监听浏览器标签页可见性变化
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                var user = getAuthUser();
+                if (user) {
+                    sessionStorage.setItem('neuro_learn_last_active', Date.now().toString());
+                }
+            }
+        });
+
+        window.addEventListener('message', function(e) {
+            var allowedOrigins = [location.origin];
+            if (e.origin && allowedOrigins.indexOf(e.origin) === -1) return;
+
+            var data = e.data;
+            if (!data || typeof data !== 'object') return;
+            if (data.type !== 'neuro_interaction') return;
+
+            var user = getAuthUser();
+            if (!user) {
+                console.warn('[postMessage] 收到子页面交互数据，但未检测到登录用户，无法关联身份');
+                return;
+            }
+
+            var payload = {
+                event: data.event || 'behavior',
+                username: user.username,
+                studentId: localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour,
+                studentIdLastFour: user.studentIdLastFour,
+                sessionId: sessionStorage.getItem('neuro_learn_session'),
+                module: data.module || (currentModulePage ? modulePageMap[currentModulePage] : ''),
+                behaviorType: data.behaviorType || '',
+                duration: data.duration || 0,
+                detail: data.detail || '',
+                timestamp: new Date().toISOString(),
+                submitted_at: new Date().toISOString(),
+                source: 'sub_page',
+                originalData: data
+            };
+
+            console.log('[postMessage] 收到子页面交互:', payload);
+
+            fetch('https://qf.kjxs.site/api/IfFvMpIjFHR', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(function(response) {
+                console.log('[postMessage] 数据发送成功, 关联用户:', user.username);
+            }).catch(function(err) {
+                console.log('[postMessage] 数据发送失败:', err);
+            });
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (currentModulePage && moduleVisitStartTime) {
+                var duration = Math.round((Date.now() - moduleVisitStartTime) / 1000);
+                var user = getAuthUser();
+                if (user) {
+                    navigator.sendBeacon('https://qf.kjxs.site/api/IfFvMpIjFHR', JSON.stringify({
+                        event: 'module_leave',
+                        username: user.username,
+                        studentIdLastFour: user.studentIdLastFour,
+                        module: modulePageMap[currentModulePage] || currentModulePage,
+                        duration: duration,
+                        timestamp: new Date().toISOString(),
+                        submitted_at: new Date().toISOString()
+                    }));
+                }
+            }
+        });
+
+        // 打开展厅
+        function openExhibition() {
+            console.log('[Exhibition] ================================');
+            console.log('[Exhibition] 🚀 openExhibition() 被调用');
+            console.log('[Exhibition] ================================');
+
+            var container = document.getElementById('exhibitionContainer');
+            var iframe = document.getElementById('exhibitionFrame');
+            var loading = document.getElementById('exhibitionLoading');
+
+            container.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            loading.style.display = 'block';
+            iframe.classList.remove('loaded');
+
+            console.log('[Exhibition] 🔍 正在获取用户信息...');
+            var user = getAuthUser();
+            console.log('[Exhibition] 👤 getAuthUser() 返回:', user ? user.username : 'null');
+
+            var exhibitUrl = 'https://preview.inibiru.com/creator/custom/index.html?id=87024';
+
+            if (user) {
+                var fullStudentId = localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour;
+                console.log('[Exhibition] ✅ 获取到用户:', user.username, '学号:', fullStudentId);
+
+                // URL已包含?id=87024，使用&拼接其他参数
+                exhibitUrl += '&username=' + encodeURIComponent(user.username) +
+                             '&studentId=' + encodeURIComponent(fullStudentId) +
+                             '&studentIdLastFour=' + encodeURIComponent(user.studentIdLastFour) +
+                             '&sessionId=' + encodeURIComponent(sessionStorage.getItem('neuro_learn_session') || '') +
+                             '&source=main_platform_exhibition';
+
+                console.log('[Exhibition] 📡 准备调用 sendExhibitionEvent("enter", ...)');
+                // 立即发送展厅进入事件到API
+                sendExhibitionEvent('enter', user, fullStudentId);
+                console.log('[Exhibition] 📡 sendExhibitionEvent 调用完成');
+            } else {
+                console.warn('[Exhibition] ⚠️ 未检测到登录用户，展厅将无法关联用户行为');
+            }
+
+            iframe.src = exhibitUrl;
+            console.log('[Exhibition] 🌐 iframe src 已设置:', exhibitUrl.substring(0, 80) + '...');
+
+            iframe.onload = function() {
+                loading.style.display = 'none';
+                iframe.classList.add('loaded');
+                console.log('[Exhibition] ✅ 展厅iframe加载完成');
+            };
+
+            iframe.onerror = function() {
+                loading.innerHTML = '<p>展厅加载失败，请稍后重试</p>';
+                console.error('[Exhibition] ❌ 展厅iframe加载失败');
+            };
+        }
+
+        // 展厅事件发送函数
+        function sendExhibitionEvent(action, user, fullStudentId) {
+            console.log('[Exhibition] 🚀 sendExhibitionEvent被调用，action=' + action);
+
+            if (!user) {
+                console.warn('[Exhibition] ⚠️ 无法发送事件：用户未登录');
+                return;
+            }
+
+            console.log('[Exhibition] ✅ 用户已验证:', user.username);
+
+            var payload = {
+                event: 'exhibition',
+                action: action,
+                username: user.username,
+                studentId: fullStudentId || user.studentIdLastFour,
+                studentIdLastFour: user.studentIdLastFour,
+                sessionId: sessionStorage.getItem('neuro_learn_session'),
+                timestamp: new Date().toISOString(),
+                submitted_at: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                source: 'main_platform_exhibition'
+            };
+
+            console.log('[Exhibition] 📡 准备发送POST请求到 https://qf.kjxs.site/api/IfFvMpIjFHR');
+            console.log('[Exhibition] 📊 Payload:', JSON.stringify(payload));
+
+            fetch('https://qf.kjxs.site/api/IfFvMpIjFHR', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(function(response) {
+                console.log('[Exhibition] 📨 收到响应，状态码:', response.status);
+                if (response.ok) {
+                    console.log('[Exhibition] ✅ ' + action + ' 事件发送成功, 用户:', user.username);
+                    return response.json();
+                } else {
+                    throw new Error('HTTP错误: ' + response.status);
+                }
+            })
+            .then(function(data) {
+                console.log('[Exhibition] 📋 API响应数据:', data);
+            })
+            .catch(function(err) {
+                console.error('[Exhibition] ❌ ' + action + ' 事件发送失败:', err.message);
+            });
+
+            console.log('[Exhibition] ⏳ fetch请求已发起（异步）');
+        }
+
+        // 关闭展厅
+        function closeExhibition() {
+            console.log('[Exhibition] ↩️ 正在关闭虚拟展厅...');
+
+            var container = document.getElementById('exhibitionContainer');
+            var iframe = document.getElementById('exhibitionFrame');
+
+            // 获取用户信息并发送离开事件（在清空iframe之前）
+            var user = getAuthUser();
+            if (user) {
+                var fullStudentId = localStorage.getItem('neuro_learn_full_student_id') || user.studentIdLastFour;
+                sendExhibitionEvent('leave', user, fullStudentId);
+            } else {
+                console.warn('[Exhibition] ⚠️ 关闭展厅时未检测到登录用户');
+            }
+
+            container.classList.remove('active');
+            iframe.src = '';
+            document.body.style.overflow = 'auto';
+
+            console.log('[Exhibition] ✅ 展厅已关闭');
+        }
+
+        // ESC键返回
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                goBack();
+                closeExhibition();
+            }
+        });
+
+        // ========== 扩展应用容器折叠/展开功能 ==========
+        function toggleAppIframe() {
+            var container = document.getElementById('appIframeContainer');
+            var toggle = document.getElementById('appIframeToggle');
+
+            if (container.classList.contains('collapsed')) {
+                container.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            } else {
+                container.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
+        }
+    </script>
+
+    
+    
+
+    
+    <script>
+    (function() {
+        'use strict';
+
+        var AUTH_CONFIG = {
+            STORAGE_KEY: 'neuro_learn_auth',
+            ENCRYPTION_KEY: 'neuro_learn_2026_secure_key',
+            MIN_NAME_LENGTH: 2,
+            MIN_STUDENT_ID_LENGTH: 4,
+            SESSION_DURATION: 24 * 60 * 60 * 1000
+        };
+
+        var CryptoUtils = {
+            stringToBytes: function(str) {
+                return new TextEncoder().encode(str);
+            },
+            bytesToString: function(bytes) {
+                return new TextDecoder().decode(bytes);
+            },
+            bytesToBase64: function(bytes) {
+                var binary = '';
+                for (var i = 0; i < bytes.length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            },
+            base64ToBytes: function(base64) {
+                var binary = atob(base64);
+                var bytes = new Uint8Array(binary.length);
+                for (var i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                return bytes;
+            },
+            encrypt: function(text, key) {
+                if (typeof text !== 'string') return '';
+                var textBytes = this.stringToBytes(text);
+                var keyBytes = this.stringToBytes(key);
+                var encryptedBytes = new Uint8Array(textBytes.length);
+                for (var i = 0; i < textBytes.length; i++) {
+                    encryptedBytes[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+                }
+                return this.bytesToBase64(encryptedBytes);
+            },
+            decrypt: function(encryptedText, key) {
+                if (typeof encryptedText !== 'string') return '';
+                try {
+                    var encryptedBytes = this.base64ToBytes(encryptedText);
+                    var keyBytes = this.stringToBytes(key);
+                    var decryptedBytes = new Uint8Array(encryptedBytes.length);
+                    for (var i = 0; i < encryptedBytes.length; i++) {
+                        decryptedBytes[i] = encryptedBytes[i] ^ keyBytes[i % keyBytes.length];
+                    }
+                    return this.bytesToString(decryptedBytes);
+                } catch (e) {
+                    return '';
+                }
+            }
+        };
+
+        var SecurityUtils = {
+            escapeHtml: function(text) {
+                if (typeof text !== 'string') return '';
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            isSafeInput: function(text) {
+                if (typeof text !== 'string') return false;
+                var patterns = [
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    /javascript:/gi,
+                    /on\w+\s*=/gi,
+                    /<iframe/gi,
+                    /<object/gi,
+                    /<embed/gi
+                ];
+                return !patterns.some(function(p) { return p.test(text); });
+            },
+            hashString: function(str) {
+                var hash = 0;
+                for (var i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(16);
+            }
+        };
+
+        var AuthManager = {
+            getAuthData: function() {
+                try {
+                    var encrypted = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY);
+                    if (!encrypted) return null;
+                    var decrypted = CryptoUtils.decrypt(encrypted, AUTH_CONFIG.ENCRYPTION_KEY);
+                    var data = JSON.parse(decrypted);
+                    if (data.timestamp && (Date.now() - data.timestamp > AUTH_CONFIG.SESSION_DURATION)) {
+                        this.clearAuth();
+                        return null;
+                    }
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            },
+            saveAuth: function(username, studentId) {
+                try {
+                    var lastFour = studentId.slice(-4);
+                    var sessionId = SecurityUtils.hashString(username + studentId + Date.now());
+                    var authData = {
+                        username: SecurityUtils.escapeHtml(username),
+                        studentIdLastFour: lastFour,
+                        timestamp: Date.now(),
+                        sessionId: sessionId
+                    };
+                    var encrypted = CryptoUtils.encrypt(JSON.stringify(authData), AUTH_CONFIG.ENCRYPTION_KEY);
+                    localStorage.setItem(AUTH_CONFIG.STORAGE_KEY, encrypted);
+                    sessionStorage.setItem('neuro_learn_session', sessionId);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+            clearAuth: function() {
+                localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY);
+                sessionStorage.removeItem('neuro_learn_session');
+            },
+            isLoggedIn: function() {
+                return this.getAuthData() !== null;
+            },
+            getCurrentUser: function() {
+                var data = this.getAuthData();
+                if (!data) return null;
+                return { username: data.username, studentIdLastFour: data.studentIdLastFour };
+            }
+        };
+
+        var Validator = {
+            validateName: function(name) {
+                var errors = [];
+                if (!name || name.trim() === '') {
+                    errors.push('用户名不能为空');
+                    return errors;
+                }
+                var trimmed = name.trim();
+                if (trimmed.length < AUTH_CONFIG.MIN_NAME_LENGTH) {
+                    errors.push('用户名不能少于' + AUTH_CONFIG.MIN_NAME_LENGTH + '个字符');
+                }
+                if (!SecurityUtils.isSafeInput(trimmed)) {
+                    errors.push('用户名包含非法字符');
+                }
+                var validPattern = /^[\u4e00-\u9fa5a-zA-Z\s\-\.·'_]+$/;
+                if (!validPattern.test(trimmed)) {
+                    errors.push('用户名只能包含中文、英文及常见符号');
+                }
+                return errors;
+            },
+            validateStudentId: function(studentId) {
+                var errors = [];
+                if (!studentId || studentId.trim() === '') {
+                    errors.push('密码（学号）不能为空');
+                    return errors;
+                }
+                var trimmed = studentId.trim();
+                if (!/^\d+$/.test(trimmed)) {
+                    errors.push('密码（学号）只能包含数字');
+                }
+                if (trimmed.length < AUTH_CONFIG.MIN_STUDENT_ID_LENGTH) {
+                    errors.push('密码（学号）不能少于' + AUTH_CONFIG.MIN_STUDENT_ID_LENGTH + '位数字');
+                }
+                if (!SecurityUtils.isSafeInput(trimmed)) {
+                    errors.push('密码（学号）包含非法字符');
+                }
+                return errors;
+            }
+        };
+
+        var LoginUI = {
+            isSubmitting: false,
+
+            show: function() {
+                var modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(function() {
+                        var nameInput = document.getElementById('studentName');
+                        if (nameInput) nameInput.focus();
+                    }, 100);
+                }
+            },
+
+            hide: function() {
+                var modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+                this.setLoading(false);
+            },
+
+            setLoading: function(loading) {
+                this.isSubmitting = loading;
+                var submitBtn = document.getElementById('loginSubmit');
+                if (!submitBtn) return;
+                var text = submitBtn.querySelector('.submit-text');
+                var spinner = submitBtn.querySelector('.submit-loading');
+                if (loading) {
+                    submitBtn.disabled = true;
+                    text.style.display = 'none';
+                    spinner.style.display = 'inline-flex';
+                } else {
+                    submitBtn.disabled = false;
+                    text.style.display = 'inline';
+                    spinner.style.display = 'none';
+                }
+            },
+
+            showError: function(message) {
+                var errorDiv = document.getElementById('loginError');
+                if (errorDiv) {
+                    errorDiv.innerHTML = '⚠️ ' + message;
+                    errorDiv.style.display = 'block';
+                }
+                var loginBox = document.querySelector('.login-box');
+                if (loginBox) {
+                    loginBox.classList.add('shake');
+                    setTimeout(function() { loginBox.classList.remove('shake'); }, 500);
+                }
+            },
+
+            clearError: function() {
+                var errorDiv = document.getElementById('loginError');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.innerHTML = '';
+                }
+            },
+
+            updateUserInfo: function() {
+                var user = AuthManager.getCurrentUser();
+                if (!user) return;
+                var userBar = document.getElementById('userInfoBar');
+                if (!userBar) {
+                    userBar = document.createElement('div');
+                    userBar.id = 'userInfoBar';
+                    userBar.className = 'user-info-bar';
+                    var header = document.querySelector('header');
+                    if (header) {
+                        header.style.position = 'relative';
+                        header.appendChild(userBar);
+                    }
+                }
+                userBar.innerHTML = '<div class="user-info-content">' +
+                    '<span class="user-avatar">👤</span>' +
+                    '<span class="user-name">' + user.username + '</span>' +
+                    '<span class="user-id">学号后四位: ' + user.studentIdLastFour + '</span>' +
+                    '<button class="logout-btn" id="logoutBtn">退出</button>' +
+                    '</div>';
+                var logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function() {
+                        if (confirm('确定要退出登录吗？')) {
+                            AuthManager.clearAuth();
+                            location.reload();
+                        }
+                    });
+                }
+            }
+        };
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            if (LoginUI.isSubmitting) return;
+
+            var nameInput = document.getElementById('studentName');
+            var idInput = document.getElementById('studentId');
+            var name = nameInput.value.trim();
+            var studentId = idInput.value.trim();
+
+            var nameErrors = Validator.validateName(name);
+            var idErrors = Validator.validateStudentId(studentId);
+            var allErrors = nameErrors.concat(idErrors);
+
+            if (allErrors.length > 0) {
+                LoginUI.showError(allErrors.join('<br>'));
+                return;
+            }
+
+            LoginUI.setLoading(true);
+
+            setTimeout(function() {
+                if (AuthManager.saveAuth(name, studentId)) {
+                    localStorage.setItem('neuro_learn_full_student_id', studentId);
+                    LoginUI.hide();
+                    LoginUI.updateUserInfo();
+                    sendLoginDataToAPI(name, studentId);
+
+                    console.log('[Auth] ✅ 登录成功 - 用户:', name, '完整学号:', studentId);
+                    console.log('[Auth] 📊 准备发送登录后的页面访问数据...');
+
+                    window.dispatchEvent(new CustomEvent('loginSuccess', {
+                        detail: AuthManager.getCurrentUser()
+                    }));
+
+                    setTimeout(function() {
+                        sendDataToAPI('index.html', '神经系统交互学习平台-主页面');
+                        console.log('[Auth] ✅ 登录后的页面访问数据已发送');
+                    }, 800);
+
+                    var redirectUrl = sessionStorage.getItem('login_redirect');
+                    if (redirectUrl) {
+                        sessionStorage.removeItem('login_redirect');
+                        var redirectMatch = redirectUrl.match(/['"](.+?)['"]/);
+                        if (redirectMatch) {
+                            setTimeout(function() {
+                                loadPage(redirectMatch[1], '', '');
+                            }, 300);
+                        }
+                    }
+                } else {
+                    LoginUI.showError('登录失败，请稍后重试');
+                    LoginUI.setLoading(false);
+                }
+            }, 800);
+        }
+
+        function sendLoginDataToAPI(username, studentId) {
+            var postData = {
+                event: 'login',
+                username: username,
+                studentIdLastFour: studentId.slice(-4),
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            };
+            fetch('https://qf.kjxs.site/api/IfFvMpIjFHR', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(postData)
+            }).catch(function(error) {
+                console.log('[Auth] 登录数据发送失败:', error);
+            });
+        }
+
+        function interceptNavigation() {
+            var cards = document.querySelectorAll('.card');
+            cards.forEach(function(card) {
+                var originalOnClick = card.getAttribute('onclick');
+                if (originalOnClick && originalOnClick.indexOf('loadPage') !== -1) {
+                    card.setAttribute('data-original-onclick', originalOnClick);
+                    card.removeAttribute('onclick');
+                    card.addEventListener('click', function(e) {
+                        if (!AuthManager.isLoggedIn()) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            var match = originalOnClick.match(/loadPage\(['"](.+?)['"]/);
+                            if (match) {
+                                sessionStorage.setItem('login_redirect', match[1]);
+                            }
+                            LoginUI.show();
+                        } else {
+                            eval(originalOnClick);
+                        }
+                    });
+                }
+            });
+
+            var exhibitionBtn = document.querySelector('.exhibition-btn-center');
+            if (exhibitionBtn) {
+                exhibitionBtn.removeAttribute('onclick');
+                exhibitionBtn.addEventListener('click', function(e) {
+                    // 使用getAuthUser检查登录状态，不依赖AuthManager
+                    var user = getAuthUser();
+                    if (!user) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('[Exhibition] ⚠️ 用户未登录，显示登录窗口');
+                        // 触发登录窗口显示
+                        var loginModal = document.getElementById('loginModal');
+                        if (loginModal) {
+                            loginModal.style.display = 'block';
+                        }
+                    } else {
+                        console.log('[Exhibition] ✅ 用户已登录，打开展厅:', user.username);
+                        openExhibition();
+                    }
+                });
+            }
+        }
+
+        function initLogin() {
+            var form = document.getElementById('loginForm');
+            var nameInput = document.getElementById('studentName');
+            var idInput = document.getElementById('studentId');
+
+            if (form) {
+                form.addEventListener('submit', handleLoginSubmit);
+            }
+
+            if (nameInput) {
+                nameInput.addEventListener('input', function() { LoginUI.clearError(); });
+                nameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); idInput.focus(); }
+                });
+            }
+
+            if (idInput) {
+                idInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^\d]/g, '');
+                    LoginUI.clearError();
+                });
+            }
+
+            if (!AuthManager.isLoggedIn()) {
+                LoginUI.show();
+            } else {
+                LoginUI.updateUserInfo();
+            }
+
+            interceptNavigation();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLogin);
+        } else {
+            initLogin();
+        }
+
+        window.LoginManager = {
+            showLogin: function() { LoginUI.show(); },
+            hideLogin: function() { LoginUI.hide(); },
+            logout: function() {
+                if (confirm('确定要退出登录吗？')) {
+                    AuthManager.clearAuth();
+                    location.reload();
+                }
+            },
+            isLoggedIn: function() { return AuthManager.isLoggedIn(); },
+            getCurrentUser: function() { return AuthManager.getCurrentUser(); }
+        };
+    })();
+    </script>
+</body>
+</html>

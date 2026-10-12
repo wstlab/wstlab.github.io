@@ -1,0 +1,12 @@
+{
+  "id": "case-38",
+  "title": "第20课 反馈控制有算法（5 课时）",
+  "category": "simulation",
+  "description": "经历算法诊断、阈值判断、自主仿真和反思，比较反馈控制的设计思路。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 38,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

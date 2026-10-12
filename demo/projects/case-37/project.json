@@ -1,0 +1,12 @@
+{
+  "id": "case-37",
+  "title": "编码与解码的应用（4 课时）",
+  "category": "programming",
+  "description": "依次体验计算机、图像、声音和文字符号编码，保存各课时的学习证据。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 37,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

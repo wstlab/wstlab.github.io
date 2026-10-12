@@ -1,0 +1,12 @@
+{
+  "id": "case-28",
+  "title": "学习笔记协作",
+  "category": "creation",
+  "description": "共学笔记工作室：围绕笔记标题、笔记、交流开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "跨学科"
+  ],
+  "order": 28,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

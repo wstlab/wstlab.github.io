@@ -1,0 +1,12 @@
+{
+  "id": "case-60",
+  "title": "HTML 代码拖拖乐（叠滘龙舟）",
+  "category": "programming",
+  "description": "龙舟代码构建图：围绕得分、正确槽位、题目数开展交互学习，在数据大屏中回看记录。",
+  "subjects": [
+    "信息科技"
+  ],
+  "order": 60,
+  "app": "index.html",
+  "dashboard": "dashboard.html"
+}

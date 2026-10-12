@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/config.js"></script><script src="/projects/shared/transport.js"></script><script>window.CASE={"id":37,"key":"case-37","title":"编码与解码的应用（4 课时）","category":"programming","description":"依次体验计算机、图像、声音和文字符号编码，保存各课时的学习证据。","headline":"编码作品实验室","view":"flow","fields":[{"key":"totalScore","label":"总分"},{"key":"taskAnswers","label":"编码答案"},{"key":"retries","label":"尝试次数"},{"key":"pixelData","label":"像素编码"}],"upload":"image","rebuilt":false,"configIds":[],"pages":[{"file":"index.html","title":"① 计算机编码之旅"},{"file":"lesson-2.html","title":"② 图像编码设计师"},{"file":"lesson-3.html","title":"③ 声音编码设计师"},{"file":"lesson-4.html","title":"④ 文字符号编码设计师"}],"tasks":{"records":"TR2T7uOoqYR"},"mapping":{"6r3hj8caqg":"TR2T7uOoqYR"},"accent":"#416d89","capture":true,"lesson":"③ 声音编码设计师"};</script><script src="/projects/shared/case-runtime.js"></script><link rel="stylesheet" href="/projects/shared/case-polish.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>声音编码设计师 - 编码大师挑战</title>
+    <style>
+       {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary-light: #F5E8C8;
+            --primary-medium: #E6D5B8;
+            --primary-dark: #D4C1A7;
+            --accent-orange: #D2691E;
+            --accent-gold: #D4A76A;
+            --accent-cream: #FFF9E6;
+            --text-dark: #5C4B37;
+            --text-medium: #8B7355;
+            --text-light: #3C2A21;
+            --background-light: #FFFDF5;
+            --background-medium: #F9F5EB;
+            --background-dark: #F0E6D6;
+            --success-color: #8F7B5E;
+            --warning-color: #B5651D;
+            --border-color: #D4C1A7;
+        }
+        
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(245, 232, 200, 0.9) 0%, rgba(245, 232, 200, 0.7) 90%),
+                radial-gradient(circle at 90% 80%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--background-medium);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent-orange), var(--accent-gold), var(--accent-orange));
+            border-radius: 15px 15px 0 0;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: var(--text-light);
+            border-left: 5px solid var(--accent-orange);
+            padding-left: 20px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .subhead {
+            color: var(--text-medium);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            padding-left: 25px;
+        }
+        
+        .card {
+            background: var(--background-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(210, 105, 30, 0.1);
+            border-color: var(--accent-orange);
+        }
+        
+        .card h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .binary-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .binary-input {
+            font-family: monospace;
+            font-size: 1.2rem;
+            padding: 10px;
+            width: 220px;
+            border: 2px solid var(--accent-gold);
+            border-radius: 8px;
+            background: var(--background-light);
+            color: var(--text-light);
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        .binary-input:focus {
+            border-color: var(--accent-orange);
+            outline: none;
+            box-shadow: 0 0 5px rgba(210, 105, 30, 0.3);
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, var(--accent-orange), var(--primary-dark));
+            color: var(--accent-cream);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--primary-medium));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(210, 105, 30, 0.2);
+        }
+        
+        .btn-small {
+            padding: 6px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .result-area {
+            background: var(--background-dark);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent-orange);
+            font-family: monospace;
+        }
+        
+        .custom-rule {
+            background: #FFF9E6;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px dashed var(--accent-gold);
+        }
+        
+        .cipher-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .cipher-item {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .cipher-item span {
+            font-weight: bold;
+            color: var(--accent-orange);
+        }
+        
+        .cipher-item input {
+            width: 100px;
+            padding: 4px;
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .note {
+            background: var(--background-dark);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-top: 15px;
+        }
+        
+        .flex-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--success-color);
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-back:hover {
+            background: #7a684c;
+            transform: translateY(-2px);
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-color), transparent);
+            margin: 25px 0;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--background-light);
+            font-family: monospace;
+            resize: vertical;
+        }
+        
+        @media (max-width: 650px) {
+            body { padding: 15px; }
+            .container { padding: 20px; }
+            .binary-input { width: 180px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎵 声音编码设计师</h1>
+    <div class="subhead">从简单节奏到声音密语 · 用声音传递文字信息</div>
+    
+    
+    <div class="card">
+        <h2>📢 挑战一 · 二进制节奏</h2>
+        <p style="margin-bottom: 10px;">编码规则：<strong>1 = 发出“叮”声，0 = 空拍</strong>。输入8位二进制，播放你的节奏。</p>
+        <div class="binary-row">
+            <input type="text" id="basicCode" class="binary-input" maxlength="8" placeholder="例如 10101010" value="10101010">
+            <button class="btn" onclick="playBasicRhythm()">▶ 播放节奏</button>
+        </div>
+        <div id="basicResult" class="result-area" style="display: none;"></div>
+        <div class="note">
+            💡 提示：试试 <code>11110000</code>（四声连响后四空拍），或 <code>10001000</code>（间隔式节奏）。
+        </div>
+    </div>
+    
+    
+    <div class="card">
+        <h2>🚀 挑战二 · 自定义音高编码</h2>
+        <p>用两位二进制表示四种音高（或休止），创造旋律！</p>
+        <div class="custom-rule">
+            <div style="margin-bottom: 10px; font-weight: bold;">🎛️ 编码规则（可修改）：</div>
+            <div class="binary-row">
+                <label>00 →</label>
+                <select id="code00">
+                    <option value="rest">休止</option>
+                    <option value="262">低音Do</option><option value="294">中音Re</option>
+                    <option value="330">中音Mi</option><option value="349">中音Fa</option>
+                    <option value="392">中音Sol</option><option value="440">中音La</option>
+                    <option value="494">中音Si</option><option value="523">高音Do</option>
+                </select>
+                <label>01 →</label>
+                <select id="code01">
+                    <option value="rest">休止</option>
+                    <option value="262">低音Do</option><option value="294" selected>中音Re</option>
+                    <option value="330">中音Mi</option><option value="349">中音Fa</option>
+                    <option value="392">中音Sol</option><option value="440">中音La</option>
+                    <option value="494">中音Si</option><option value="523">高音Do</option>
+                </select>
+                <label>10 →</label>
+                <select id="code10">
+                    <option value="rest">休止</option>
+                    <option value="262">低音Do</option><option value="294">中音Re</option>
+                    <option value="330" selected>中音Mi</option><option value="349">中音Fa</option>
+                    <option value="392">中音Sol</option><option value="440">中音La</option>
+                    <option value="494">中音Si</option><option value="523">高音Do</option>
+                </select>
+                <label>11 →</label>
+                <select id="code11">
+                    <option value="rest">休止</option>
+                    <option value="262">低音Do</option><option value="294">中音Re</option>
+                    <option value="330">中音Mi</option><option value="349">中音Fa</option>
+                    <option value="392">中音Sol</option><option value="440" selected>中音La</option>
+                    <option value="494">中音Si</option><option value="523">高音Do</option>
+                </select>
+            </div>
+        </div>
+        <p>输入二进制序列（长度偶数）：</p>
+        <div class="binary-row">
+            <input type="text" id="advancedCode" class="binary-input" placeholder="例如 00011011" value="00011011">
+            <button class="btn" onclick="playAdvancedMelody()">▶ 播放旋律</button>
+            <button class="btn btn-small" onclick="exampleMelody()">🎼 示例旋律</button>
+        </div>
+        <div id="advancedResult" class="result-area" style="display: none;"></div>
+    </div>
+    
+    
+    <div class="card">
+        <h2>🔐 挑战三 · 声音密语</h2>
+        <p>设计你的“声音密码本”：为每个字母或汉字分配一段独特的声音模式，实现声音传信！</p>
+        
+        <div class="custom-rule">
+            <div style="font-weight: bold; margin-bottom: 10px;">📖 声音-文字映射表（可编辑）</div>
+            <p style="font-size: 0.85rem; margin-bottom: 8px;">每个字符对应一段由 <strong>0(空拍)</strong> 和 <strong>1(叮声)</strong> 组成的节奏模式（最多6位）。播放时连续发出，字符间用短暂停顿分隔。</p>
+            <div id="cipherPanel" class="cipher-table">
+                
+            </div>
+            <div class="flex-buttons">
+                <button class="btn btn-small" onclick="addCustomChar()">➕ 添加新字符</button>
+                <button class="btn btn-small" onclick="resetDefaultCipher()">↺ 重置默认密码本</button>
+            </div>
+        </div>
+        
+        <p>✏️ 输入你想用声音表达的文字（支持字母和汉字，按当前映射表转换）：</p>
+        <textarea id="textToEncode" rows="2" placeholder="例如：HELLO 或 你好世界"></textarea>
+        <div class="binary-row">
+            <button class="btn" onclick="encodeAndPlayText()">🔊 播放声音密语</button>
+            <button class="btn btn-small" onclick="showEncodedPattern()">📋 查看编码序列</button>
+        </div>
+        <div id="voiceResult" class="result-area" style="display: none;"></div>
+        <div class="note">
+            ✨ 进阶玩法：修改映射表，让每个字符对应独特的节奏（例如“A”=1010，“我”=111000）。然后输入一句话，听声音猜文字！你可以把密码本分享给同学，互相发送“声音密信”。
+        </div>
+    </div>
+    
+    <hr>
+    <div style="text-align: center;">
+        <a href="index.html" class="btn btn-back" style="text-decoration: none;">← 返回主页面</a>
+    </div>
+</div>
+
+<script>
+    // ========== 公共音频播放函数 ==========
+    let audioCtx = null;
+    function playTone(frequency, duration, volume = 0.25) {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const resumePlay = () => {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = frequency;
+            gain.gain.value = volume;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
+            osc.stop(now + duration);
+        };
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().then(resumePlay);
+        } else {
+            resumePlay();
+        }
+    }
+    
+    function playSilence(duration) {
+        // 空拍：静音，仅延迟
+        return new Promise(resolve => setTimeout(resolve, duration * 1000));
+    }
+    
+    // ========== 挑战一 ==========
+    function playBasicRhythm() {
+        let code = document.getElementById('basicCode').value.trim();
+        const resultDiv = document.getElementById('basicResult');
+        if (!/^[01]{8}$/.test(code)) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '❌ 请输入8位二进制（只包含0和1）';
+            return;
+        }
+        let visual = code.replace(/1/g, '🔔 ').replace(/0/g, '⏸️ ');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `🎶 播放中：${visual}<br>（每拍间隔0.4秒）`;
+        const beats = code.split('');
+        let idx = 0;
+        function step() {
+            if (idx >= beats.length) {
+                resultDiv.innerHTML = `✅ 播放完成！编码：${code}<br>${visual}`;
+                return;
+            }
+            if (beats[idx] === '1') playTone(880, 0.3);
+            idx++;
+            setTimeout(step, 400);
+        }
+        step();
+    }
+    
+    // ========== 挑战二 ==========
+    function getCustomMapping() {
+        return {
+            '00': document.getElementById('code00').value,
+            '01': document.getElementById('code01').value,
+            '10': document.getElementById('code10').value,
+            '11': document.getElementById('code11').value
+        };
+    }
+    
+    function playAdvancedMelody() {
+        let binarySeq = document.getElementById('advancedCode').value.trim();
+        const resultDiv = document.getElementById('advancedResult');
+        if (binarySeq.length === 0 || binarySeq.length % 2 !== 0 || !/^[01]+$/.test(binarySeq)) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '❌ 请输入偶数位二进制序列';
+            return;
+        }
+        const pairs = [];
+        for (let i = 0; i < binarySeq.length; i += 2) pairs.push(binarySeq.substr(i,2));
+        const mapping = getCustomMapping();
+        const notes = [];
+        for (let p of pairs) {
+            if (!mapping[p]) { resultDiv.innerHTML = `❌ 无效片段：${p}`; return; }
+            notes.push(mapping[p]);
+        }
+        let description = '';
+        for (let i=0;i<pairs.length;i++) {
+            let val = notes[i];
+            let name = (val==='rest')?'休止':(getFreqName(val));
+            description += `${pairs[i]}→${name} `;
+        }
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `🎼 播放自定义旋律...<br>📝 ${description}`;
+        let idx = 0;
+        function playNext() {
+            if (idx >= notes.length) {
+                resultDiv.innerHTML = `✅ 播放完成！<br>📝 ${description}`;
+                return;
+            }
+            let note = notes[idx];
+            if (note !== 'rest') playTone(parseFloat(note), 0.4);
+            idx++;
+            setTimeout(playNext, 450);
+        }
+        playNext();
+    }
+    
+    function getFreqName(val) {
+        const map = {262:'低Do',294:'中Re',330:'中Mi',349:'中Fa',392:'中Sol',440:'中La',494:'中Si',523:'高Do'};
+        return map[parseFloat(val)] || val;
+    }
+    
+    function exampleMelody() {
+        document.getElementById('advancedCode').value = '11111010010100';
+        playAdvancedMelody();
+    }
+    
+    // ========== 挑战三：声音密语（声音代表文字） ==========
+    // 默认密码本（字符→二进制节奏模式，最长6位）
+    let soundCipher = {
+        'A': '101', 'B': '1101', 'C': '1000', 'D': '1001', 'E': '10',
+        'F': '1110', 'G': '1100', 'H': '1010', 'I': '1011', 'J': '1111',
+        'K': '10001', 'L': '10010', 'M': '10011', 'N': '10101', 'O': '10110',
+        'P': '10111', 'Q': '11001', 'R': '11010', 'S': '11011', 'T': '11100',
+        'U': '11101', 'V': '11110', 'W': '11111', 'X': '100001', 'Y': '100010', 'Z': '100011',
+        '你': '101010', '我': '101011', '他': '101100', '好': '101101', '吗': '101110'
+    };
+    
+    // 渲染密码本编辑界面
+    function renderCipherTable() {
+        const container = document.getElementById('cipherPanel');
+        container.innerHTML = '';
+        for (let [char, pattern] of Object.entries(soundCipher)) {
+            const div = document.createElement('div');
+            div.className = 'cipher-item';
+            div.innerHTML = `
+                <span>${char}</span>
+                <input type="text" class="cipher-pattern" data-char="${char}" value="${pattern}" maxlength="8" placeholder="二进制">
+                <button class="btn-small" onclick="removeChar('${char}')" style="background:#B5651D; padding:2px 8px;">🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+        // 绑定输入事件
+        document.querySelectorAll('.cipher-pattern').forEach(inp => {
+            inp.addEventListener('change', function(e) {
+                let ch = this.dataset.char;
+                let newPattern = this.value.trim();
+                if (/^[01]+$/.test(newPattern) && newPattern.length <= 8) {
+                    soundCipher[ch] = newPattern;
+                } else {
+                    alert('请输入只包含0和1的编码，长度不超过8位');
+                    this.value = soundCipher[ch];
+                }
+            });
+        });
+    }
+    
+    function addCustomChar() {
+        let newChar = prompt('请输入新字符（单个字母或汉字）:');
+        if (!newChar) return;
+        if (soundCipher[newChar]) {
+            alert('该字符已存在，请删除后重新添加');
+            return;
+        }
+        let defaultPattern = prompt('请输入对应的二进制节奏（例如 1010）:', '1010');
+        if (!defaultPattern || !/^[01]+$/.test(defaultPattern)) {
+            alert('无效的二进制序列');
+            return;
+        }
+        soundCipher[newChar] = defaultPattern;
+        renderCipherTable();
+    }
+    
+    function removeChar(char) {
+        delete soundCipher[char];
+        renderCipherTable();
+    }
+    
+    function resetDefaultCipher() {
+        soundCipher = {
+            'A': '101', 'B': '1101', 'C': '1000', 'D': '1001', 'E': '10',
+            'F': '1110', 'G': '1100', 'H': '1010', 'I': '1011', 'J': '1111',
+            'K': '10001', 'L': '10010', 'M': '10011', 'N': '10101', 'O': '10110',
+            'P': '10111', 'Q': '11001', 'R': '11010', 'S': '11011', 'T': '11100',
+            'U': '11101', 'V': '11110', 'W': '11111', 'X': '100001', 'Y': '100010', 'Z': '100011',
+            '你': '101010', '我': '101011', '他': '101100', '好': '101101', '吗': '101110'
+        };
+        renderCipherTable();
+    }
+    
+    async function encodeAndPlayText() {
+        let text = document.getElementById('textToEncode').value;
+        const resultDiv = document.getElementById('voiceResult');
+        if (!text.trim()) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '❌ 请输入文字';
+            return;
+        }
+        // 将文字转换为大写字母（简单处理），汉字直接匹配
+        let upperText = text.toUpperCase();
+        let patterns = [];
+        let unknownChars = [];
+        for (let ch of upperText) {
+            if (soundCipher[ch]) {
+                patterns.push(soundCipher[ch]);
+            } else {
+                unknownChars.push(ch);
+            }
+        }
+        if (unknownChars.length > 0) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `⚠️ 以下字符未定义声音编码：${unknownChars.join(', ')}<br>请先在密码本中添加它们。`;
+            return;
+        }
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `🔊 播放声音密语：将文字转换为 ${patterns.length} 段声音模式...<br>${patterns.map(p=>`[${p}]`).join(' ')}`;
+        
+        // 顺序播放每个字符的声音模式，字符间停顿0.2秒
+        for (let i=0; i<patterns.length; i++) {
+            await playPattern(patterns[i]);
+            if (i < patterns.length-1) await playSilence(0.2);
+        }
+        resultDiv.innerHTML = `✅ 播放完成！文字“${text}”已通过声音发送。`;
+    }
+    
+    function playPattern(pattern) {
+        return new Promise((resolve) => {
+            const bits = pattern.split('');
+            let idx = 0;
+            function playNext() {
+                if (idx >= bits.length) {
+                    resolve();
+                    return;
+                }
+                if (bits[idx] === '1') {
+                    playTone(880, 0.2); // 短促叮声
+                }
+                idx++;
+                setTimeout(playNext, 250); // 每拍0.25秒
+            }
+            playNext();
+        });
+    }
+    
+    function showEncodedPattern() {
+        let text = document.getElementById('textToEncode').value.toUpperCase();
+        let patterns = [];
+        for (let ch of text) {
+            if (soundCipher[ch]) patterns.push(soundCipher[ch]);
+            else patterns.push('?');
+        }
+        alert(`编码序列：${patterns.join(' ')}`);
+    }
+    
+    // 初始化
+    window.onload = () => {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        renderCipherTable();
+    };
+</script>
+<script src="/projects/shared/case-evidence.js"></script></body>
+</html>
