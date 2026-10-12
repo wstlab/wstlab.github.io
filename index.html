@@ -744,7 +744,7 @@ img { max-width: 100%; display: block; }
           <button class="lang-option active" data-lang="zh" role="menuitem">中文</button>
           <button class="lang-option" data-lang="en" role="menuitem">English</button>
           <button class="lang-option" data-lang="zh_tw" role="menuitem">繁體</button>
-          <button class="lang-option" data-lang="id" role="menuitem">Bahasa Indonesia</button>
+          <button class="lang-option" data-lang="id" role="menuitem">Indonesia</button>
           <button class="lang-option" data-lang="th" role="menuitem">ภาษาไทย</button>
         </div>
       </div>
@@ -1230,7 +1230,7 @@ const applyTranslation = (lang) => {
   }
   
   // 更新语言下拉当前显示与选中状态
-  const langNames = { zh: '中文', en: 'English', zh_tw: '繁體', id: 'Bahasa Indonesia', th: 'ภาษาไทย' };
+  const langNames = { zh: '中文', en: 'English', zh_tw: '繁體', id: 'Indonesia', th: 'ภาษาไทย' };
   const currentLangLabel = document.querySelector('.lang-toggle .current-lang');
   if (currentLangLabel) {
     currentLangLabel.textContent = langNames[lang] || lang;
