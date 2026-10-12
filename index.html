@@ -745,6 +745,7 @@ img { max-width: 100%; display: block; }
           <button class="lang-option" data-lang="en" role="menuitem">English</button>
           <button class="lang-option" data-lang="zh_tw" role="menuitem">繁體</button>
           <button class="lang-option" data-lang="id" role="menuitem">Bahasa Indonesia</button>
+          <button class="lang-option" data-lang="th" role="menuitem">ภาษาไทย</button>
         </div>
       </div>
     </div>
@@ -1202,7 +1203,7 @@ const applyTranslation = (lang) => {
   currentLang = lang;
   
   // 更新HTML语言属性
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'zh_tw' ? 'zh-TW' : lang === 'id' ? 'id' : 'en';
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'zh_tw' ? 'zh-TW' : lang === 'id' ? 'id' : lang === 'th' ? 'th' : 'en';
   
   // 翻译所有带data-key的元素
   document.querySelectorAll('[data-key]').forEach(el => {
@@ -1229,7 +1230,7 @@ const applyTranslation = (lang) => {
   }
   
   // 更新语言下拉当前显示与选中状态
-  const langNames = { zh: '中文', en: 'English', zh_tw: '繁體', id: 'Bahasa Indonesia' };
+  const langNames = { zh: '中文', en: 'English', zh_tw: '繁體', id: 'Bahasa Indonesia', th: 'ภาษาไทย' };
   const currentLangLabel = document.querySelector('.lang-toggle .current-lang');
   if (currentLangLabel) {
     currentLangLabel.textContent = langNames[lang] || lang;
@@ -1256,6 +1257,8 @@ const detectSystemLanguage = () => {
     return 'en';
   } else if (systemLang.startsWith('id')) {
     return 'id';
+  } else if (systemLang.startsWith('th')) {
+    return 'th';
   }
   return 'zh';
 };
