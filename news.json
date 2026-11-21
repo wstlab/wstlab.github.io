@@ -1,5 +1,10 @@
 [
   {
+    "date": "2026-11",
+    "title": "QuickForm教师版3.0发布，支持WebScoket",
+    "content": "QuickForm教师版3.0，支持WebScoket，可以制作实时交互的网页应用，如抢答器、实时知识问答、教学同屏等。"
+  },
+  {
     "date": "2026-10",
     "title": "国家智慧教育教师发展平台收录QuickForm案例",
     "content": "国家智慧教育教师发展平台’AI素养专区‘的’创AI‘中，发表了宁德林晓勇老师撰写的案例《AI赋能学科实验：基于QuickForm+SIoT技术的理化生实验数据实时动态可视化的研究与应用》，详情访问https://jiaoshi.smartedu.cn/"
